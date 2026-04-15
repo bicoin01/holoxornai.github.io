@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flash IA Efeito Tecnológico 3D</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Inclua a biblioteca i18next -->
+    <script src="https://unpkg.com/i18next@21.10.0/dist/umd/i18next.min.js"></script>
+    <script src="https://unpkg.com/i18next-browser-languagedetector@7.0.0/dist/umd/i18nextBrowserLanguageDetector.min.js"></script>
+    <style>
+        /* Estilos gerais */
+        body {
+            margin: 0;
+            overflow: hidden;
+            background: linear-gradient(to right, #6a1e9c, #3f51b5);
+            color: white;
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        header {
+            position: absolute;
+            top: 0;
+            width: 100%;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 10;
+        }
+
+        .logo {
+            width: 150px;
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 100;
+        }
+
+        .menu {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 20px;
+            z-index: 100;
+        }
+
+        .menu a {
+            color: white;
+            text-decoration: none;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .header-title {
+            position: absolute;
+            top: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 70px;
+            font-weight: bold;
+            color: #00ff99;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 5px;
+            text-shadow: 0 0 10px #00ff99, 0 0 20px #00ff99, 0 0 30px #00ff99;
+            animation: fadeIn 2s ease-out, glow 1.5s infinite alternate;
+            z-index: 10;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-50px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes glow {
+            0% { text-shadow: 0 0 10px #00ff99, 0 0 20px #00ff99, 0 0 30px #00ff99; }
+            50% { text-shadow: 0 0 20px #ff00ff, 0 0 40px #ff00ff, 0 0 60px #ff00ff; }
+            100% { text-shadow: 0 0 10px #00ff99, 0 0 20px #00ff99, 0 0 30px #00ff99; }
+        }
+
+        .additional-menu {
+            position: absolute;
+            top: 250px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            z-index: 10;
+            max-width: 90%;
+        }
+
+        .additional-menu a {
+            color: white;
+            text-decoration: none;
+            padding: 8px 15px;
+            border: 2px solid white;
+            border-radius: 20px;
+            font-weight: 700;
+            transition: background-color 0.3s;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .additional-menu a:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .contact-info {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 18px;
+            color: white;
+            text-align: center;
+            font-weight: 700;
+            animation: fadeIn 2s ease-out;
+            z-index: 10;
+        }
+
+        /* Estilo do botão de tradução */
+        .language-selector {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+
+        .language-selector button {
+            background-color: transparent;
+            border: 2px solid #00ff99;
+            color: #00ff99;
+            padding: 8px 16px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 14px;
+            text-transform: uppercase;
+            cursor: pointer;
+            border-radius: 20px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .language-selector button:hover {
+            background-color: #00ff99;
+            color: #000;
+        }
+
+        /* Estilo dos modais */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+
+        .modal-content {
+            background: rgba(0, 0, 0, 0.9);
+            padding: 40px;
+            border-radius: 15px;
+            width: 350px;
+            text-align: center;
+            box-shadow: 0 0 20px rgba(0, 255, 153, 0.5);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .modal-content h2 {
+            margin-bottom: 20px;
+            font-size: 2rem;
+            color: #00ff99;
+            text-shadow: 0 0 10px #00ff99;
+        }
+
+        .modal-content input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 5px;
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 1rem;
+            font-family: 'Orbitron', sans-serif;
+            transition: background-color 0.3s, box-shadow 0.3s;
+        }
+
+        .modal-content input::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+            font-style: italic;
+        }
+
+        .modal-content input:focus {
+            background-color: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 0 10px #00ff99;
+            outline: none;
+        }
+
+        .modal-content button {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            background-color: #6a1e9c;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            font-family: 'Orbitron', sans-serif;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.3s;
+        }
+
+        .modal-content button:hover {
+            background-color: #3f51b5;
+            transform: scale(1.05);
+        }
+
+        .wallet-buttons button {
+            background-color: #f5a623;
+            margin: 5px 0;
+            font-size: 1rem;
+            padding: 10px;
+            width: 100%;
+        }
+
+        .wallet-buttons button:hover {
+            background-color: #d47f20;
+        }
+
+        @media (max-width: 768px) {
+            .header-title { font-size: 40px; top: 80px; }
+            .menu { gap: 10px; top: 10px; }
+            .menu a { font-size: 12px; }
+            .additional-menu { top: 180px; }
+            .additional-menu a { font-size: 10px; padding: 5px 10px; }
+            .contact-info { font-size: 12px; }
+            .modal-content { width: 90%; padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <!-- Logotipo no canto superior esquerdo -->
+        <img src="https://bradicoin.com/wp-content/uploads/2025/02/Screenshot_20250217-154739.png" alt="Logotipo" class="logo">
+        
+        <!-- Menu centralizado -->
+        <div class="menu">
+            <a href="#" id="home-link" data-i18n="menu.home">Home</a>
+            <a href="#" id="login-link" data-i18n="menu.login">Login</a>
+            <a href="#" id="registration-link" data-i18n="menu.registration">Registration</a>
+            <a href="#" id="contact-link" data-i18n="menu.contact">Contact</a>
+        </div>
+    </header>
+
+    <!-- Botão de tradução no canto superior direito -->
+    <div class="language-selector">
+        <button id="language-button">🌐 EN</button>
+    </div>
+
+    <h1 class="header-title" data-i18n="title">Holoxorn</h1>
+
+    <!-- Menu adicional -->
+    <div class="additional-menu">
+        <a href="#" id="about-holoxorn-link" data-i18n="menu.about">About Holoxorn</a>
+        <a href="#" id="holoxorn-projects-link" data-i18n="menu.projects">Holoxorn Projects</a>
+        <a href="#" id="holoxorn-technology-link" data-i18n="menu.technology">Holoxorn Technology</a>
+        <a href="#" id="research-development-link" data-i18n="menu.research">Research and Development</a>
+        <a href="#" id="intelligent-robotics-link" data-i18n="menu.robotics">Intelligent Robotics</a>
+        <a href="#" id="machine-learning-link" data-i18n="menu.machine-learning">Machine Learning</a>
+        <a href="#" id="automation-link" data-i18n="menu.automation">Automation</a>
+        <a href="#" id="ai-innovations-link" data-i18n="menu.innovations">AI Innovations</a>
+    </div>
+
+    <!-- Adicionando informações de contato -->
+    <div class="contact-info">
+        <p data-i18n="contact.info">Contact: <a href="mailto:contact@bradicoin.com" style="color: #00ff99;">contact@bradicoin.com</a></p>
+    </div>
+
+    <!-- Modal de Login -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <h2 data-i18n="login.title">Login</h2>
+            <form id="loginForm">
+                <input type="email" id="email" placeholder="Email" required>
+                <input type="password" id="password" placeholder="Password" required>
+                <button type="submit" data-i18n="login.submit">Enter</button>
+            </form>
+            <div class="wallet-buttons">
+                <button id="metamaskButton" data-i18n="login.metamask">Login with MetaMask</button>
+                <button id="coinbaseButton" data-i18n="login.coinbase">Login with Coinbase</button>
+                <button id="phantomButton" data-i18n="login.phantom">Login with Phantom</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Cadastro -->
+    <div id="registrationModal" class="modal">
+        <div class="modal-content">
+            <h2 data-i18n="registration.title">Sign Up</h2>
+            <form id="registerForm">
+                <input type="email" id="regEmail" placeholder="Email" required>
+                <input type="password" id="regPassword" placeholder="Password" required>
+                <button type="submit" data-i18n="registration.submit">Sign Up</button>
+            </form>
+            <div class="wallet-buttons">
+                <button id="regMetamaskButton" data-i18n="registration.metamask">Sign Up with MetaMask</button>
+                <button id="regCoinbaseButton" data-i18n="registration.coinbase">Sign Up with Coinbase</button>
+                <button id="regPhantomButton" data-i18n="registration.phantom">Sign Up with Phantom</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        // Configuração do i18next
+        const resources = {
+            en: {
+                translation: {
+                    menu: {
+                        home: "Home",
+                        login: "Login",
+                        registration: "Registration",
+                        contact: "Contact",
+                        about: "About Holoxorn",
+                        projects: "Holoxorn Projects",
+                        technology: "Holoxorn Technology",
+                        research: "Research and Development",
+                        robotics: "Intelligent Robotics",
+                        "machine-learning": "Machine Learning",
+                        automation: "Automation",
+                        innovations: "AI Innovations"
+                    },
+                    title: "Holoxorn",
+                    contact: {
+                        info: "Contact: <a href='mailto:contact@bradicoin.com' style='color: #00ff99;'>contact@bradicoin.com</a>"
+                    },
+                    login: {
+                        title: "Login",
+                        submit: "Enter",
+                        metamask: "Login with MetaMask",
+                        coinbase: "Login with Coinbase",
+                        phantom: "Login with Phantom"
+                    },
+                    registration: {
+                        title: "Sign Up",
+                        submit: "Sign Up",
+                        metamask: "Sign Up with MetaMask",
+                        coinbase: "Sign Up with Coinbase",
+                        phantom: "Sign Up with Phantom"
+                    }
+                }
+            },
+            pt: {
+                translation: {
+                    menu: {
+                        home: "Início",
+                        login: "Login",
+                        registration: "Cadastro",
+                        contact: "Contato",
+                        about: "Sobre o Holoxorn",
+                        projects: "Projetos do Holoxorn",
+                        technology: "Tecnologia do Holoxorn",
+                        research: "Pesquisa e Desenvolvimento",
+                        robotics: "Robótica Inteligente",
+                        "machine-learning": "Aprendizado de Máquina",
+                        automation: "Automação",
+                        innovations: "Inovações em IA"
+                    },
+                    title: "Holoxorn",
+                    contact: {
+                        info: "Contato: <a href='mailto:contact@bradicoin.com' style='color: #00ff99;'>contact@bradicoin.com</a>"
+                    },
+                    login: {
+                        title: "Login",
+                        submit: "Entrar",
+                        metamask: "Login com MetaMask",
+                        coinbase: "Login com Coinbase",
+                        phantom: "Login com Phantom"
+                    },
+                    registration: {
+                        title: "Cadastro",
+                        submit: "Cadastrar",
+                        metamask: "Cadastrar com MetaMask",
+                        coinbase: "Cadastrar com Coinbase",
+                        phantom: "Cadastrar com Phantom"
+                    }
+                }
+            }
+        };
+
+        // Inicializar i18next
+        i18next.init({
+            fallbackLng: 'en',
+            debug: false,
+            resources: resources
+        }, function(err, t) {
+            if (err) console.error('i18next error:', err);
+            updateContent();
+        });
+
+        // Função para atualizar o conteúdo da página
+        function updateContent() {
+            document.querySelectorAll('[data-i18n]').forEach(element => {
+                const key = element.getAttribute('data-i18n');
+                const translatedText = i18next.t(key);
+                if (translatedText && translatedText !== key) {
+                    if (element.innerHTML.includes('href=')) {
+                        // Preservar links HTML
+                        const originalHtml = element.innerHTML;
+                        const textOnly = translatedText;
+                        element.innerHTML = originalHtml.replace(/[^<]*/, textOnly);
+                    } else {
+                        element.innerHTML = translatedText;
+                    }
+                }
+            });
+        }
+
+        // Evento de mudança no botão de idiomas
+        const languageButton = document.getElementById('language-button');
+        const languages = ['en', 'pt'];
+        let currentLanguageIndex = 0;
+
+        languageButton.addEventListener('click', () => {
+            currentLanguageIndex = (currentLanguageIndex + 1) % languages.length;
+            const selectedLanguage = languages[currentLanguageIndex];
+            i18next.changeLanguage(selectedLanguage, () => {
+                updateContent();
+                languageButton.textContent = `🌐 ${selectedLanguage.toUpperCase()}`;
+            });
+        });
+
+        // Abrir modal de login
+        const loginLink = document.getElementById('login-link');
+        const loginModal = document.getElementById('loginModal');
+
+        if(loginLink) {
+            loginLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                loginModal.style.display = 'flex';
+            });
+        }
+
+        // Abrir modal de cadastro
+        const registrationLink = document.getElementById('registration-link');
+        const registrationModal = document.getElementById('registrationModal');
+
+        if(registrationLink) {
+            registrationLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                registrationModal.style.display = 'flex';
+            });
+        }
+
+        // Fechar modais ao clicar fora
+        const modals = document.querySelectorAll('.modal');
+        modals.forEach(modal => {
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.style.display = 'none';
+                }
+            });
+        });
+
+        // Função para mostrar alertas seguros
+        function showMessage(message, isError = false) {
+            alert(message);
+        }
+
+        // Login com email
+        const loginForm = document.getElementById('loginForm');
+        if(loginForm) {
+            loginForm.addEventListener('submit', function(event) {
+                event.preventDefault();
+                const email = document.getElementById('email').value;
+                const password = document.getElementById('password').value;
+
+                if (email && password) {
+                    const savedEmail = localStorage.getItem('userEmail');
+                    const savedPassword = localStorage.getItem('userPassword');
+                    
+                    if (savedEmail === email && savedPassword === password) {
+                        showMessage('Login realizado com sucesso!');
+                        loginModal.style.display = 'none';
+                    } else {
+                        showMessage('Email ou senha incorretos!', true);
+                    }
+                } else {
+                    showMessage('Por favor, preencha todos os campos.', true);
+                }
+            });
+        }
+
+        // Cadastro com email
+        const registerForm = document.getElementById('registerForm');
+        if(registerForm) {
+            registerForm.addEventListener('submit', function(event) {
+                event.preventDefault();
+                const email = document.getElementById('regEmail').value;
+                const password = document.getElementById('regPassword').value;
+
+                if (email && password) {
+                    localStorage.setItem('userEmail', email);
+                    localStorage.setItem('userPassword', password);
+                    showMessage('Cadastro realizado com sucesso!');
+                    registrationModal.style.display = 'none';
+                } else {
+                    showMessage('Por favor, preencha todos os campos.', true);
+                }
+            });
+        }
+
+        // MetaMask - Cadastro
+        const regMetamaskButton = document.getElementById('regMetamaskButton');
+        if(regMetamaskButton) {
+            regMetamaskButton.addEventListener('click', async function() {
+                if (typeof window.ethereum !== 'undefined') {
+                    try {
+                        const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
+                        const userAddress = accounts[0];
+                        showMessage(`Cadastro com MetaMask realizado! Endereço: ${userAddress.substring(0,10)}...`);
+                        registrationModal.style.display = 'none';
+                    } catch (error) {
+                        console.error(error);
+                        showMessage('Falha ao cadastrar com MetaMask.', true);
+                    }
+                } else {
+                    showMessage('MetaMask não está instalado. Instale a extensão MetaMask.', true);
+                }
+            });
+        }
+
+        // MetaMask - Login
+        const metamaskButton = document.getElementById('metamaskButton');
+        if(metamaskButton) {
+            metamaskButton.addEventListener('click', async function() {
+                if (typeof window.ethereum !== 'undefined') {
+                    try {
+                        const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
+                        const userAddress = accounts[0];
+                        showMessage(`Login com MetaMask realizado! Endereço: ${userAddress.substring(0,10)}...`);
+                        loginModal.style.display = 'none';
+                    } catch (error) {
+                        console.error(error);
+                        showMessage('Falha ao fazer login com MetaMask.', true);
+                    }
+                } else {
+                    showMessage('MetaMask não está instalado. Instale a extensão MetaMask.', true);
+                }
+            });
+        }
+
+        // Phantom - Cadastro
+        const regPhantomButton = document.getElementById('regPhantomButton');
+        if(regPhantomButton) {
+            regPhantomButton.addEventListener('click', async function() {
+                if (window.solana && window.solana.isPhantom) {
+                    try {
+                        const response = await window.solana.connect();
+                        const publicKey = response.publicKey.toString();
+                        showMessage(`Cadastro com Phantom realizado! Endereço: ${publicKey.substring(0,10)}...`);
+                        registrationModal.style.display = 'none';
+                    } catch (error) {
+                        console.error(error);
+                        showMessage('Falha ao cadastrar com Phantom.', true);
+                    }
+                } else {
+                    showMessage('Phantom não está instalado. Instale a extensão Phantom.', true);
+                }
+            });
+        }
+
+        // Phantom - Login
+        const phantomButton = document.getElementById('phantomButton');
+        if(phantomButton) {
+            phantomButton.addEventListener('click', async function() {
+                if (window.solana && window.solana.isPhantom) {
+                    try {
+                        const response = await window.solana.connect();
+                        const publicKey = response.publicKey.toString();
+                        showMessage(`Login com Phantom realizado! Endereço: ${publicKey.substring(0,10)}...`);
+                        loginModal.style.display = 'none';
+                    } catch (error) {
+                        console.error(error);
+                        showMessage('Falha ao fazer login com Phantom.', true);
+                    }
+                } else {
+                    showMessage('Phantom não está instalado. Instale a extensão Phantom.', true);
+                }
+            });
+        }
+
+        // Coinbase (simulado)
+        const coinbaseButton = document.getElementById('coinbaseButton');
+        const regCoinbaseButton = document.getElementById('regCoinbaseButton');
+        
+        function handleCoinbase(type) {
+            showMessage(`Funcionalidade ${type} com Coinbase em desenvolvimento. Por favor, use email ou MetaMask.`);
+        }
+        
+        if(coinbaseButton) {
+            coinbaseButton.addEventListener('click', () => handleCoinbase('Login'));
+        }
+        
+        if(regCoinbaseButton) {
+            regCoinbaseButton.addEventListener('click', () => handleCoinbase('Cadastro'));
+        }
+
+        // Home link
+        const homeLink = document.getElementById('home-link');
+        if(homeLink) {
+            homeLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+        }
+
+        // Contact link
+        const contactLink = document.getElementById('contact-link');
+        if(contactLink) {
+            contactLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                const contactInfo = document.querySelector('.contact-info');
+                if(contactInfo) {
+                    contactInfo.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        }
+
+        // Menu adicional - alertas informativos
+        const menuItems = ['about-holoxorn-link', 'holoxorn-projects-link', 'holoxorn-technology-link', 
+                          'research-development-link', 'intelligent-robotics-link', 'machine-learning-link', 
+                          'automation-link', 'ai-innovations-link'];
+        
+        menuItems.forEach(itemId => {
+            const element = document.getElementById(itemId);
+            if(element) {
+                element.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const text = element.textContent;
+                    showMessage(`📡 ${text}: Conteúdo em desenvolvimento. Em breve mais informações!`);
+                });
+            }
+        });
+
+        // Animação 3D
+        let scene, camera, renderer, cubes = [], mouseX = 0, mouseY = 0;
+
+        function init() {
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.z = 5;
+
+            renderer = new THREE.WebGLRenderer({ alpha: false });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setClearColor(0x000000, 0);
+            document.body.appendChild(renderer.domElement);
+
+            const cubeMaterial = new THREE.MeshStandardMaterial({ 
+                color: 0x7f00ff, 
+                emissive: 0x3f51b5, 
+                emissiveIntensity: 0.6, 
+                roughness: 0.5, 
+                metalness: 0.8 
+            });
+
+            for (let i = 0; i < 1500; i++) {
+                const geometry = new THREE.BoxGeometry(0.5, 0.5, 0.5);
+                const cube = new THREE.Mesh(geometry, cubeMaterial);
+                cube.position.x = (Math.random() - 0.5) * 80;
+                cube.position.y = (Math.random() - 0.5) * 80;
+                cube.position.z = (Math.random() - 0.5) * 80;
+                cube.rotation.x = Math.random() * Math.PI;
+                cube.rotation.y = Math.random() * Math.PI;
+                scene.add(cube);
+                cubes.push(cube);
+            }
+
+            const light = new THREE.PointLight(0xffffff, 1, 100);
+            light.position.set(10, 10, 10);
+            scene.add(light);
+
+            const ambientLight = new THREE.AmbientLight(0x404040);
+            scene.add(ambientLight);
+            
+            const backLight = new THREE.PointLight(0x00ff99, 0.5);
+            backLight.position.set(-5, -5, -5);
+            scene.add(backLight);
+
+            window.addEventListener('mousemove', onMouseMove, false);
+            animate();
+        }
+
+        function onMouseMove(event) {
+            mouseX = (event.clientX / window.innerWidth) * 2 - 1;
+            mouseY = -(event.clientY / window.innerHeight) * 2 + 1;
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            cubes.forEach(cube => {
+                cube.rotation.x += 0.01;
+                cube.rotation.y += 0.01;
+                cube.rotation.z += 0.005;
+            });
+            camera.position.x += (mouseX * 2 - camera.position.x) * 0.03;
+            camera.position.y += (-mouseY * 2 - camera.position.y) * 0.03;
+            camera.lookAt(scene.position);
+            renderer.render(scene, camera);
+        }
+
+        window.addEventListener('resize', () => {
+            if(renderer) {
+                renderer.setSize(window.innerWidth, window.innerHeight);
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+            }
+        });
+
+        init();
+    </script>
+</body>
+</html>
