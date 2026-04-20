@@ -2,14 +2,14 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Holoxorn</title>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
-    <!-- Inclua a biblioteca i18next -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Holoxorn - AI Interactive Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="https://unpkg.com/i18next@21.10.0/dist/umd/i18next.min.js"></script>
     <script src="https://unpkg.com/i18next-browser-languagedetector@7.0.0/dist/umd/i18nextBrowserLanguageDetector.min.js"></script>
     <style>
-        /* Estilos gerais */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             margin: 0;
             overflow: hidden;
@@ -17,716 +17,455 @@
             color: white;
             font-family: 'Orbitron', sans-serif;
         }
-
-        header {
-            position: absolute;
-            top: 0;
-            width: 100%;
-            padding: 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            z-index: 10;
-        }
-
-        .logo {
-            width: 150px;
-            position: fixed;
-            top: 20px;
-            left: 20px;
-            z-index: 100;
-        }
-
-        .menu {
-            position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            gap: 20px;
-            z-index: 100;
-        }
-
-        .menu a {
-            color: white;
-            text-decoration: none;
-            font-weight: 700;
-            cursor: pointer;
-        }
-
-        .header-title {
-            position: absolute;
-            top: 100px;
-            left: 50%;
-            transform: translateX(-50%);
-            font-size: 70px;
-            font-weight: bold;
-            color: #00ff99;
-            text-align: center;
-            text-transform: uppercase;
-            letter-spacing: 5px;
-            text-shadow: 0 0 10px #00ff99, 0 0 20px #00ff99, 0 0 30px #00ff99;
-            animation: fadeIn 2s ease-out, glow 1.5s infinite alternate;
-            z-index: 10;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-50px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        @keyframes glow {
-            0% { text-shadow: 0 0 10px #00ff99, 0 0 20px #00ff99, 0 0 30px #00ff99; }
-            50% { text-shadow: 0 0 20px #ff00ff, 0 0 40px #ff00ff, 0 0 60px #ff00ff; }
-            100% { text-shadow: 0 0 10px #00ff99, 0 0 20px #00ff99, 0 0 30px #00ff99; }
-        }
-
-        .additional-menu {
-            position: absolute;
-            top: 250px;
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 10px;
-            z-index: 10;
-            max-width: 90%;
-        }
-
-        .additional-menu a {
-            color: white;
-            text-decoration: none;
-            padding: 8px 15px;
-            border: 2px solid white;
-            border-radius: 20px;
-            font-weight: 700;
-            transition: background-color 0.3s;
-            cursor: pointer;
-            font-size: 14px;
-        }
-
-        .additional-menu a:hover {
-            background-color: rgba(255, 255, 255, 0.2);
-        }
-
-        .contact-info {
-            position: absolute;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            font-size: 18px;
-            color: white;
-            text-align: center;
-            font-weight: 700;
-            animation: fadeIn 2s ease-out;
-            z-index: 10;
-        }
-
-        /* Estilo do botão de tradução */
-        .language-selector {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 1000;
-        }
-
-        .language-selector button {
-            background-color: transparent;
-            border: 2px solid #00ff99;
-            color: #00ff99;
-            padding: 8px 16px;
-            font-family: 'Orbitron', sans-serif;
-            font-size: 14px;
-            text-transform: uppercase;
-            cursor: pointer;
-            border-radius: 20px;
-            transition: background-color 0.3s, color 0.3s;
-        }
-
-        .language-selector button:hover {
-            background-color: #00ff99;
-            color: #000;
-        }
-
-        /* Estilo dos modais */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            justify-content: center;
-            align-items: center;
-            z-index: 2000;
-        }
-
-        .modal-content {
-            background: rgba(0, 0, 0, 0.9);
-            padding: 40px;
-            border-radius: 15px;
-            width: 350px;
-            text-align: center;
-            box-shadow: 0 0 20px rgba(0, 255, 153, 0.5);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .modal-content h2 {
-            margin-bottom: 20px;
-            font-size: 2rem;
-            color: #00ff99;
-            text-shadow: 0 0 10px #00ff99;
-        }
-
-        .modal-content input {
-            width: 100%;
-            padding: 12px;
-            margin: 10px 0;
-            border: none;
-            border-radius: 5px;
-            background-color: rgba(255, 255, 255, 0.1);
-            color: white;
-            font-size: 1rem;
-            font-family: 'Orbitron', sans-serif;
-            transition: background-color 0.3s, box-shadow 0.3s;
-        }
-
-        .modal-content input::placeholder {
-            color: rgba(255, 255, 255, 0.7);
-            font-style: italic;
-        }
-
-        .modal-content input:focus {
-            background-color: rgba(255, 255, 255, 0.2);
-            box-shadow: 0 0 10px #00ff99;
-            outline: none;
-        }
-
-        .modal-content button {
-            width: 100%;
-            padding: 12px;
-            margin: 10px 0;
-            background-color: #6a1e9c;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            font-size: 1rem;
-            font-family: 'Orbitron', sans-serif;
-            cursor: pointer;
-            transition: background-color 0.3s, transform 0.3s;
-        }
-
-        .modal-content button:hover {
-            background-color: #3f51b5;
-            transform: scale(1.05);
-        }
-
-        .wallet-buttons button {
-            background-color: #f5a623;
-            margin: 5px 0;
-            font-size: 1rem;
-            padding: 10px;
-            width: 100%;
-        }
-
-        .wallet-buttons button:hover {
-            background-color: #d47f20;
-        }
-
-        @media (max-width: 768px) {
-            .header-title { font-size: 40px; top: 80px; }
-            .menu { gap: 10px; top: 10px; }
-            .menu a { font-size: 12px; }
-            .additional-menu { top: 180px; }
-            .additional-menu a { font-size: 10px; padding: 5px 10px; }
-            .contact-info { font-size: 12px; }
-            .modal-content { width: 90%; padding: 20px; }
-        }
+        header { position: absolute; top: 0; width: 100%; padding: 20px; display: flex; justify-content: space-between; align-items: center; z-index: 10; }
+        .logo { width: 150px; position: fixed; top: 20px; left: 20px; z-index: 100; }
+        .menu { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); display: flex; gap: 20px; z-index: 100; }
+        .menu a { color: white; text-decoration: none; font-weight: 700; cursor: pointer; }
+        .header-title { position: absolute; top: 100px; left: 50%; transform: translateX(-50%); font-size: 70px; font-weight: bold; color: #00ff99; text-align: center; text-transform: uppercase; letter-spacing: 5px; text-shadow: 0 0 10px #00ff99, 0 0 20px #00ff99, 0 0 30px #00ff99; animation: fadeIn 2s ease-out, glow 1.5s infinite alternate; z-index: 10; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-50px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes glow { 0% { text-shadow: 0 0 10px #00ff99, 0 0 20px #00ff99, 0 0 30px #00ff99; } 50% { text-shadow: 0 0 20px #ff00ff, 0 0 40px #ff00ff, 0 0 60px #ff00ff; } 100% { text-shadow: 0 0 10px #00ff99, 0 0 20px #00ff99, 0 0 30px #00ff99; } }
+        .additional-menu { position: absolute; top: 250px; left: 50%; transform: translateX(-50%); display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; z-index: 10; max-width: 90%; }
+        .additional-menu a { color: white; text-decoration: none; padding: 8px 15px; border: 2px solid white; border-radius: 20px; font-weight: 700; transition: 0.3s; cursor: pointer; font-size: 14px; }
+        .additional-menu a:hover { background-color: rgba(255,255,255,0.2); }
+        .contact-info { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); font-size: 18px; color: white; text-align: center; font-weight: 700; z-index: 10; }
+        .language-selector { position: fixed; top: 20px; right: 20px; z-index: 1000; }
+        .globe-btn { background: transparent; border: 2px solid #00ff99; color: #00ff99; padding: 8px 16px; font-family: 'Orbitron'; font-size: 14px; cursor: pointer; border-radius: 20px; display: flex; align-items: center; gap: 8px; }
+        .globe-btn:hover { background: #00ff99; color: #000; }
+        .lang-dropdown { position: absolute; top: 45px; right: 0; background: rgba(0,0,0,0.95); backdrop-filter: blur(10px); border-radius: 15px; border: 1px solid #00ff99; display: none; flex-direction: column; min-width: 140px; z-index: 1001; }
+        .lang-dropdown button { background: transparent; border: none; color: white; font-family: 'Orbitron'; padding: 10px 15px; cursor: pointer; }
+        .lang-dropdown button:hover { background: #6a1e9c; color: #00ff99; }
+        .language-selector.active .lang-dropdown { display: flex; }
+        /* DASHBOARD PRINCIPAL */
+        .dashboard-container { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 92%; max-width: 1400px; height: 88vh; background: rgba(0,0,0,0.92); backdrop-filter: blur(20px); border-radius: 30px; border: 2px solid #9b59b6; box-shadow: 0 0 50px rgba(155,89,182,0.5); z-index: 200; padding: 20px; display: none; flex-direction: column; overflow: hidden; }
+        .dashboard-container.show { display: flex; }
+        .dashboard-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #00ffff; padding-bottom: 15px; margin-bottom: 20px; flex-wrap: wrap; }
+        .dashboard-header h2 { font-size: 1.4rem; background: linear-gradient(135deg, #a855f7, #06b6d4); -webkit-background-clip: text; background-clip: text; color: transparent; }
+        .user-info { display: flex; align-items: center; gap: 15px; }
+        .user-avatar { width: 40px; height: 40px; background: linear-gradient(135deg,#9b59b6,#3498db); border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+        .logout-dash-btn { background: linear-gradient(90deg,#e74c8b,#9b59b6); border: none; padding: 8px 20px; border-radius: 40px; font-family: 'Orbitron'; font-weight: bold; color: white; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: 0.3s; }
+        .logout-dash-btn:hover { transform: scale(1.03); box-shadow: 0 0 15px #ff66cc; }
+        /* LAYOUT 2 COLUNAS */
+        .dashboard-main { display: flex; gap: 20px; flex: 1; overflow: hidden; }
+        .col-left { flex: 1.4; display: flex; flex-direction: column; gap: 15px; overflow-y: auto; padding-right: 8px; }
+        .col-right { flex: 1; display: flex; flex-direction: column; gap: 15px; overflow-y: auto; }
+        .dash-card { background: rgba(30,20,50,0.7); border-radius: 20px; padding: 16px; border: 1px solid #9b59b6; transition: 0.2s; }
+        .dash-card:hover { border-color: #00ffff; box-shadow: 0 0 15px rgba(0,255,255,0.2); }
+        .card-title { font-size: 0.9rem; color: #c084fc; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; border-left: 3px solid #00ffff; padding-left: 10px; }
+        .config-row { display: flex; justify-content: space-between; align-items: center; margin: 10px 0; }
+        .toggle-neon { width: 44px; height: 22px; background: #2d2d5e; border-radius: 30px; position: relative; cursor: pointer; }
+        .toggle-neon.active { background: #00ffff; box-shadow: 0 0 10px cyan; }
+        .toggle-neon::after { content: ''; width: 18px; height: 18px; background: white; border-radius: 50%; position: absolute; top: 2px; left: 3px; transition: 0.2s; }
+        .toggle-neon.active::after { left: 23px; background: #1a1a2e; }
+        .config-select { background: #0e0e2a; border: 1px solid #9b59b6; color: white; font-family: 'Orbitron'; padding: 5px 10px; border-radius: 20px; cursor: pointer; font-size: 0.7rem; }
+        /* Upload area */
+        .upload-area { border: 2px dashed #9b59b6; border-radius: 15px; padding: 15px; text-align: center; cursor: pointer; background: rgba(155,89,182,0.1); transition: 0.2s; }
+        .upload-area:hover { border-color: #00ffff; background: rgba(0,255,255,0.1); }
+        .file-list { margin-top: 10px; max-height: 100px; overflow-y: auto; font-size: 0.7rem; }
+        .file-item { background: rgba(0,0,0,0.5); padding: 5px 8px; margin: 4px 0; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; }
+        .delete-file { cursor: pointer; color: #ff6b6b; transition: 0.2s; }
+        .delete-file:hover { color: #ff0000; }
+        .media-preview { max-height: 100px; overflow-y: auto; margin-top: 8px; display: flex; gap: 8px; flex-wrap: wrap; }
+        .media-preview img, .media-preview video { max-width: 80px; max-height: 70px; border-radius: 8px; }
+        /* MICROFONE */
+        .mic-area { display: flex; align-items: center; gap: 12px; margin: 10px 0; }
+        .mic-btn { background: linear-gradient(135deg,#e74c8b,#9b59b6); border: none; width: 55px; height: 55px; border-radius: 50%; cursor: pointer; font-size: 1.5rem; transition: 0.2s; color: white; }
+        .mic-btn.recording { background: #ff3333; animation: pulse 1s infinite; box-shadow: 0 0 20px red; }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.08); } 100% { transform: scale(1); } }
+        .mic-status { font-size: 0.7rem; opacity: 0.8; }
+        .transcript-area { background: rgba(0,0,0,0.5); border-radius: 12px; padding: 10px; margin-top: 10px; font-size: 0.75rem; max-height: 80px; overflow-y: auto; }
+        /* INTERAÇÃO COM IA */
+        .ai-interaction-area { background: rgba(20,20,50,0.6); border-radius: 20px; padding: 15px; }
+        .ai-input-group { display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap; }
+        .ai-textarea { flex: 1; background: rgba(10,10,30,0.9); border: 1px solid #9b59b6; border-radius: 20px; padding: 14px; color: white; font-family: 'Orbitron'; font-size: 0.85rem; resize: vertical; min-height: 70px; }
+        .ai-textarea:focus { outline: none; border-color: #00ffff; box-shadow: 0 0 10px cyan; }
+        .action-buttons { display: flex; gap: 10px; }
+        .icon-btn { background: linear-gradient(135deg, #9b59b6, #3498db); border: none; width: 50px; height: 50px; border-radius: 50%; cursor: pointer; font-size: 1.3rem; transition: 0.2s; color: white; display: flex; align-items: center; justify-content: center; }
+        .icon-btn:hover { transform: scale(1.08); box-shadow: 0 0 15px #00ffff; }
+        .send-btn-large { background: linear-gradient(90deg, #00ff99, #3498db); border: none; padding: 12px 25px; border-radius: 40px; font-family: 'Orbitron'; font-weight: bold; color: #000; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 8px; width: 100%; justify-content: center; margin-top: 12px; }
+        .send-btn-large:hover { transform: scale(1.02); box-shadow: 0 0 20px #00ff99; }
+        .ai-response-box { background: rgba(0,0,0,0.4); border-radius: 16px; padding: 15px; margin-top: 15px; font-size: 0.8rem; border-left: 3px solid #00ffff; min-height: 80px; }
+        .settings-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 8px; }
+        .setting-item { display: flex; justify-content: space-between; align-items: center; font-size: 0.7rem; padding: 6px 0; border-bottom: 1px solid rgba(155,89,182,0.3); }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); justify-content: center; align-items: center; z-index: 2000; }
+        .modal-content { background: rgba(0,0,0,0.95); padding: 30px; border-radius: 20px; width: 350px; text-align: center; border: 1px solid #00ff99; }
+        .modal-content input { width: 100%; padding: 10px; margin: 8px 0; background: rgba(255,255,255,0.1); border: none; border-radius: 8px; color: white; }
+        .modal-content button { width: 100%; padding: 10px; margin: 8px 0; background: #6a1e9c; border: none; border-radius: 8px; color: white; cursor: pointer; }
+        .google-auth-btn { background: #4285F4 !important; }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: #1a1a3a; }
+        ::-webkit-scrollbar-thumb { background: #9b59b6; }
+        @media (max-width: 900px) { .dashboard-main { flex-direction: column; } .col-left, .col-right { width: 100%; } .header-title { font-size: 40px; top: 80px; } .ai-input-group { flex-direction: column; } .action-buttons { justify-content: center; } }
     </style>
 </head>
 <body>
-    <header>
-        <!-- Logotipo no canto superior esquerdo -->
-        <img src="https://bradicoin.com/wp-content/uploads/2025/02/Screenshot_20250217-154739.png" alt="Logotipo" class="logo">
-        
-        <!-- Menu centralizado -->
-        <div class="menu">
-            <a href="#" id="home-link" data-i18n="menu.home">Home</a>
-            <a href="#" id="login-link" data-i18n="menu.login">Login</a>
-            <a href="#" id="registration-link" data-i18n="menu.registration">Registration</a>
-            <a href="#" id="contact-link" data-i18n="menu.contact">Contact</a>
+<header>
+    <img src="https://bradicoin.com/wp-content/uploads/2025/02/Screenshot_20250217-154739.png" alt="Logo" class="logo">
+    <div class="menu">
+        <a href="#" id="home-link" data-i18n="menu.home">Home</a>
+        <a href="#" id="login-link" data-i18n="menu.login">Login</a>
+        <a href="#" id="registration-link" data-i18n="menu.registration">Registration</a>
+        <a href="#" id="contact-link" data-i18n="menu.contact">Contact</a>
+    </div>
+</header>
+<div class="language-selector" id="langSelector">
+    <button class="globe-btn" id="language-button">🌐 EN</button>
+    <div class="lang-dropdown">
+        <button data-lang="en">🇬🇧 English</button>
+        <button data-lang="pt">🇵🇹 Português</button>
+        <button data-lang="es">🇪🇸 Español</button>
+        <button data-lang="ar">🇸🇦 العربية</button>
+    </div>
+</div>
+<h1 class="header-title" data-i18n="title">Holoxorn</h1>
+<div class="additional-menu">
+    <a href="#" id="about-link" data-i18n="menu.about">About Holoxorn</a>
+    <a href="#" id="projects-link" data-i18n="menu.projects">Holoxorn Projects</a>
+    <a href="#" id="tech-link" data-i18n="menu.technology">Holoxorn Technology</a>
+    <a href="#" id="research-link" data-i18n="menu.research">Research & Development</a>
+    <a href="#" id="robotics-link" data-i18n="menu.robotics">Intelligent Robotics</a>
+    <a href="#" id="ml-link" data-i18n="menu.machine-learning">Machine Learning</a>
+    <a href="#" id="automation-link" data-i18n="menu.automation">Automation</a>
+    <a href="#" id="ai-link" data-i18n="menu.innovations">AI Innovations</a>
+</div>
+<div class="contact-info"><p data-i18n="contact.info">Contact: <a href="mailto:contact@holoxorn.com" style="color:#00ff99;">contact@holoxorn.com</a></p></div>
+
+<!-- DASHBOARD HOLOXORN -->
+<div id="dashboardContainer" class="dashboard-container">
+    <div class="dashboard-header">
+        <h2><i class="fas fa-brain"></i> HOLOXORN NEURAL DASHBOARD</h2>
+        <div class="user-info"><div class="user-avatar" id="userAvatar">👤</div><button id="logoutDashboardBtn" class="logout-dash-btn"><i class="fas fa-sign-out-alt"></i> LOGOUT</button></div>
+    </div>
+    <div class="dashboard-main">
+        <div class="col-left">
+            <div class="dash-card ai-interaction-area">
+                <div class="card-title"><i class="fas fa-comment-dots"></i> INTERACT WITH HOLOXORN AI</div>
+                <div class="ai-input-group">
+                    <textarea id="aiMessageInput" class="ai-textarea" rows="2" placeholder="Type your message, command or question for Holoxorn AI..."></textarea>
+                    <div class="action-buttons">
+                        <button id="micActionBtn" class="icon-btn" title="Voice Input (Microphone)"><i class="fas fa-microphone"></i></button>
+                        <button id="uploadActionBtn" class="icon-btn" title="Upload Files (Images, Videos, Documents)"><i class="fas fa-paperclip"></i></button>
+                    </div>
+                </div>
+                <button id="sendAiMessageBtn" class="send-btn-large"><i class="fas fa-paper-plane"></i> SEND TO HOLOXORN AI</button>
+                <div id="aiResponseBox" class="ai-response-box"><i class="fas fa-robot"></i> Holoxorn AI is ready. Type or speak your command...</div>
+            </div>
+            <div class="dash-card">
+                <div class="card-title"><i class="fas fa-microphone-alt"></i> VOICE RECOGNITION</div>
+                <div class="mic-area">
+                    <button id="micButton" class="mic-btn"><i class="fas fa-microphone"></i></button>
+                    <span id="micStatus" class="mic-status">⚪ Click to start recording</span>
+                </div>
+                <div id="transcriptText" class="transcript-area">Voice transcript will appear here. Speak clearly!</div>
+                <div style="font-size:0.65rem; margin-top:8px;"><i class="fas fa-info-circle"></i> Supports English, Portuguese, Spanish. Click mic, speak, and AI will auto-respond.</div>
+            </div>
+            <div class="dash-card">
+                <div class="card-title"><i class="fas fa-cloud-upload-alt"></i> FILE UPLOAD CENTER</div>
+                <div class="upload-area" id="uploadArea">
+                    <i class="fas fa-upload" style="font-size: 1.8rem;"></i>
+                    <p>Click or drag & drop files</p>
+                    <small>Images, Videos, Audio, PDF, Documents</small>
+                    <input type="file" id="fileInput" multiple accept="image/*,video/*,audio/*,application/pdf,application/msword,text/plain" style="display:none">
+                </div>
+                <div id="fileList" class="file-list"></div>
+                <div id="mediaPreview" class="media-preview"></div>
+            </div>
         </div>
-    </header>
-
-    <!-- Botão de tradução no canto superior direito -->
-    <div class="language-selector">
-        <button id="language-button">🌐 EN</button>
-    </div>
-
-    <h1 class="header-title" data-i18n="title">Holoxorn</h1>
-
-    <!-- Menu adicional -->
-    <div class="additional-menu">
-        <a href="About Holoxorn.html" id="about-holoxorn-link" data-i18n="menu.about">About Holoxorn</a>
-        <a href="#" id="holoxorn-projects-link" data-i18n="menu.projects">Holoxorn Projects</a>
-        <a href="#" id="holoxorn-technology-link" data-i18n="menu.technology">Holoxorn Technology</a>
-        <a href="#" id="research-development-link" data-i18n="menu.research">Research and Development</a>
-        <a href="#" id="intelligent-robotics-link" data-i18n="menu.robotics">Intelligent Robotics</a>
-        <a href="#" id="machine-learning-link" data-i18n="menu.machine-learning">Machine Learning</a>
-        <a href="#" id="automation-link" data-i18n="menu.automation">Automation</a>
-        <a href="#" id="ai-innovations-link" data-i18n="menu.innovations">AI Innovations</a>
-    </div>
-
-    <!-- Adicionando informações de contato -->
-    <div class="contact-info">
-        <p data-i18n="contact.info">Contact: <a href="mailto:contact@bradicoin.com" style="color: #00ff99;"></a></p>
-    </div>
-
-    <!-- Modal de Login -->
-    <div id="loginModal" class="modal">
-        <div class="modal-content">
-            <h2 data-i18n="login.title">Login</h2>
-            <form id="loginForm">
-                <input type="email" id="email" placeholder="Email" required>
-                <input type="password" id="password" placeholder="Password" required>
-                <button type="submit" data-i18n="login.submit">Enter</button>
-            </form>
-            <div class="wallet-buttons">
-                <button id="metamaskButton" data-i18n="login.metamask">Login with MetaMask</button>
-                <button id="coinbaseButton" data-i18n="login.coinbase">Login with Coinbase</button>
-                <button id="phantomButton" data-i18n="login.phantom">Login with Phantom</button>
+        <div class="col-right">
+            <div class="dash-card">
+                <div class="card-title"><i class="fas fa-sliders-h"></i> AI CONFIGURATIONS (9 Features)</div>
+                <div class="settings-grid">
+                    <div class="setting-item"><label><i class="fas fa-brain"></i> Deep Learning</label><div class="toggle-neon" id="deepToggle"></div></div>
+                    <div class="setting-item"><label><i class="fas fa-eye"></i> Visual Recognition</label><div class="toggle-neon" id="visionToggle"></div></div>
+                    <div class="setting-item"><label><i class="fas fa-language"></i> NLP Optimizer</label><div class="toggle-neon" id="nlpTogglex"></div></div>
+                    <div class="setting-item"><label><i class="fas fa-robot"></i> Auto-Learning</label><div class="toggle-neon" id="autoToggle"></div></div>
+                    <div class="setting-item"><label><i class="fas fa-chart-line"></i> Predictive Analytics</label><div class="toggle-neon" id="predictToggle"></div></div>
+                    <div class="setting-item"><label><i class="fas fa-database"></i> Neural Cache</label><div class="toggle-neon" id="cacheToggle"></div></div>
+                    <div class="setting-item"><label><i class="fas fa-shield-virus"></i> Anomaly Detect</label><div class="toggle-neon" id="anomalyToggle"></div></div>
+                    <div class="setting-item"><label><i class="fas fa-cloud-upload-alt"></i> Auto-Sync Cloud</label><div class="toggle-neon" id="cloudToggle"></div></div>
+                    <div class="setting-item"><label><i class="fas fa-bolt"></i> Quantum Boost</label><div class="toggle-neon" id="quantumBoostToggle"></div></div>
+                </div>
+            </div>
+            <div class="dash-card">
+                <div class="card-title"><i class="fas fa-chart-simple"></i> SYSTEM METRICS</div>
+                <div class="config-row"><label><i class="fas fa-microchip"></i> AI Core Temp</label><span id="aiTemp">42°C</span></div>
+                <div class="config-row"><label><i class="fas fa-memory"></i> Neural Load</label><span id="neuralLoad">28%</span></div>
+                <div class="config-row"><label><i class="fas fa-hdd"></i> Storage Used</label><span id="storageInfoDash">0 MB</span></div>
+                <div class="config-row"><label><i class="fas fa-clock"></i> Uptime</label><span id="uptime">00:00:00</span></div>
+            </div>
+            <div class="dash-card">
+                <div class="card-title"><i class="fas fa-palette"></i> VISUAL PREFERENCES</div>
+                <div class="config-row"><label>✨ Neon Intensity</label><select id="glowSelect" class="config-select"><option>Low</option><option selected>Medium</option><option>High</option></select></div>
+                <div class="config-row"><label>🌀 HUD Animation</label><div class="toggle-neon" id="hudAnim"></div></div>
+                <div class="config-row"><label>🔒 Quantum Encryption</label><div class="toggle-neon" id="encryptToggle"></div></div>
+            </div>
+            <div class="dash-card">
+                <div class="card-title"><i class="fas fa-bell"></i> NOTIFICATIONS</div>
+                <div id="notificationList" style="font-size:0.7rem; max-height: 120px; overflow-y: auto;">⚡ System online.<br>🤖 Holoxorn AI ready.</div>
+                <button id="clearNotifBtn" style="margin-top:8px; background:#2d2d5e; border:none; padding:6px; border-radius:20px; font-size:0.7rem; cursor:pointer; width:100%;">Clear All</button>
             </div>
         </div>
     </div>
+</div>
 
-    <!-- Modal de Cadastro -->
-    <div id="registrationModal" class="modal">
-        <div class="modal-content">
-            <h2 data-i18n="registration.title">Sign Up</h2>
-            <form id="registerForm">
-                <input type="email" id="regEmail" placeholder="Email" required>
-                <input type="password" id="regPassword" placeholder="Password" required>
-                <button type="submit" data-i18n="registration.submit">Sign Up</button>
-            </form>
-            <div class="wallet-buttons">
-                <button id="regMetamaskButton" data-i18n="registration.metamask">Sign Up with MetaMask</button>
-                <button id="regCoinbaseButton" data-i18n="registration.coinbase">Sign Up with Coinbase</button>
-                <button id="regPhantomButton" data-i18n="registration.phantom">Sign Up with Phantom</button>
-            </div>
-        </div>
-    </div>
+<!-- MODAIS LOGIN -->
+<div id="loginModal" class="modal"><div class="modal-content"><h2>Login</h2><form id="loginForm"><input type="email" id="email" placeholder="Email"><input type="password" id="password" placeholder="Password"><button type="submit">Enter</button></form><button id="googleLoginBtn" class="google-auth-btn">🔐 Google Login</button><button class="close-modal-btn close-login">Close</button><p style="font-size:10px;">✨ Test: any email/password works</p></div></div>
+<div id="registrationModal" class="modal"><div class="modal-content"><h2>Sign Up</h2><form id="registerForm"><input type="email" id="regEmail" placeholder="Email"><input type="password" id="regPassword" placeholder="Password"><button type="submit">Sign Up</button></form><button id="googleRegisterBtn" class="google-auth-btn">✨ Google Signup</button><button class="close-modal-btn close-register">Close</button></div></div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script>
-        // Configuração do i18next
-        const resources = {
-            en: {
-                translation: {
-                    menu: {
-                        home: "Home",
-                        login: "Login",
-                        registration: "Registration",
-                        contact: "Contact",
-                        about: "About Holoxorn",
-                        projects: "Holoxorn Projects",
-                        technology: "Holoxorn Technology",
-                        research: "Research and Development",
-                        robotics: "Intelligent Robotics",
-                        "machine-learning": "Machine Learning",
-                        automation: "Automation",
-                        innovations: "AI Innovations"
-                    },
-                    title: "Holoxorn",
-                    contact: {
-                        info: "Contact: <a href='mailto:contact@bradicoin.com' style='color: #00ff99;'>contact@bradicoin.com</a>"
-                    },
-                    login: {
-                        title: "Login",
-                        submit: "Enter",
-                        metamask: "Login with MetaMask",
-                        coinbase: "Login with Coinbase",
-                        phantom: "Login with Phantom"
-                    },
-                    registration: {
-                        title: "Sign Up",
-                        submit: "Sign Up",
-                        metamask: "Sign Up with MetaMask",
-                        coinbase: "Sign Up with Coinbase",
-                        phantom: "Sign Up with Phantom"
-                    }
-                }
-            },
-            pt: {
-                translation: {
-                    menu: {
-                        home: "Início",
-                        login: "Login",
-                        registration: "Cadastro",
-                        contact: "Contato",
-                        about: "Sobre o Holoxorn",
-                        projects: "Projetos do Holoxorn",
-                        technology: "Tecnologia do Holoxorn",
-                        research: "Pesquisa e Desenvolvimento",
-                        robotics: "Robótica Inteligente",
-                        "machine-learning": "Aprendizado de Máquina",
-                        automation: "Automação",
-                        innovations: "Inovações em IA"
-                    },
-                    title: "Holoxorn",
-                    contact: {
-                        info: "Contato: <a href='mailto:contact@bradicoin.com' style='color: #00ff99;'>contact@bradicoin.com</a>"
-                    },
-                    login: {
-                        title: "Login",
-                        submit: "Entrar",
-                        metamask: "Login com MetaMask",
-                        coinbase: "Login com Coinbase",
-                        phantom: "Login com Phantom"
-                    },
-                    registration: {
-                        title: "Cadastro",
-                        submit: "Cadastrar",
-                        metamask: "Cadastrar com MetaMask",
-                        coinbase: "Cadastrar com Coinbase",
-                        phantom: "Cadastrar com Phantom"
-                    }
-                }
-            }
-        };
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+    // ========== SISTEMA DE LOGIN LIVRE ==========
+    let isLoggedIn = false, currentUserEmail = "Explorer";
+    const dashboard = document.getElementById('dashboardContainer');
+    const loginModalEl = document.getElementById('loginModal'), registerModalEl = document.getElementById('registrationModal');
+    function updateUI() { if(isLoggedIn) { dashboard.classList.add('show'); loginModalEl.style.display='none'; registerModalEl.style.display='none'; document.getElementById('userAvatar').innerHTML = currentUserEmail.charAt(0).toUpperCase(); addNotif(`✅ Welcome ${currentUserEmail}`); } else dashboard.classList.remove('show'); }
+    function logoutFunc() { isLoggedIn=false; currentUserEmail="Explorer"; updateUI(); addNotif("🔓 User logged out"); alert("🔓 Logged out from Holoxorn."); }
+    document.getElementById('loginForm')?.addEventListener('submit',(e)=>{e.preventDefault(); if(document.getElementById('email').value && document.getElementById('password').value){currentUserEmail=document.getElementById('email').value; isLoggedIn=true; updateUI(); alert("✅ Login success!");} else alert("Fill fields");});
+    document.getElementById('registerForm')?.addEventListener('submit',(e)=>{e.preventDefault(); if(document.getElementById('regEmail').value && document.getElementById('regPassword').value){currentUserEmail=document.getElementById('regEmail').value; isLoggedIn=true; updateUI(); alert("✅ Registered!");} else alert("Fill fields");});
+    function googleAuth(){currentUserEmail="google@holoxorn.com"; isLoggedIn=true; updateUI(); alert("Google Login Demo");}
+    document.getElementById('googleLoginBtn')?.addEventListener('click',googleAuth); document.getElementById('googleRegisterBtn')?.addEventListener('click',googleAuth);
+    document.getElementById('logoutDashboardBtn')?.addEventListener('click',logoutFunc);
+    document.getElementById('login-link')?.addEventListener('click',(e)=>{e.preventDefault(); if(!isLoggedIn) loginModalEl.style.display='flex'; else alert("Already in");});
+    document.getElementById('registration-link')?.addEventListener('click',(e)=>{e.preventDefault(); if(!isLoggedIn) registerModalEl.style.display='flex'; else alert("Already in");});
+    document.querySelectorAll('.close-login, .close-register, .close-modal-btn').forEach(btn=>btn.addEventListener('click',()=>{loginModalEl.style.display='none'; registerModalEl.style.display='none';}));
+    window.onclick=(e)=>{if(e.target===loginModalEl) loginModalEl.style.display='none'; if(e.target===registerModalEl) registerModalEl.style.display='none';};
+    document.getElementById('home-link')?.addEventListener('click',(e)=>{e.preventDefault(); window.scrollTo({top:0,behavior:'smooth'});});
+    document.getElementById('contact-link')?.addEventListener('click',(e)=>{e.preventDefault(); document.querySelector('.contact-info')?.scrollIntoView({behavior:'smooth'});});
+    ['about-link','projects-link','tech-link','research-link','robotics-link','ml-link','automation-link','ai-link'].forEach(id=>{document.getElementById(id)?.addEventListener('click',(e)=>{e.preventDefault(); addNotif(`📡 ${id} module coming soon`); alert(`📡 Coming soon`);});});
 
-        // Inicializar i18next
-        i18next.init({
-            fallbackLng: 'en',
-            debug: false,
-            resources: resources
-        }, function(err, t) {
-            if (err) console.error('i18next error:', err);
-            updateContent();
+    // ========== INTERAÇÃO COM IA ==========
+    const aiInput = document.getElementById('aiMessageInput');
+    const sendBtn = document.getElementById('sendAiMessageBtn');
+    const aiResponseBox = document.getElementById('aiResponseBox');
+    
+    function sendToAI() {
+        let msg = aiInput.value.trim();
+        if(!msg) { alert("Please type or speak a message"); return; }
+        aiResponseBox.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Holoxorn AI is processing...`;
+        setTimeout(() => {
+            const responses = [
+                `🤖 Holoxorn AI: "${msg}" - Neural pattern analyzed. How can I assist you further?`,
+                `✨ AI Core: I've processed your input. Quantum response ready.`,
+                `🧠 Holoxorn: Thank you for your message. My neural networks are optimizing.`,
+                `⚡ AI Interface active: "${msg.substring(0,50)}" has been logged.`,
+                `🌌 Neural insight received. Holoxorn is enhancing its learning.`
+            ];
+            let randomResp = responses[Math.floor(Math.random() * responses.length)];
+            aiResponseBox.innerHTML = `<i class="fas fa-robot"></i> ${randomResp}`;
+            addNotif(`💬 AI responded to your message`);
+            aiInput.value = '';
+        }, 1000);
+    }
+    sendBtn.addEventListener('click', sendToAI);
+    aiInput.addEventListener('keypress', (e) => { if(e.key === 'Enter') sendToAI(); });
+
+    // ========== MICROFONE ==========
+    const micBtn = document.getElementById('micButton');
+    const micActionBtn = document.getElementById('micActionBtn');
+    const micStatus = document.getElementById('micStatus');
+    const transcriptDiv = document.getElementById('transcriptText');
+    let isRecordingMic = false;
+    let recognition = null;
+    
+    function initSpeechRecognition() {
+        if('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            recognition = new SpeechRecognition();
+            recognition.continuous = false;
+            recognition.interimResults = true;
+            recognition.lang = 'en-US';
+            recognition.onstart = () => { micStatus.innerHTML = '🔴 Recording... Speak now'; micBtn.classList.add('recording'); if(micActionBtn) micActionBtn.classList.add('recording'); isRecordingMic = true; };
+            recognition.onresult = (event) => {
+                let transcript = Array.from(event.results).map(r => r[0].transcript).join('');
+                transcriptDiv.innerHTML = `🎤 You said: "${transcript}"`;
+                micStatus.innerHTML = '✅ Processed';
+                aiInput.value = transcript;
+                sendToAI();
+                addNotif(`🎤 Voice input: ${transcript.substring(0,40)}`);
+                stopRecording();
+            };
+            recognition.onerror = (e) => { micStatus.innerHTML = '⚠️ Error, try again'; stopRecording(); };
+            recognition.onend = () => { stopRecording(); };
+        } else {
+            micStatus.innerHTML = '❌ Not supported';
+            if(micBtn) micBtn.disabled = true;
+            if(micActionBtn) micActionBtn.disabled = true;
+        }
+    }
+    function stopRecording() {
+        if(recognition) try { recognition.stop(); } catch(e) {}
+        micBtn.classList.remove('recording');
+        if(micActionBtn) micActionBtn.classList.remove('recording');
+        if(micStatus.innerHTML.includes('Recording')) micStatus.innerHTML = '⚪ Ready';
+        isRecordingMic = false;
+    }
+    function startRecording() {
+        if(recognition) { try { recognition.start(); } catch(e) { micStatus.innerHTML = '⚠️ Already recording'; } }
+        else { alert("Speech recognition not supported"); }
+    }
+    function toggleMic() { if(isRecordingMic) stopRecording(); else startRecording(); }
+    initSpeechRecognition();
+    if(micBtn) micBtn.addEventListener('click', toggleMic);
+    if(micActionBtn) micActionBtn.addEventListener('click', toggleMic);
+
+    // ========== UPLOAD ==========
+    let uploadedFiles = [];
+    const uploadArea = document.getElementById('uploadArea');
+    const fileInputEl = document.getElementById('fileInput');
+    const fileListDiv = document.getElementById('fileList');
+    const mediaPreviewDiv = document.getElementById('mediaPreview');
+    const uploadActionBtn = document.getElementById('uploadActionBtn');
+    
+    function triggerUpload() { fileInputEl.click(); }
+    uploadArea?.addEventListener('click', triggerUpload);
+    uploadActionBtn?.addEventListener('click', triggerUpload);
+    uploadArea?.addEventListener('dragover', e => e.preventDefault());
+    uploadArea?.addEventListener('drop', e => { e.preventDefault(); handleFiles(e.dataTransfer.files); });
+    fileInputEl?.addEventListener('change', e => handleFiles(e.target.files));
+    
+    function handleFiles(files) {
+        Array.from(files).forEach(file => {
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+                uploadedFiles.push({ name: file.name, type: file.type, data: ev.target.result });
+                updateFileListUI();
+                updateStorageMetric();
+                addPreview(file.type, ev.target.result);
+                addNotif(`📎 Uploaded: ${file.name}`);
+            };
+            reader.readAsDataURL(file);
         });
+    }
+    function updateFileListUI() {
+        fileListDiv.innerHTML = uploadedFiles.map((f, idx) => `<div class="file-item"><div><i class="fas fa-${f.type.includes('image')?'image':f.type.includes('video')?'video':'file'}"></i> ${f.name.substring(0,25)}</div><i class="fas fa-trash delete-file" data-idx="${idx}"></i></div>`).join('');
+        document.querySelectorAll('.delete-file').forEach(el => { el.addEventListener('click', (e) => { let idx = parseInt(el.getAttribute('data-idx')); uploadedFiles.splice(idx, 1); updateFileListUI(); updateStorageMetric(); addNotif(`🗑️ File removed`); }); });
+    }
+    function addPreview(type, data) {
+        let html = '';
+        if(type.includes('image')) html = `<img src="${data}" alt="preview">`;
+        else if(type.includes('video')) html = `<video controls><source src="${data}"></video>`;
+        else html = `<div style="background:#2d2d5e; padding:5px; border-radius:8px;"><i class="fas fa-file-alt"></i> Document</div>`;
+        if(html) mediaPreviewDiv.innerHTML = html + mediaPreviewDiv.innerHTML;
+        if(mediaPreviewDiv.children.length > 4) mediaPreviewDiv.removeChild(mediaPreviewDiv.lastChild);
+    }
+    function updateStorageMetric() {
+        let total = uploadedFiles.reduce((s,f) => s + (f.data?.length || 0), 0);
+        let mb = (total / (1024*1024)).toFixed(2);
+        document.getElementById('storageInfoDash').innerText = `${mb} MB (${uploadedFiles.length} files)`;
+    }
 
-        // Função para atualizar o conteúdo da página
-        function updateContent() {
-            document.querySelectorAll('[data-i18n]').forEach(element => {
-                const key = element.getAttribute('data-i18n');
-                const translatedText = i18next.t(key);
-                if (translatedText && translatedText !== key) {
-                    if (element.innerHTML.includes('href=')) {
-                        // Preservar links HTML
-                        const originalHtml = element.innerHTML;
-                        const textOnly = translatedText;
-                        element.innerHTML = originalHtml.replace(/[^<]*/, textOnly);
-                    } else {
-                        element.innerHTML = translatedText;
-                    }
-                }
-            });
-        }
+    // ========== TOGGLES ==========
+    const toggles = ['deepToggle','visionToggle','nlpTogglex','autoToggle','predictToggle','cacheToggle','anomalyToggle','cloudToggle','quantumBoostToggle','hudAnim','encryptToggle'];
+    toggles.forEach(id => { let el = document.getElementById(id); if(el) el.addEventListener('click', function() { this.classList.toggle('active'); addNotif(`⚙️ ${id.replace('Toggle','')} ${this.classList.contains('active')?'ON':'OFF'}`); }); });
+    document.getElementById('glowSelect')?.addEventListener('change', (e) => addNotif(`✨ Neon intensity: ${e.target.value}`));
+    document.getElementById('clearNotifBtn')?.addEventListener('click', () => { document.getElementById('notificationList').innerHTML = '✨ Notifications cleared.'; addNotif("Notifications cleared"); });
+    
+    function addNotif(msg) {
+        let notifDiv = document.getElementById('notificationList');
+        let newMsg = `<div>🔔 ${new Date().toLocaleTimeString()} - ${msg}</div>`;
+        notifDiv.innerHTML = newMsg + notifDiv.innerHTML;
+        if(notifDiv.children.length > 6) notifDiv.removeChild(notifDiv.lastChild);
+    }
 
-        // Evento de mudança no botão de idiomas
-        const languageButton = document.getElementById('language-button');
-        const languages = ['en', 'pt'];
-        let currentLanguageIndex = 0;
+    // ========== MÉTRICAS ==========
+    let startTime = Date.now();
+    setInterval(() => {
+        let seconds = Math.floor((Date.now() - startTime)/1000);
+        let hrs = Math.floor(seconds/3600), mins = Math.floor((seconds%3600)/60), secs = seconds%60;
+        document.getElementById('uptime').innerText = `${hrs.toString().padStart(2,'0')}:${mins.toString().padStart(2,'0')}:${secs.toString().padStart(2,'0')}`;
+        let temp = 38 + Math.floor(Math.random() * 10);
+        let load = 20 + Math.floor(Math.random() * 45);
+        document.getElementById('aiTemp').innerText = `${temp}°C`;
+        document.getElementById('neuralLoad').innerText = `${load}%`;
+    }, 4000);
 
-        languageButton.addEventListener('click', () => {
-            currentLanguageIndex = (currentLanguageIndex + 1) % languages.length;
-            const selectedLanguage = languages[currentLanguageIndex];
-            i18next.changeLanguage(selectedLanguage, () => {
-                updateContent();
-                languageButton.textContent = `🌐 ${selectedLanguage.toUpperCase()}`;
-            });
+    // ========== TRADUTOR ==========
+    const trans = {
+        en: { menu: { home:"Home", login:"Login", registration:"Register", contact:"Contact", about:"About", projects:"Projects", technology:"Tech", research:"Research", robotics:"Robotics", "machine-learning":"ML", automation:"Auto", innovations:"AI" }, title:"Holoxorn", contact: { info:"Contact: <a href='mailto:contact@holoxorn.com' style='color:#00ff99;'>contact@holoxorn.com</a>" } },
+        pt: { menu: { home:"Início", login:"Login", registration:"Cadastro", contact:"Contato", about:"Sobre", projects:"Projetos", technology:"Tecnologia", research:"Pesquisa", robotics:"Robótica", "machine-learning":"ML", automation:"Automação", innovations:"Inovações" }, title:"Holoxorn", contact: { info:"Contato: <a href='mailto:contact@holoxorn.com' style='color:#00ff99;'>contact@holoxorn.com</a>" } },
+        es: { menu: { home:"Inicio", login:"Iniciar", registration:"Registro", contact:"Contacto", about:"Acerca", projects:"Proyectos", technology:"Tecnología", research:"Investigación", robotics:"Robótica", "machine-learning":"ML", automation:"Automación", innovations:"Innovaciones" }, title:"Holoxorn", contact: { info:"Contacto: <a href='mailto:contact@holoxorn.com' style='color:#00ff99;'>contact@holoxorn.com</a>" } },
+        ar: { menu: { home:"الرئيسية", login:"دخول", registration:"تسجيل", contact:"اتصل", about:"عن", projects:"مشاريع", technology:"تقنية", research:"بحث", robotics:"روبوتات", "machine-learning":"تعلم آلة", automation:"أتمتة", innovations:"ابتكارات" }, title:"هولوكسورن", contact: { info:"اتصال: <a href='mailto:contact@holoxorn.com' style='color:#00ff99;'>contact@holoxorn.com</a>" } }
+    };
+    let curLang = 'en';
+    function updateTexts() {
+        let t = trans[curLang];
+        if(!t) return;
+        document.querySelectorAll('[data-i18n]').forEach(el => {
+            let key = el.getAttribute('data-i18n');
+            let val = key.split('.').reduce((o,i) => o?.[i], t);
+            if(val) { if(el.innerHTML.includes('href')) el.innerHTML = val; else el.innerText = val; }
         });
+        document.getElementById('language-button').innerHTML = `🌐 ${curLang.toUpperCase()}`;
+    }
+    document.querySelectorAll('.lang-dropdown button').forEach(btn => { btn.addEventListener('click', (e) => { curLang = btn.getAttribute('data-lang'); updateTexts(); document.getElementById('langSelector').classList.remove('active'); }); });
+    document.getElementById('language-button')?.addEventListener('click', (e) => { e.stopPropagation(); document.getElementById('langSelector').classList.toggle('active'); });
+    document.addEventListener('click', () => document.getElementById('langSelector')?.classList.remove('active'));
+    updateTexts();
 
-        // Abrir modal de login
-        const loginLink = document.getElementById('login-link');
-        const loginModal = document.getElementById('loginModal');
-
-        if(loginLink) {
-            loginLink.addEventListener('click', (e) => {
-                e.preventDefault();
-                loginModal.style.display = 'flex';
-            });
-        }
-
-        // Abrir modal de cadastro
-        const registrationLink = document.getElementById('registration-link');
-        const registrationModal = document.getElementById('registrationModal');
-
-        if(registrationLink) {
-            registrationLink.addEventListener('click', (e) => {
-                e.preventDefault();
-                registrationModal.style.display = 'flex';
-            });
-        }
-
-        // Fechar modais ao clicar fora
-        const modals = document.querySelectorAll('.modal');
-        modals.forEach(modal => {
-            modal.addEventListener('click', (e) => {
-                if (e.target === modal) {
-                    modal.style.display = 'none';
-                }
-            });
+    // ========== ANIMAÇÃO 3D CUBOS - CORES ROXO E FUNDO PRETO ==========
+    let scene, camera, renderer, cubes = [], mouseX = 0, mouseY = 0;
+    function init3D() {
+        scene = new THREE.Scene();
+        camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.z = 5;
+        renderer = new THREE.WebGLRenderer({ alpha: false });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setClearColor(0x000000, 0);
+        document.body.appendChild(renderer.domElement);
+        const cubeMaterial = new THREE.MeshStandardMaterial({ 
+            color: 0x7f00ff, 
+            emissive: 0x3f51b5, 
+            emissiveIntensity: 0.6, 
+            roughness: 0.5, 
+            metalness: 0.8 
         });
-
-        // Função para mostrar alertas seguros
-        function showMessage(message, isError = false) {
-            alert(message);
+        for (let i = 0; i < 1500; i++) {
+            const geometry = new THREE.BoxGeometry(0.5, 0.5, 0.5);
+            const cube = new THREE.Mesh(geometry, cubeMaterial);
+            cube.position.x = (Math.random() - 0.5) * 80;
+            cube.position.y = (Math.random() - 0.5) * 80;
+            cube.position.z = (Math.random() - 0.5) * 80;
+            cube.rotation.x = Math.random() * Math.PI;
+            cube.rotation.y = Math.random() * Math.PI;
+            scene.add(cube);
+            cubes.push(cube);
         }
-
-        // Login com email
-        const loginForm = document.getElementById('loginForm');
-        if(loginForm) {
-            loginForm.addEventListener('submit', function(event) {
-                event.preventDefault();
-                const email = document.getElementById('email').value;
-                const password = document.getElementById('password').value;
-
-                if (email && password) {
-                    const savedEmail = localStorage.getItem('userEmail');
-                    const savedPassword = localStorage.getItem('userPassword');
-                    
-                    if (savedEmail === email && savedPassword === password) {
-                        showMessage('Login realizado com sucesso!');
-                        loginModal.style.display = 'none';
-                    } else {
-                        showMessage('Email ou senha incorretos!', true);
-                    }
-                } else {
-                    showMessage('Por favor, preencha todos os campos.', true);
-                }
-            });
-        }
-
-        // Cadastro com email
-        const registerForm = document.getElementById('registerForm');
-        if(registerForm) {
-            registerForm.addEventListener('submit', function(event) {
-                event.preventDefault();
-                const email = document.getElementById('regEmail').value;
-                const password = document.getElementById('regPassword').value;
-
-                if (email && password) {
-                    localStorage.setItem('userEmail', email);
-                    localStorage.setItem('userPassword', password);
-                    showMessage('Cadastro realizado com sucesso!');
-                    registrationModal.style.display = 'none';
-                } else {
-                    showMessage('Por favor, preencha todos os campos.', true);
-                }
-            });
-        }
-
-        // MetaMask - Cadastro
-        const regMetamaskButton = document.getElementById('regMetamaskButton');
-        if(regMetamaskButton) {
-            regMetamaskButton.addEventListener('click', async function() {
-                if (typeof window.ethereum !== 'undefined') {
-                    try {
-                        const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
-                        const userAddress = accounts[0];
-                        showMessage(`Cadastro com MetaMask realizado! Endereço: ${userAddress.substring(0,10)}...`);
-                        registrationModal.style.display = 'none';
-                    } catch (error) {
-                        console.error(error);
-                        showMessage('Falha ao cadastrar com MetaMask.', true);
-                    }
-                } else {
-                    showMessage('MetaMask não está instalado. Instale a extensão MetaMask.', true);
-                }
-            });
-        }
-
-        // MetaMask - Login
-        const metamaskButton = document.getElementById('metamaskButton');
-        if(metamaskButton) {
-            metamaskButton.addEventListener('click', async function() {
-                if (typeof window.ethereum !== 'undefined') {
-                    try {
-                        const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
-                        const userAddress = accounts[0];
-                        showMessage(`Login com MetaMask realizado! Endereço: ${userAddress.substring(0,10)}...`);
-                        loginModal.style.display = 'none';
-                    } catch (error) {
-                        console.error(error);
-                        showMessage('Falha ao fazer login com MetaMask.', true);
-                    }
-                } else {
-                    showMessage('MetaMask não está instalado. Instale a extensão MetaMask.', true);
-                }
-            });
-        }
-
-        // Phantom - Cadastro
-        const regPhantomButton = document.getElementById('regPhantomButton');
-        if(regPhantomButton) {
-            regPhantomButton.addEventListener('click', async function() {
-                if (window.solana && window.solana.isPhantom) {
-                    try {
-                        const response = await window.solana.connect();
-                        const publicKey = response.publicKey.toString();
-                        showMessage(`Cadastro com Phantom realizado! Endereço: ${publicKey.substring(0,10)}...`);
-                        registrationModal.style.display = 'none';
-                    } catch (error) {
-                        console.error(error);
-                        showMessage('Falha ao cadastrar com Phantom.', true);
-                    }
-                } else {
-                    showMessage('Phantom não está instalado. Instale a extensão Phantom.', true);
-                }
-            });
-        }
-
-        // Phantom - Login
-        const phantomButton = document.getElementById('phantomButton');
-        if(phantomButton) {
-            phantomButton.addEventListener('click', async function() {
-                if (window.solana && window.solana.isPhantom) {
-                    try {
-                        const response = await window.solana.connect();
-                        const publicKey = response.publicKey.toString();
-                        showMessage(`Login com Phantom realizado! Endereço: ${publicKey.substring(0,10)}...`);
-                        loginModal.style.display = 'none';
-                    } catch (error) {
-                        console.error(error);
-                        showMessage('Falha ao fazer login com Phantom.', true);
-                    }
-                } else {
-                    showMessage('Phantom não está instalado. Instale a extensão Phantom.', true);
-                }
-            });
-        }
-
-        // Coinbase (simulado)
-        const coinbaseButton = document.getElementById('coinbaseButton');
-        const regCoinbaseButton = document.getElementById('regCoinbaseButton');
-        
-        function handleCoinbase(type) {
-            showMessage(`Funcionalidade ${type} com Coinbase em desenvolvimento. Por favor, use email ou MetaMask.`);
-        }
-        
-        if(coinbaseButton) {
-            coinbaseButton.addEventListener('click', () => handleCoinbase('Login'));
-        }
-        
-        if(regCoinbaseButton) {
-            regCoinbaseButton.addEventListener('click', () => handleCoinbase('Cadastro'));
-        }
-
-        // Home link
-        const homeLink = document.getElementById('home-link');
-        if(homeLink) {
-            homeLink.addEventListener('click', (e) => {
-                e.preventDefault();
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-            });
-        }
-
-        // Contact link
-        const contactLink = document.getElementById('contact-link');
-        if(contactLink) {
-            contactLink.addEventListener('click', (e) => {
-                e.preventDefault();
-                const contactInfo = document.querySelector('.contact-info');
-                if(contactInfo) {
-                    contactInfo.scrollIntoView({ behavior: 'smooth' });
-                }
-            });
-        }
-
-        // Menu adicional - alertas informativos
-        const menuItems = ['about-holoxorn-link', 'holoxorn-projects-link', 'holoxorn-technology-link', 
-                          'research-development-link', 'intelligent-robotics-link', 'machine-learning-link', 
-                          'automation-link', 'ai-innovations-link'];
-        
-        menuItems.forEach(itemId => {
-            const element = document.getElementById(itemId);
-            if(element) {
-                element.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    const text = element.textContent;
-                    showMessage(`📡 ${text}: Conteúdo em desenvolvimento. Em breve mais informações!`);
-                });
-            }
+        const light = new THREE.PointLight(0xffffff, 1, 100);
+        light.position.set(10, 10, 10);
+        scene.add(light);
+        const ambientLight = new THREE.AmbientLight(0x404040);
+        scene.add(ambientLight);
+        const backLight = new THREE.PointLight(0x7f00ff, 0.5);
+        backLight.position.set(-5, -5, -5);
+        scene.add(backLight);
+        window.addEventListener('mousemove', onMouseMove, false);
+        animate();
+    }
+    function onMouseMove(event) {
+        mouseX = (event.clientX / window.innerWidth) * 2 - 1;
+        mouseY = -(event.clientY / window.innerHeight) * 2 + 1;
+    }
+    function animate() {
+        requestAnimationFrame(animate);
+        cubes.forEach(cube => {
+            cube.rotation.x += 0.01;
+            cube.rotation.y += 0.01;
+            cube.rotation.z += 0.005;
         });
-
-        // Animação 3D
-        let scene, camera, renderer, cubes = [], mouseX = 0, mouseY = 0;
-
-        function init() {
-            scene = new THREE.Scene();
-            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-            camera.position.z = 5;
-
-            renderer = new THREE.WebGLRenderer({ alpha: false });
+        camera.position.x += (mouseX * 2 - camera.position.x) * 0.03;
+        camera.position.y += (-mouseY * 2 - camera.position.y) * 0.03;
+        camera.lookAt(scene.position);
+        renderer.render(scene, camera);
+    }
+    window.addEventListener('resize', () => {
+        if(renderer) {
             renderer.setSize(window.innerWidth, window.innerHeight);
-            renderer.setClearColor(0x000000, 0);
-            document.body.appendChild(renderer.domElement);
-
-            const cubeMaterial = new THREE.MeshStandardMaterial({ 
-                color: 0x7f00ff, 
-                emissive: 0x3f51b5, 
-                emissiveIntensity: 0.6, 
-                roughness: 0.5, 
-                metalness: 0.8 
-            });
-
-            for (let i = 0; i < 1500; i++) {
-                const geometry = new THREE.BoxGeometry(0.5, 0.5, 0.5);
-                const cube = new THREE.Mesh(geometry, cubeMaterial);
-                cube.position.x = (Math.random() - 0.5) * 80;
-                cube.position.y = (Math.random() - 0.5) * 80;
-                cube.position.z = (Math.random() - 0.5) * 80;
-                cube.rotation.x = Math.random() * Math.PI;
-                cube.rotation.y = Math.random() * Math.PI;
-                scene.add(cube);
-                cubes.push(cube);
-            }
-
-            const light = new THREE.PointLight(0xffffff, 1, 100);
-            light.position.set(10, 10, 10);
-            scene.add(light);
-
-            const ambientLight = new THREE.AmbientLight(0x404040);
-            scene.add(ambientLight);
-            
-            const backLight = new THREE.PointLight(0x00ff99, 0.5);
-            backLight.position.set(-5, -5, -5);
-            scene.add(backLight);
-
-            window.addEventListener('mousemove', onMouseMove, false);
-            animate();
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
         }
-
-        function onMouseMove(event) {
-            mouseX = (event.clientX / window.innerWidth) * 2 - 1;
-            mouseY = -(event.clientY / window.innerHeight) * 2 + 1;
-        }
-
-        function animate() {
-            requestAnimationFrame(animate);
-            cubes.forEach(cube => {
-                cube.rotation.x += 0.01;
-                cube.rotation.y += 0.01;
-                cube.rotation.z += 0.005;
-            });
-            camera.position.x += (mouseX * 2 - camera.position.x) * 0.03;
-            camera.position.y += (-mouseY * 2 - camera.position.y) * 0.03;
-            camera.lookAt(scene.position);
-            renderer.render(scene, camera);
-        }
-
-        window.addEventListener('resize', () => {
-            if(renderer) {
-                renderer.setSize(window.innerWidth, window.innerHeight);
-                camera.aspect = window.innerWidth / window.innerHeight;
-                camera.updateProjectionMatrix();
-            }
-        });
-
-        init();
-    </script>
+    });
+    init3D();
+    updateUI();
+    updateStorageMetric();
+</script>
 </body>
 </html>
