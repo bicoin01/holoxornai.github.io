@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Holoxorn - Offline</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #0a0a2a 0%, #1a0a3a 50%, #0a0a2a 100%);
+            color: white;
+            font-family: 'Orbitron', monospace;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Animated background particles */
+        .particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 0;
+        }
+
+        .particle {
+            position: absolute;
+            background: rgba(155, 89, 182, 0.4);
+            border-radius: 50%;
+            animation: float 15s infinite ease-in-out;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) translateX(0); opacity: 0.3; }
+            50% { transform: translateY(-100px) translateX(50px); opacity: 0.8; }
+        }
+
+        /* Main content */
+        .offline-container {
+            position: relative;
+            z-index: 10;
+            text-align: center;
+            max-width: 500px;
+            padding: 40px;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(20px);
+            border-radius: 40px;
+            border: 2px solid #9b59b6;
+            box-shadow: 0 0 60px rgba(155, 89, 182, 0.4);
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .offline-icon {
+            font-size: 5rem;
+            color: #9b59b6;
+            margin-bottom: 20px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { text-shadow: 0 0 10px #9b59b6; }
+            50% { text-shadow: 0 0 30px #ff00ff, 0 0 20px #9b59b6; }
+        }
+
+        h1 {
+            font-size: 2rem;
+            color: #00ff99;
+            text-shadow: 0 0 10px #00ff99;
+            margin-bottom: 15px;
+            letter-spacing: 3px;
+        }
+
+        .glitch-text {
+            font-size: 1rem;
+            color: #c084fc;
+            margin-bottom: 25px;
+            line-height: 1.6;
+        }
+
+        .status-card {
+            background: rgba(30, 20, 50, 0.6);
+            border-radius: 20px;
+            padding: 20px;
+            margin: 20px 0;
+            border: 1px solid #9b59b6;
+        }
+
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 12px 0;
+            font-size: 0.85rem;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 5px 12px;
+            border-radius: 20px;
+        }
+
+        .offline-badge {
+            color: #ff6b6b;
+        }
+
+        .retry-btn {
+            background: linear-gradient(90deg, #9b59b6, #3498db);
+            border: none;
+            padding: 14px 35px;
+            border-radius: 40px;
+            font-family: 'Orbitron', monospace;
+            font-weight: bold;
+            font-size: 1rem;
+            color: white;
+            cursor: pointer;
+            transition: 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .retry-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 25px #9b59b6;
+        }
+
+        .features-list {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 25px;
+            flex-wrap: wrap;
+        }
+
+        .feature {
+            background: rgba(155, 89, 182, 0.2);
+            border-radius: 12px;
+            padding: 8px 15px;
+            font-size: 0.7rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .retry-count {
+            font-size: 0.7rem;
+            color: #888;
+            margin-top: 15px;
+        }
+
+        @media (max-width: 600px) {
+            .offline-container { margin: 20px; padding: 25px; }
+            h1 { font-size: 1.5rem; }
+            .offline-icon { font-size: 3.5rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="particles" id="particles"></div>
+    
+    <div class="offline-container">
+        <div class="offline-icon">
+            <i class="fas fa-satellite-dish"></i>
+        </div>
+        
+        <h1>📡 OFFLINE MODE</h1>
+        
+        <div class="glitch-text">
+            <i class="fas fa-robot"></i> Holoxorn AI is currently offline.<br>
+            Your neural interface is disconnected from the main server.
+        </div>
+        
+        <div class="status-card">
+            <div class="status-item">
+                <span><i class="fas fa-wifi"></i> Connection Status</span>
+                <span class="status-badge offline-badge"><i class="fas fa-exclamation-triangle"></i> Disconnected</span>
+            </div>
+            <div class="status-item">
+                <span><i class="fas fa-microchip"></i> AI Core</span>
+                <span class="status-badge"><i class="fas fa-power-off"></i> Standby Mode</span>
+            </div>
+            <div class="status-item">
+                <span><i class="fas fa-database"></i> Local Cache</span>
+                <span class="status-badge"><i class="fas fa-check-circle" style="color:#00ff99;"></i> Available</span>
+            </div>
+        </div>
+        
+        <div class="glitch-text" style="font-size: 0.8rem;">
+            <i class="fas fa-info-circle"></i> Don't worry! Your conversations and files are saved locally.<br>
+            They will sync automatically when connection is restored.
+        </div>
+        
+        <button class="retry-btn" id="retryBtn" onclick="checkConnection()">
+            <i class="fas fa-sync-alt"></i> TRY TO RECONNECT
+        </button>
+        
+        <div class="features-list">
+            <div class="feature"><i class="fas fa-microphone"></i> Voice Ready</div>
+            <div class="feature"><i class="fas fa-upload"></i> Local Uploads</div>
+            <div class="feature"><i class="fas fa-brain"></i> AI Cached</div>
+        </div>
+        
+        <div class="retry-count" id="retryCount"></div>
+    </div>
+
+    <script>
+        // Generate animated particles
+        function createParticles() {
+            const container = document.getElementById('particles');
+            const particleCount = 50;
+            
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('particle');
+                const size = Math.random() * 8 + 2;
+                particle.style.width = size + 'px';
+                particle.style.height = size + 'px';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.top = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 15 + 's';
+                particle.style.animationDuration = (Math.random() * 10 + 10) + 's';
+                container.appendChild(particle);
+            }
+        }
+        
+        // Check connection and redirect
+        let retryCount = 0;
+        
+        async function checkConnection() {
+            const retryBtn = document.getElementById('retryBtn');
+            const retryCountDiv = document.getElementById('retryCount');
+            
+            retryBtn.disabled = true;
+            retryBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> CONNECTING...';
+            retryCount++;
+            retryCountDiv.innerHTML = `Reconnection attempts: ${retryCount}`;
+            
+            try {
+                // Try to fetch a small resource
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 5000);
+                
+                const response = await fetch('/api/health', {
+                    method: 'GET',
+                    signal: controller.signal
+                });
+                
+                clearTimeout(timeoutId);
+                
+                if (response.ok) {
+                    // Connection restored - redirect to main page
+                    retryBtn.innerHTML = '<i class="fas fa-check-circle"></i> CONNECTED! REDIRECTING...';
+                    setTimeout(() => {
+                        window.location.href = '/';
+                    }, 1000);
+                } else {
+                    throw new Error('Server not responding');
+                }
+            } catch (error) {
+                console.log('Still offline:', error);
+                retryBtn.innerHTML = '<i class="fas fa-sync-alt"></i> TRY TO RECONNECT';
+                retryBtn.disabled = false;
+                
+                // Show error feedback
+                const statusCard = document.querySelector('.status-card');
+                statusCard.style.borderColor = '#ff6b6b';
+                setTimeout(() => {
+                    statusCard.style.borderColor = '#9b59b6';
+                }, 500);
+            }
+        }
+        
+        // Auto retry every 30 seconds
+        let autoRetryInterval = setInterval(() => {
+            if (document.hasFocus()) {
+                checkConnection();
+            }
+        }, 30000);
+        
+        // Listen for online event
+        window.addEventListener('online', () => {
+            const retryBtn = document.getElementById('retryBtn');
+            retryBtn.innerHTML = '<i class="fas fa-check-circle"></i> CONNECTION RESTORED!';
+            setTimeout(() => {
+                window.location.href = '/';
+            }, 1500);
+        });
+        
+        // Initialize particles
+        createParticles();
+        
+        // Display stored conversations count if available
+        if (localStorage.getItem('holoxorn_conversations')) {
+            const conversations = JSON.parse(localStorage.getItem('holoxorn_conversations') || '[]');
+            if (conversations.length > 0) {
+                const statusCard = document.querySelector('.status-card');
+                const cachedInfo = document.createElement('div');
+                cachedInfo.className = 'status-item';
+                cachedInfo.innerHTML = `
+                    <span><i class="fas fa-save"></i> Saved Locally</span>
+                    <span class="status-badge"><i class="fas fa-message"></i> ${conversations.length} messages</span>
+                `;
+                statusCard.appendChild(cachedInfo);
+            }
+        }
+        
+        console.log('[Holoxorn] Offline page loaded - AI in standby mode');
+    </script>
+</body>
+</html>
