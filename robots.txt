@@ -1,0 +1,18 @@
+# Holoxorn AI - Robots.txt
+# Allows search engines to index the site
+
+User-agent: *
+Allow: /
+Disallow: /backend/
+Disallow: /uploads/
+Disallow: /data/
+Disallow: /private/
+
+# Sitemap location
+Sitemap: https://www.holoxornai.com/sitemap.xml
+
+# Crawl delay for bots
+Crawl-delay: 1
+
+# Host directive
+Host: https://www.holoxornai.com
