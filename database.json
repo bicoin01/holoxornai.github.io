@@ -1,0 +1,77 @@
+{
+  "users": [
+    {
+      "id": 1700000000000,
+      "email": "demo@holoxorn.com",
+      "name": "Demo User",
+      "password": "demo123",
+      "avatar": "https://bradicoin.com/wp-content/uploads/2025/02/Screenshot_20250217-154739.png",
+      "createdAt": "2026-04-20T10:00:00.000Z",
+      "lastLogin": "2026-04-20T10:00:00.000Z",
+      "settings": {
+        "theme": "dark",
+        "language": "en",
+        "notifications": true,
+        "voiceEnabled": true
+      }
+    }
+  ],
+  "conversations": [
+    {
+      "id": 1700000000001,
+      "userId": 1700000000000,
+      "sessionId": "session_1700000000000",
+      "userMessage": "Hello Holoxorn! How are you?",
+      "aiResponse": "🤖 Holoxorn AI: Hello! I'm fully operational and ready to assist you with any task. How can I help today?",
+      "timestamp": "2026-04-20T10:05:00.000Z",
+      "sentiment": "positive",
+      "intent": "greeting"
+    },
+    {
+      "id": 1700000000002,
+      "userId": 1700000000000,
+      "sessionId": "session_1700000000000",
+      "userMessage": "What can you do?",
+      "aiResponse": "✨ AI Core: I can recognize voice commands, upload and process files, answer questions, configure AI settings, and much more! Try me!",
+      "timestamp": "2026-04-20T10:06:00.000Z",
+      "sentiment": "neutral",
+      "intent": "capabilities"
+    }
+  ],
+  "files": [
+    {
+      "id": 1700000000003,
+      "userId": 1700000000000,
+      "originalName": "holoxorn-demo-image.png",
+      "filename": "1700000000003-demo.png",
+      "size": 1024000,
+      "mimetype": "image/png",
+      "path": "/uploads/1700000000003-demo.png",
+      "uploadedAt": "2026-04-20T10:10:00.000Z",
+      "description": "Demo upload example"
+    }
+  ],
+  "analytics": {
+    "totalVisits": 0,
+    "totalConversations": 2,
+    "totalUploads": 1,
+    "activeUsers": 0,
+    "popularFeatures": [
+      "voice-commands",
+      "file-upload",
+      "ai-chat"
+    ]
+  },
+  "systemConfig": {
+    "aiModel": "holoxorn-v1",
+    "maxFileSizeMB": 10,
+    "allowedFileTypes": ["image", "video", "audio", "pdf", "document"],
+    "rateLimit": {
+      "maxRequestsPerMinute": 60,
+      "maxUploadsPerHour": 20
+    },
+    "maintenanceMode": false,
+    "version": "1.0.0",
+    "lastUpdated": "2026-04-20T00:00:00.000Z"
+  }
+}
