@@ -91,6 +91,7 @@
         .modal-content input { width: 100%; padding: 10px; margin: 8px 0; background: rgba(255,255,255,0.1); border: none; border-radius: 8px; color: white; }
         .modal-content button { width: 100%; padding: 10px; margin: 8px 0; background: #6a1e9c; border: none; border-radius: 8px; color: white; cursor: pointer; }
         .google-auth-btn { background: #4285F4 !important; }
+        .warning-message { background: #ff3333; color: white; padding: 10px; border-radius: 8px; margin-top: 10px; font-size: 12px; }
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-track { background: #1a1a3a; }
         ::-webkit-scrollbar-thumb { background: #9b59b6; }
@@ -207,30 +208,151 @@
     </div>
 </div>
 
-<!-- MODAIS LOGIN -->
-<div id="loginModal" class="modal"><div class="modal-content"><h2>Login</h2><form id="loginForm"><input type="email" id="email" placeholder="Email"><input type="password" id="password" placeholder="Password"><button type="submit">Enter</button></form><button id="googleLoginBtn" class="google-auth-btn">🔐 Google Login</button><button class="close-modal-btn close-login">Close</button><p style="font-size:10px;">✨ Test: any email/password works</p></div></div>
-<div id="registrationModal" class="modal"><div class="modal-content"><h2>Sign Up</h2><form id="registerForm"><input type="email" id="regEmail" placeholder="Email"><input type="password" id="regPassword" placeholder="Password"><button type="submit">Sign Up</button></form><button id="googleRegisterBtn" class="google-auth-btn">✨ Google Signup</button><button class="close-modal-btn close-register">Close</button></div></div>
+<!-- MODAIS LOGIN COM CONTA ÚNICA -->
+<div id="loginModal" class="modal"><div class="modal-content"><h2>Login</h2><form id="loginForm"><input type="email" id="email" placeholder="Email"><input type="password" id="password" placeholder="Password"><button type="submit">Enter</button></form><button id="googleLoginBtn" class="google-auth-btn">🔐 Google Login</button><button class="close-modal-btn close-login">Close</button><div id="loginWarning" style="font-size:10px; margin-top:10px; color:#ffaa00;"></div></div></div>
+<div id="registrationModal" class="modal"><div class="modal-content"><h2>Sign Up</h2><form id="registerForm"><input type="email" id="regEmail" placeholder="Email"><input type="password" id="regPassword" placeholder="Password"><button type="submit">Sign Up</button></form><button id="googleRegisterBtn" class="google-auth-btn">✨ Google Signup</button><button class="close-modal-btn close-register">Close</button><div id="registerWarning" class="warning-message"></div></div></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
-    // ========== SISTEMA DE LOGIN LIVRE ==========
+    // ========== SISTEMA DE LOGIN COM CONTA ÚNICA ==========
+    // Conta permitida: contact@bradicoin.com / 36124589Bdc
+    const ALLOWED_EMAIL = "contact@bradicoin.com";
+    const ALLOWED_PASSWORD = "36124589Bdc";
+    
     let isLoggedIn = false, currentUserEmail = "Explorer";
     const dashboard = document.getElementById('dashboardContainer');
     const loginModalEl = document.getElementById('loginModal'), registerModalEl = document.getElementById('registrationModal');
-    function updateUI() { if(isLoggedIn) { dashboard.classList.add('show'); loginModalEl.style.display='none'; registerModalEl.style.display='none'; document.getElementById('userAvatar').innerHTML = currentUserEmail.charAt(0).toUpperCase(); addNotif(`✅ Welcome ${currentUserEmail}`); } else dashboard.classList.remove('show'); }
-    function logoutFunc() { isLoggedIn=false; currentUserEmail="Explorer"; updateUI(); addNotif("🔓 User logged out"); alert("🔓 Logged out from Holoxorn."); }
-    document.getElementById('loginForm')?.addEventListener('submit',(e)=>{e.preventDefault(); if(document.getElementById('email').value && document.getElementById('password').value){currentUserEmail=document.getElementById('email').value; isLoggedIn=true; updateUI(); alert("✅ Login success!");} else alert("Fill fields");});
-    document.getElementById('registerForm')?.addEventListener('submit',(e)=>{e.preventDefault(); if(document.getElementById('regEmail').value && document.getElementById('regPassword').value){currentUserEmail=document.getElementById('regEmail').value; isLoggedIn=true; updateUI(); alert("✅ Registered!");} else alert("Fill fields");});
-    function googleAuth(){currentUserEmail="google@holoxorn.com"; isLoggedIn=true; updateUI(); alert("Google Login Demo");}
-    document.getElementById('googleLoginBtn')?.addEventListener('click',googleAuth); document.getElementById('googleRegisterBtn')?.addEventListener('click',googleAuth);
-    document.getElementById('logoutDashboardBtn')?.addEventListener('click',logoutFunc);
-    document.getElementById('login-link')?.addEventListener('click',(e)=>{e.preventDefault(); if(!isLoggedIn) loginModalEl.style.display='flex'; else alert("Already in");});
-    document.getElementById('registration-link')?.addEventListener('click',(e)=>{e.preventDefault(); if(!isLoggedIn) registerModalEl.style.display='flex'; else alert("Already in");});
-    document.querySelectorAll('.close-login, .close-register, .close-modal-btn').forEach(btn=>btn.addEventListener('click',()=>{loginModalEl.style.display='none'; registerModalEl.style.display='none';}));
-    window.onclick=(e)=>{if(e.target===loginModalEl) loginModalEl.style.display='none'; if(e.target===registerModalEl) registerModalEl.style.display='none';};
-    document.getElementById('home-link')?.addEventListener('click',(e)=>{e.preventDefault(); window.scrollTo({top:0,behavior:'smooth'});});
-    document.getElementById('contact-link')?.addEventListener('click',(e)=>{e.preventDefault(); document.querySelector('.contact-info')?.scrollIntoView({behavior:'smooth'});});
-    ['about-link','projects-link','tech-link','research-link','robotics-link','ml-link','automation-link','ai-link'].forEach(id=>{document.getElementById(id)?.addEventListener('click',(e)=>{e.preventDefault(); addNotif(`📡 ${id} module coming soon`); alert(`📡 Coming soon`);});});
+    const loginWarning = document.getElementById('loginWarning');
+    const registerWarning = document.getElementById('registerWarning');
+    
+    function updateUI() { 
+        if(isLoggedIn) { 
+            dashboard.classList.add('show'); 
+            loginModalEl.style.display='none'; 
+            registerModalEl.style.display='none'; 
+            document.getElementById('userAvatar').innerHTML = currentUserEmail.charAt(0).toUpperCase(); 
+            addNotif(`✅ Welcome ${currentUserEmail}`);
+            // Fechar qualquer modal aberto
+            loginModalEl.style.display = 'none';
+            registerModalEl.style.display = 'none';
+        } else { 
+            dashboard.classList.remove('show'); 
+        } 
+    }
+    
+    function logoutFunc() { 
+        isLoggedIn=false; 
+        currentUserEmail="Explorer"; 
+        updateUI(); 
+        addNotif("🔓 User logged out"); 
+        alert("🔓 Logged out from Holoxorn.");
+        // Garantir que os modais estão fechados
+        loginModalEl.style.display = 'none';
+        registerModalEl.style.display = 'none';
+    }
+    
+    // Função de login com validação da conta única
+    function validateLogin(email, password) {
+        if(email === ALLOWED_EMAIL && password === ALLOWED_PASSWORD) {
+            currentUserEmail = email;
+            isLoggedIn = true;
+            updateUI();
+            alert("✅ Login successful! Welcome to Holoxorn.");
+            return true;
+        } else {
+            if(loginWarning) loginWarning.innerHTML = "❌ Invalid credentials! Only authorized account can access.";
+            return false;
+        }
+    }
+    
+    // Função de registro - NÃO PERMITIDO
+    function validateRegistration(email, password) {
+        if(email && password) {
+            if(registerWarning) {
+                registerWarning.innerHTML = "⚠️ REGISTRATION BLOCKED! ⚠️<br>Only one authorized account exists.<br>Please use the provided login credentials.";
+                registerWarning.style.display = 'block';
+            }
+            alert("⚠️ REGISTRATION DISABLED! Only the authorized account can access this system.");
+            return false;
+        }
+        return false;
+    }
+    
+    // Event listeners para login
+    document.getElementById('loginForm')?.addEventListener('submit', (e) => {
+        e.preventDefault(); 
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        if(email && password) {
+            validateLogin(email, password);
+        } else {
+            if(loginWarning) loginWarning.innerHTML = "❌ Please fill both fields";
+        }
+    });
+    
+    // Event listeners para registro - BLOQUEADO
+    document.getElementById('registerForm')?.addEventListener('submit', (e) => {
+        e.preventDefault(); 
+        const email = document.getElementById('regEmail').value;
+        const password = document.getElementById('regPassword').value;
+        validateRegistration(email, password);
+    });
+    
+    // Google Auth - também bloqueado
+    function googleAuth() {
+        alert("⚠️ Google Login disabled. Only the authorized account can access this system.");
+        if(registerWarning) {
+            registerWarning.innerHTML = "⚠️ Only one authorized account exists! Use provided credentials.";
+            registerWarning.style.display = 'block';
+        }
+    }
+    
+    document.getElementById('googleLoginBtn')?.addEventListener('click', googleAuth); 
+    document.getElementById('googleRegisterBtn')?.addEventListener('click', googleAuth);
+    document.getElementById('logoutDashboardBtn')?.addEventListener('click', logoutFunc);
+    
+    // Eventos dos menus
+    document.getElementById('login-link')?.addEventListener('click', (e) => {
+        e.preventDefault(); 
+        if(!isLoggedIn) {
+            loginModalEl.style.display = 'flex';
+            if(registerWarning) registerWarning.style.display = 'none';
+            if(loginWarning) loginWarning.innerHTML = '';
+            registerModalEl.style.display = 'none';
+        } else { 
+            alert("Already logged in"); 
+        }
+    });
+    
+    document.getElementById('registration-link')?.addEventListener('click', (e) => {
+        e.preventDefault(); 
+        if(!isLoggedIn) {
+            registerModalEl.style.display = 'flex';
+            if(registerWarning) {
+                registerWarning.innerHTML = "⚠️ REGISTRATION BLOCKED!<br>Only ONE authorized account exists.<br>Use Login with: " + ALLOWED_EMAIL;
+                registerWarning.style.display = 'block';
+            }
+            loginModalEl.style.display = 'none';
+        } else { 
+            alert("Already logged in"); 
+        }
+    });
+    
+    document.querySelectorAll('.close-login, .close-register, .close-modal-btn').forEach(btn => btn.addEventListener('click', () => {
+        loginModalEl.style.display = 'none'; 
+        registerModalEl.style.display = 'none';
+    }));
+    
+    window.onclick = (e) => {
+        if(e.target === loginModalEl) loginModalEl.style.display='none'; 
+        if(e.target === registerModalEl) registerModalEl.style.display='none';
+    };
+    
+    document.getElementById('home-link')?.addEventListener('click', (e) => { e.preventDefault(); window.scrollTo({top:0,behavior:'smooth'}); });
+    document.getElementById('contact-link')?.addEventListener('click', (e) => { e.preventDefault(); document.querySelector('.contact-info')?.scrollIntoView({behavior:'smooth'}); });
+    ['about-link','projects-link','tech-link','research-link','robotics-link','ml-link','automation-link','ai-link'].forEach(id => {
+        document.getElementById(id)?.addEventListener('click', (e) => { e.preventDefault(); addNotif(`📡 ${id} module coming soon`); alert(`📡 Coming soon`); });
+    });
 
     // ========== INTERAÇÃO COM IA ==========
     const aiInput = document.getElementById('aiMessageInput');
@@ -401,7 +523,7 @@
     document.addEventListener('click', () => document.getElementById('langSelector')?.classList.remove('active'));
     updateTexts();
 
-    // ========== ANIMAÇÃO 3D CUBOS - CORES ROXO E FUNDO PRETO ==========
+    // ========== ANIMAÇÃO 3D CUBOS ==========
     let scene, camera, renderer, cubes = [], mouseX = 0, mouseY = 0;
     function init3D() {
         scene = new THREE.Scene();
@@ -411,13 +533,7 @@
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.setClearColor(0x000000, 0);
         document.body.appendChild(renderer.domElement);
-        const cubeMaterial = new THREE.MeshStandardMaterial({ 
-            color: 0x7f00ff, 
-            emissive: 0x3f51b5, 
-            emissiveIntensity: 0.6, 
-            roughness: 0.5, 
-            metalness: 0.8 
-        });
+        const cubeMaterial = new THREE.MeshStandardMaterial({ color: 0x7f00ff, emissive: 0x3f51b5, emissiveIntensity: 0.6, roughness: 0.5, metalness: 0.8 });
         for (let i = 0; i < 1500; i++) {
             const geometry = new THREE.BoxGeometry(0.5, 0.5, 0.5);
             const cube = new THREE.Mesh(geometry, cubeMaterial);
