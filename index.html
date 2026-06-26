@@ -6,10 +6,6 @@
     <title>Holoxorn - AI Interactive Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <script src="https://unpkg.com/i18next@21.10.0/dist/umd/i18next.min.js">
-    </script>
-    <script src="https://unpkg.com/i18next-browser-languagedetector@7.0.0/dist/umd/i18nextBrowserLanguageDetector.min.js">
-    </script>
     <style>
         * {
             margin: 0;
@@ -19,9 +15,20 @@
         body {
             margin: 0;
             overflow: hidden;
-            background: linear-gradient(to right, #6a1e9c, #3f51b5);
+            background: #000000;
             color: white;
             font-family: 'Orbitron', sans-serif;
+        }
+        #three-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 0;
+            pointer-events: none;
+            display: block;
+            background: #000000;
         }
         header {
             position: absolute;
@@ -48,19 +55,31 @@
             display: flex;
             gap: 20px;
             z-index: 100;
+            flex-wrap: wrap;
+            justify-content: center;
+            background: rgba(0,0,0,0.5);
+            padding: 8px 20px;
+            border-radius: 30px;
+            backdrop-filter: blur(10px);
         }
         .menu a {
             color: white;
             text-decoration: none;
             font-weight: 700;
             cursor: pointer;
+            transition: 0.3s;
+            font-size: 0.8rem;
+        }
+        .menu a:hover {
+            color: #00ff99;
+            text-shadow: 0 0 20px rgba(0,255,153,0.3);
         }
         .header-title {
             position: absolute;
-            top: 100px;
+            top: 80px;
             left: 50%;
             transform: translateX(-50%);
-            font-size: 70px;
+            font-size: 60px;
             font-weight: bold;
             color: #00ff99;
             text-align: center;
@@ -71,29 +90,17 @@
             z-index: 10;
         }
         @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(-50px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(-50px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         @keyframes glow {
-            0% {
-                text-shadow: 0 0 10px #00ff99, 0 0 20px #00ff99, 0 0 30px #00ff99;
-            }
-            50% {
-                text-shadow: 0 0 20px #ff00ff, 0 0 40px #ff00ff, 0 0 60px #ff00ff;
-            }
-            100% {
-                text-shadow: 0 0 10px #00ff99, 0 0 20px #00ff99, 0 0 30px #00ff99;
-            }
+            0% { text-shadow: 0 0 10px #00ff99, 0 0 20px #00ff99, 0 0 30px #00ff99; }
+            50% { text-shadow: 0 0 20px #ff00ff, 0 0 40px #ff00ff, 0 0 60px #ff00ff; }
+            100% { text-shadow: 0 0 10px #00ff99, 0 0 20px #00ff99, 0 0 30px #00ff99; }
         }
         .additional-menu {
             position: absolute;
-            top: 250px;
+            top: 200px;
             left: 50%;
             transform: translateX(-50%);
             display: flex;
@@ -112,22 +119,37 @@
             font-weight: 700;
             transition: 0.3s;
             cursor: pointer;
-            font-size: 14px;
+            font-size: 13px;
+            background: rgba(0,0,0,0.3);
+            backdrop-filter: blur(5px);
         }
         .additional-menu a:hover {
-            background-color: rgba(255, 255, 255, 0.2);
+            background-color: rgba(0, 255, 153, 0.2);
+            border-color: #00ff99;
+            box-shadow: 0 0 30px rgba(0,255,153,0.2);
+            transform: translateY(-2px);
         }
         .contact-info {
             position: absolute;
             bottom: 20px;
             left: 50%;
             transform: translateX(-50%);
-            font-size: 18px;
-            color: white;
+            font-size: 16px;
+            color: #a8b2d1;
             text-align: center;
             font-weight: 700;
             z-index: 10;
+            background: rgba(0,0,0,0.3);
+            padding: 8px 20px;
+            border-radius: 30px;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(0,255,153,0.1);
         }
+        .contact-info a {
+            color: #00ff99;
+            text-decoration: none;
+        }
+
         .language-selector {
             position: fixed;
             top: 20px;
@@ -135,21 +157,23 @@
             z-index: 1000;
         }
         .globe-btn {
-            background: transparent;
+            background: rgba(0,0,0,0.5);
             border: 2px solid #00ff99;
             color: #00ff99;
             padding: 8px 16px;
             font-family: 'Orbitron';
-            font-size: 14px;
+            font-size: 13px;
             cursor: pointer;
             border-radius: 20px;
             display: flex;
             align-items: center;
             gap: 8px;
+            backdrop-filter: blur(10px);
+            transition: 0.3s;
         }
         .globe-btn:hover {
-            background: #00ff99;
-            color: #000;
+            background: rgba(0,255,153,0.1);
+            box-shadow: 0 0 30px rgba(0,255,153,0.2);
         }
         .lang-dropdown {
             position: absolute;
@@ -163,6 +187,7 @@
             flex-direction: column;
             min-width: 140px;
             z-index: 1001;
+            overflow: hidden;
         }
         .lang-dropdown button {
             background: transparent;
@@ -171,6 +196,8 @@
             font-family: 'Orbitron';
             padding: 10px 15px;
             cursor: pointer;
+            transition: 0.3s;
+            font-size: 13px;
         }
         .lang-dropdown button:hover {
             background: #6a1e9c;
@@ -179,15 +206,273 @@
         .language-selector.active .lang-dropdown {
             display: flex;
         }
-        /* DASHBOARD PRINCIPAL */
+
+        /* ===== MODAL OVERLAY ===== */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            justify-content: center;
+            align-items: center;
+            z-index: 5000;
+        }
+        .modal-overlay.active {
+            display: flex !important;
+        }
+        .modal-box {
+            background: rgba(10, 10, 30, 0.95);
+            padding: 35px 30px;
+            border-radius: 30px;
+            width: 420px;
+            max-width: 92%;
+            text-align: center;
+            border: 1px solid rgba(0, 255, 153, 0.3);
+            box-shadow: 0 0 60px rgba(0, 255, 153, 0.1);
+            animation: modalIn 0.5s ease-out;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        @keyframes modalIn {
+            from { opacity: 0; transform: scale(0.9) translateY(30px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        .modal-box .modal-icon {
+            font-size: 2.5rem;
+            color: #00ff99;
+            margin-bottom: 8px;
+        }
+        .modal-box h2 {
+            color: #00ff99;
+            font-size: 1.5rem;
+            letter-spacing: 3px;
+            margin-bottom: 3px;
+        }
+        .modal-box .subtitle {
+            color: #a8b2d1;
+            font-size: 0.65rem;
+            margin-bottom: 20px;
+            opacity: 0.7;
+        }
+        .modal-box input {
+            width: 100%;
+            padding: 12px 16px;
+            margin: 6px 0;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(155, 89, 182, 0.3);
+            border-radius: 12px;
+            color: white;
+            font-family: 'Orbitron';
+            font-size: 0.75rem;
+            transition: 0.3s;
+        }
+        .modal-box input:focus {
+            outline: none;
+            border-color: #00ff99;
+            box-shadow: 0 0 20px rgba(0, 255, 153, 0.05);
+        }
+        .modal-box input::placeholder {
+            color: rgba(255, 255, 255, 0.3);
+        }
+        .modal-box .btn-primary {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0 6px 0;
+            background: linear-gradient(135deg, #00ff99, #00ccff);
+            border: none;
+            border-radius: 12px;
+            color: #000;
+            font-family: 'Orbitron';
+            font-size: 0.85rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+            letter-spacing: 2px;
+        }
+        .modal-box .btn-primary:hover {
+            transform: scale(1.02);
+            box-shadow: 0 0 30px rgba(0, 255, 153, 0.3);
+        }
+        .modal-box .btn-primary.purple {
+            background: linear-gradient(135deg, #a855f7, #06b6d4);
+            color: white;
+        }
+        .modal-box .btn-google {
+            width: 100%;
+            padding: 10px;
+            margin: 4px 0;
+            background: #4285F4;
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-family: 'Orbitron';
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .modal-box .btn-google:hover {
+            transform: scale(1.02);
+            box-shadow: 0 0 20px rgba(66, 133, 244, 0.3);
+        }
+        .modal-box .btn-close {
+            width: 100%;
+            padding: 8px;
+            margin: 4px 0;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            color: #a8b2d1;
+            font-family: 'Orbitron';
+            font-size: 0.65rem;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .modal-box .btn-close:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        .modal-box .warning {
+            font-size: 0.65rem;
+            color: #ffaa00;
+            margin-top: 8px;
+            min-height: 18px;
+        }
+        .modal-box .success {
+            font-size: 0.65rem;
+            color: #00ff99;
+            margin-top: 8px;
+            min-height: 18px;
+        }
+        .modal-box .hint {
+            font-size: 0.55rem;
+            color: rgba(255, 255, 255, 0.3);
+            margin-top: 12px;
+            padding: 8px;
+            background: rgba(0, 255, 153, 0.05);
+            border-radius: 8px;
+            border: 1px dashed rgba(0, 255, 153, 0.1);
+        }
+        .modal-box .hint span {
+            color: #00ff99;
+        }
+
+        /* ===== PÁGINAS DE INFORMAÇÃO ===== */
+        .info-page {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.92);
+            backdrop-filter: blur(20px);
+            justify-content: center;
+            align-items: center;
+            z-index: 3000;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        .info-page.active {
+            display: flex !important;
+        }
+        .info-content {
+            background: rgba(10, 10, 30, 0.95);
+            padding: 40px;
+            border-radius: 30px;
+            max-width: 900px;
+            width: 95%;
+            max-height: 85vh;
+            overflow-y: auto;
+            border: 1px solid rgba(0, 255, 153, 0.2);
+            box-shadow: 0 0 60px rgba(0, 255, 153, 0.05);
+            animation: modalIn 0.5s ease-out;
+        }
+        .info-content h2 {
+            color: #00ff99;
+            font-size: 1.8rem;
+            letter-spacing: 3px;
+            margin-bottom: 10px;
+            border-bottom: 2px solid rgba(0, 255, 153, 0.2);
+            padding-bottom: 15px;
+        }
+        .info-content .info-icon {
+            font-size: 3rem;
+            color: #00ff99;
+            margin-bottom: 15px;
+            display: block;
+        }
+        .info-content p {
+            color: #a8b2d1;
+            font-size: 0.9rem;
+            line-height: 2;
+            margin: 15px 0;
+            font-family: 'Orbitron', sans-serif;
+        }
+        .info-content .info-features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .info-content .info-features .feature {
+            background: rgba(155, 89, 182, 0.1);
+            border: 1px solid rgba(155, 89, 182, 0.2);
+            border-radius: 15px;
+            padding: 15px;
+            text-align: center;
+            transition: 0.3s;
+        }
+        .info-content .info-features .feature:hover {
+            border-color: #00ff99;
+            transform: translateY(-3px);
+            box-shadow: 0 0 30px rgba(0, 255, 153, 0.05);
+        }
+        .info-content .info-features .feature i {
+            font-size: 2rem;
+            color: #00ff99;
+            margin-bottom: 10px;
+        }
+        .info-content .info-features .feature h4 {
+            color: white;
+            font-size: 0.8rem;
+            margin-bottom: 5px;
+        }
+        .info-content .info-features .feature p {
+            font-size: 0.65rem;
+            color: #a8b2d1;
+            margin: 0;
+            line-height: 1.5;
+        }
+        .info-content .btn-close-info {
+            width: 100%;
+            padding: 12px;
+            margin-top: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            color: #a8b2d1;
+            font-family: 'Orbitron';
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .info-content .btn-close-info:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        /* ===== DASHBOARD ===== */
         .dashboard-container {
             position: fixed;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 92%;
-            max-width: 1400px;
-            height: 88vh;
+            width: 94%;
+            max-width: 1500px;
+            height: 90vh;
             background: rgba(0, 0, 0, 0.92);
             backdrop-filter: blur(20px);
             border-radius: 30px;
@@ -201,6 +486,11 @@
         }
         .dashboard-container.show {
             display: flex;
+            animation: dashboardIn 0.5s ease-out;
+        }
+        @keyframes dashboardIn {
+            from { opacity: 0; transform: translate(-50%, -50%) scale(0.95); }
+            to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
         }
         .dashboard-header {
             display: flex;
@@ -212,7 +502,7 @@
             flex-wrap: wrap;
         }
         .dashboard-header h2 {
-            font-size: 1.4rem;
+            font-size: 1.2rem;
             background: linear-gradient(135deg, #a855f7, #06b6d4);
             -webkit-background-clip: text;
             background-clip: text;
@@ -221,7 +511,7 @@
         .user-info {
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 12px;
         }
         .user-avatar {
             width: 40px;
@@ -231,11 +521,12 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            font-weight: bold;
         }
         .logout-dash-btn {
             background: linear-gradient(90deg, #e74c8b, #9b59b6);
             border: none;
-            padding: 8px 20px;
+            padding: 8px 18px;
             border-radius: 40px;
             font-family: 'Orbitron';
             font-weight: bold;
@@ -245,48 +536,60 @@
             align-items: center;
             gap: 8px;
             transition: 0.3s;
+            font-size: 0.7rem;
         }
         .logout-dash-btn:hover {
             transform: scale(1.03);
             box-shadow: 0 0 15px #ff66cc;
         }
-        /* LAYOUT 2 COLUNAS */
+
         .dashboard-main {
             display: flex;
-            gap: 20px;
+            gap: 15px;
             flex: 1;
             overflow: hidden;
         }
         .col-left {
-            flex: 1.4;
+            flex: 0.8;
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 12px;
             overflow-y: auto;
-            padding-right: 8px;
+            padding-right: 6px;
+        }
+        .col-center {
+            flex: 2.4;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            overflow: hidden;
+            background: rgba(20, 15, 40, 0.5);
+            border-radius: 25px;
+            border: 1px solid rgba(155, 89, 182, 0.15);
+            padding: 16px;
         }
         .col-right {
             flex: 1;
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 12px;
             overflow-y: auto;
         }
         .dash-card {
             background: rgba(30, 20, 50, 0.7);
-            border-radius: 20px;
-            padding: 16px;
-            border: 1px solid #9b59b6;
-            transition: 0.2s;
+            border-radius: 18px;
+            padding: 14px;
+            border: 1px solid rgba(155, 89, 182, 0.2);
+            transition: 0.3s;
         }
         .dash-card:hover {
             border-color: #00ffff;
-            box-shadow: 0 0 15px rgba(0, 255, 255, 0.2);
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.1);
         }
         .card-title {
-            font-size: 0.9rem;
+            font-size: 0.75rem;
             color: #c084fc;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
             display: flex;
             align-items: center;
             gap: 8px;
@@ -297,15 +600,18 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin: 10px 0;
+            margin: 8px 0;
+            font-size: 0.65rem;
         }
         .toggle-neon {
-            width: 44px;
-            height: 22px;
+            width: 38px;
+            height: 20px;
             background: #2d2d5e;
             border-radius: 30px;
             position: relative;
             cursor: pointer;
+            flex-shrink: 0;
+            border: 1px solid rgba(155, 89, 182, 0.2);
         }
         .toggle-neon.active {
             background: #00ffff;
@@ -313,222 +619,297 @@
         }
         .toggle-neon::after {
             content: '';
-            width: 18px;
-            height: 18px;
+            width: 16px;
+            height: 16px;
             background: white;
             border-radius: 50%;
             position: absolute;
-            top: 2px;
-            left: 3px;
-            transition: 0.2s;
+            top: 1px;
+            left: 2px;
+            transition: 0.3s;
         }
         .toggle-neon.active::after {
-            left: 23px;
+            left: 19px;
             background: #1a1a2e;
         }
-        .config-select {
-            background: #0e0e2a;
-            border: 1px solid #9b59b6;
-            color: white;
-            font-family: 'Orbitron';
-            padding: 5px 10px;
-            border-radius: 20px;
-            cursor: pointer;
-            font-size: 0.7rem;
+
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            min-height: 300px;
         }
-        /* Upload area */
-        .upload-area {
-            border: 2px dashed #9b59b6;
-            border-radius: 15px;
-            padding: 15px;
-            text-align: center;
-            cursor: pointer;
-            background: rgba(155, 89, 182, 0.1);
-            transition: 0.2s;
-        }
-        .upload-area:hover {
-            border-color: #00ffff;
-            background: rgba(0, 255, 255, 0.1);
-        }
-        .file-list {
-            margin-top: 10px;
-            max-height: 100px;
-            overflow-y: auto;
-            font-size: 0.7rem;
-        }
-        .file-item {
-            background: rgba(0, 0, 0, 0.5);
-            padding: 5px 8px;
-            margin: 4px 0;
-            border-radius: 8px;
+        .chat-toolbar {
             display: flex;
             justify-content: space-between;
             align-items: center;
-        }
-        .delete-file {
-            cursor: pointer;
-            color: #ff6b6b;
-            transition: 0.2s;
-        }
-        .delete-file:hover {
-            color: #ff0000;
-        }
-        .media-preview {
-            max-height: 100px;
-            overflow-y: auto;
-            margin-top: 8px;
-            display: flex;
-            gap: 8px;
+            margin-bottom: 8px;
             flex-wrap: wrap;
+            gap: 8px;
         }
-        .media-preview img,
-        .media-preview video {
-            max-width: 80px;
-            max-height: 70px;
-            border-radius: 8px;
+        .chat-toolbar .chat-actions {
+            display: flex;
+            gap: 6px;
         }
-        /* MICROFONE */
-        .mic-area {
+        .chat-toolbar .chat-actions button {
+            background: rgba(155, 89, 182, 0.2);
+            border: 1px solid rgba(155, 89, 182, 0.2);
+            padding: 6px 12px;
+            border-radius: 20px;
+            color: #a8b2d1;
+            font-family: 'Orbitron';
+            font-size: 0.55rem;
+            cursor: pointer;
+            transition: 0.3s;
             display: flex;
             align-items: center;
-            gap: 12px;
-            margin: 10px 0;
+            gap: 5px;
         }
-        .mic-btn {
-            background: linear-gradient(135deg, #e74c8b, #9b59b6);
-            border: none;
-            width: 55px;
-            height: 55px;
-            border-radius: 50%;
-            cursor: pointer;
-            font-size: 1.5rem;
-            transition: 0.2s;
-            color: white;
+        .chat-toolbar .chat-actions button:hover {
+            background: rgba(0, 255, 153, 0.15);
+            border-color: #00ff99;
+            color: #00ff99;
         }
-        .mic-btn.recording {
-            background: #ff3333;
-            animation: pulse 1s infinite;
-            box-shadow: 0 0 20px red;
+        .chat-toolbar .chat-actions button.danger:hover {
+            background: rgba(255, 51, 51, 0.15);
+            border-color: #ff3333;
+            color: #ff3333;
         }
-        @keyframes pulse {
-            0% {
-                transform: scale(1);
-            }
-            50% {
-                transform: scale(1.08);
-            }
-            100% {
-                transform: scale(1);
-            }
-        }
-        .mic-status {
-            font-size: 0.7rem;
-            opacity: 0.8;
-        }
-        .transcript-area {
-            background: rgba(0, 0, 0, 0.5);
-            border-radius: 12px;
-            padding: 10px;
-            margin-top: 10px;
-            font-size: 0.75rem;
-            max-height: 80px;
+        .chat-messages {
+            flex: 1;
             overflow-y: auto;
-        }
-        /* INTERAÇÃO COM IA */
-        .ai-interaction-area {
-            background: rgba(20, 20, 50, 0.6);
-            border-radius: 20px;
-            padding: 15px;
-        }
-        .ai-input-group {
+            padding: 10px 5px;
             display: flex;
-            gap: 12px;
+            flex-direction: column;
+            gap: 8px;
+            min-height: 200px;
+            max-height: calc(100% - 130px);
+        }
+        .chat-messages::-webkit-scrollbar {
+            width: 4px;
+        }
+        .chat-messages::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 4px;
+        }
+        .chat-messages::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, #00ff99, #00ffff);
+            border-radius: 4px;
+        }
+        .chat-msg {
+            padding: 10px 16px;
+            border-radius: 16px;
+            max-width: 85%;
+            font-size: 0.75rem;
+            animation: msgIn 0.3s ease-out;
+            line-height: 1.6;
+            word-break: break-word;
+        }
+        @keyframes msgIn {
+            from { opacity: 0; transform: translateY(10px) scale(0.98); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        .chat-msg.user {
+            align-self: flex-end;
+            background: linear-gradient(135deg, rgba(155, 89, 182, 0.3), rgba(63, 81, 181, 0.2));
+            border: 1px solid rgba(155, 89, 182, 0.2);
+            border-bottom-right-radius: 4px;
+        }
+        .chat-msg.assistant {
+            align-self: flex-start;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(0, 255, 153, 0.1);
+            border-bottom-left-radius: 4px;
+        }
+        .chat-msg .msg-time {
+            font-size: 0.5rem;
+            opacity: 0.5;
+            margin-top: 4px;
+            display: block;
+            font-family: 'Orbitron';
+        }
+        .chat-msg .msg-icon {
+            margin-right: 8px;
+        }
+        .chat-input-area {
+            display: flex;
+            gap: 8px;
             align-items: flex-end;
+            padding: 8px 0 4px 0;
+            border-top: 1px solid rgba(155, 89, 182, 0.1);
+            margin-top: 8px;
             flex-wrap: wrap;
         }
-        .ai-textarea {
+        .chat-input-area .ai-textarea {
             flex: 1;
             background: rgba(10, 10, 30, 0.9);
-            border: 1px solid #9b59b6;
-            border-radius: 20px;
-            padding: 14px;
+            border: 1px solid rgba(155, 89, 182, 0.2);
+            border-radius: 16px;
+            padding: 10px 16px;
             color: white;
             font-family: 'Orbitron';
-            font-size: 0.85rem;
-            resize: vertical;
-            min-height: 70px;
+            font-size: 0.7rem;
+            resize: none;
+            min-height: 42px;
+            max-height: 100px;
+            transition: 0.3s;
+            min-width: 120px;
         }
-        .ai-textarea:focus {
+        .chat-input-area .ai-textarea:focus {
             outline: none;
-            border-color: #00ffff;
-            box-shadow: 0 0 10px cyan;
+            border-color: #00ff99;
+            box-shadow: 0 0 20px rgba(0, 255, 153, 0.1);
         }
-        .action-buttons {
+        .chat-input-area .ai-textarea::placeholder {
+            color: rgba(255, 255, 255, 0.3);
+        }
+        .chat-input-area .action-buttons {
             display: flex;
-            gap: 10px;
+            gap: 5px;
         }
-        .icon-btn {
-            background: linear-gradient(135deg, #9b59b6, #3498db);
-            border: none;
-            width: 50px;
-            height: 50px;
+        .chat-input-area .icon-btn {
+            background: rgba(155, 89, 182, 0.2);
+            border: 1px solid rgba(155, 89, 182, 0.2);
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
             cursor: pointer;
-            font-size: 1.3rem;
-            transition: 0.2s;
+            font-size: 0.9rem;
+            transition: 0.3s;
             color: white;
             display: flex;
             align-items: center;
             justify-content: center;
         }
-        .icon-btn:hover {
-            transform: scale(1.08);
-            box-shadow: 0 0 15px #00ffff;
+        .chat-input-area .icon-btn:hover {
+            background: rgba(0, 255, 153, 0.15);
+            border-color: #00ff99;
+            box-shadow: 0 0 25px rgba(0, 255, 153, 0.15);
+            transform: scale(1.05);
         }
-        .send-btn-large {
-            background: linear-gradient(90deg, #00ff99, #3498db);
+        .chat-input-area .send-btn {
+            background: linear-gradient(135deg, #00ff99, #00ccff);
             border: none;
-            padding: 12px 25px;
-            border-radius: 40px;
+            padding: 8px 20px;
+            border-radius: 30px;
             font-family: 'Orbitron';
             font-weight: bold;
             color: #000;
             cursor: pointer;
-            transition: 0.2s;
+            transition: 0.3s;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
+            font-size: 0.65rem;
+            letter-spacing: 1px;
+            min-height: 40px;
+        }
+        .chat-input-area .send-btn:hover {
+            transform: scale(1.03);
+            box-shadow: 0 0 40px rgba(0, 255, 153, 0.3);
+        }
+        .typing-indicator {
+            display: none;
+            padding: 4px 0;
+            color: #00ff99;
+            font-size: 0.65rem;
+            align-items: center;
+            gap: 6px;
+        }
+        .typing-indicator.active {
+            display: flex;
+        }
+        .typing-indicator span {
+            display: inline-block;
+            animation: typingDot 1.4s infinite;
+        }
+        .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+        .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes typingDot {
+            0%, 60%, 100% { opacity: 0.2; }
+            30% { opacity: 1; }
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            margin-right: 5px;
+        }
+        .status-indicator.online {
+            background: #00ff99;
+            box-shadow: 0 0 10px #00ff99;
+        }
+        .progress-bar {
             width: 100%;
-            justify-content: center;
-            margin-top: 12px;
+            height: 4px;
+            background: #1a1a3a;
+            border-radius: 4px;
+            margin-top: 6px;
+            overflow: hidden;
         }
-        .send-btn-large:hover {
-            transform: scale(1.02);
-            box-shadow: 0 0 20px #00ff99;
+        .progress-bar .fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00ff99, #3498db);
+            transition: width 0.5s ease;
+            border-radius: 4px;
         }
-        .ai-response-box {
-            background: rgba(0, 0, 0, 0.4);
-            border-radius: 16px;
-            padding: 15px;
-            margin-top: 15px;
-            font-size: 0.8rem;
-            border-left: 3px solid #00ffff;
-            min-height: 80px;
+        .entity-tag {
+            display: inline-block;
+            background: rgba(155, 89, 182, 0.3);
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 0.55rem;
+            margin: 2px 4px 2px 0;
+            border: 1px solid rgba(155, 89, 182, 0.3);
+        }
+        .history-item {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 6px 10px;
+            margin: 3px 0;
+            border-radius: 8px;
+            font-size: 0.6rem;
+            border-left: 2px solid #00ff99;
+        }
+        .security-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 4px;
+        }
+        .security-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.55rem;
+            padding: 3px 0;
+            border-bottom: 1px solid rgba(155, 89, 182, 0.08);
+        }
+        .security-item label {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            color: #a8b2d1;
+        }
+        .security-item label i {
+            font-size: 0.65rem;
+            color: #c084fc;
         }
         .settings-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 8px;
+            gap: 6px;
         }
         .setting-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-size: 0.7rem;
-            padding: 6px 0;
-            border-bottom: 1px solid rgba(155, 89, 182, 0.3);
+            font-size: 0.6rem;
+            padding: 4px 0;
+            border-bottom: 1px solid rgba(155, 89, 182, 0.15);
         }
-        .modal {
+
+        .confirm-modal {
             display: none;
             position: fixed;
             top: 0;
@@ -538,267 +919,108 @@
             background: rgba(0, 0, 0, 0.85);
             justify-content: center;
             align-items: center;
-            z-index: 2000;
+            z-index: 3000;
+            backdrop-filter: blur(10px);
         }
-        .modal-content {
-            background: rgba(0, 0, 0, 0.95);
-            padding: 30px;
-            border-radius: 20px;
-            width: 350px;
-            text-align: center;
-            border: 1px solid #00ff99;
-        }
-        .modal-content input {
-            width: 100%;
-            padding: 10px;
-            margin: 8px 0;
-            background: rgba(255, 255, 255, 0.1);
-            border: none;
-            border-radius: 8px;
-            color: white;
-        }
-        .modal-content button {
-            width: 100%;
-            padding: 10px;
-            margin: 8px 0;
-            background: #6a1e9c;
-            border: none;
-            border-radius: 8px;
-            color: white;
-            cursor: pointer;
-        }
-        .google-auth-btn {
-            background: #4285F4 !important;
-        }
-        .warning-message {
-            background: #ff3333;
-            color: white;
-            padding: 10px;
-            border-radius: 8px;
-            margin-top: 10px;
-            font-size: 12px;
-        }
-        ::-webkit-scrollbar {
-            width: 4px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #1a1a3a;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #9b59b6;
-        }
-        @media (max-width: 900px) {
-            .dashboard-main {
-                flex-direction: column;
-            }
-            .col-left,
-            .col-right {
-                width: 100%;
-            }
-            .header-title {
-                font-size: 40px;
-                top: 80px;
-            }
-            .ai-input-group {
-                flex-direction: column;
-            }
-            .action-buttons {
-                justify-content: center;
-            }
-        }
-
-        /* NOVOS ESTILOS PARA AS FUNCIONALIDADES ADICIONADAS */
-        .history-item {
-            background: rgba(0, 0, 0, 0.3);
-            padding: 8px 12px;
-            margin: 4px 0;
-            border-radius: 8px;
-            font-size: 0.7rem;
-            border-left: 2px solid #00ff99;
-        }
-
-        .status-indicator {
-            display: inline-block;
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            margin-right: 6px;
-        }
-
-        .status-indicator.online {
-            background: #00ff99;
-            box-shadow: 0 0 10px #00ff99;
-        }
-
-        .status-indicator.offline {
-            background: #ff3333;
-            box-shadow: 0 0 10px #ff3333;
-        }
-
-        .status-indicator.processing {
-            background: #ffaa00;
-            box-shadow: 0 0 10px #ffaa00;
-            animation: pulse 0.8s infinite;
-        }
-
-        .progress-bar {
-            width: 100%;
-            height: 4px;
-            background: #1a1a3a;
-            border-radius: 4px;
-            margin-top: 8px;
-            overflow: hidden;
-        }
-
-        .progress-bar .fill {
-            height: 100%;
-            background: linear-gradient(90deg, #00ff99, #3498db);
-            transition: width 0.5s ease;
-            border-radius: 4px;
-        }
-
-        .quick-actions {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 8px;
-            margin-top: 8px;
-        }
-
-        .quick-action-btn {
-            background: rgba(155, 89, 182, 0.2);
-            border: 1px solid #9b59b6;
-            border-radius: 12px;
-            padding: 8px 4px;
-            color: white;
-            font-family: 'Orbitron';
-            font-size: 0.6rem;
-            cursor: pointer;
-            transition: 0.2s;
-            text-align: center;
-        }
-
-        .quick-action-btn:hover {
-            background: rgba(155, 89, 182, 0.4);
-            border-color: #00ffff;
-            transform: scale(1.02);
-        }
-
-        .quick-action-btn i {
-            display: block;
-            font-size: 1.2rem;
-            margin-bottom: 4px;
-        }
-
-        .knowledge-base-item {
-            padding: 6px 0;
-            border-bottom: 1px solid rgba(155, 89, 182, 0.2);
-            font-size: 0.7rem;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-
-        .knowledge-base-item:hover {
-            color: #00ff99;
-            padding-left: 8px;
-        }
-
-        .knowledge-base-item .tag {
-            background: rgba(0, 255, 153, 0.2);
-            padding: 1px 8px;
-            border-radius: 10px;
-            font-size: 0.6rem;
-            margin-left: 6px;
-        }
-
-        .sentiment-indicator {
+        .confirm-modal.show {
             display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 6px 0;
         }
-
-        .sentiment-bar {
-            flex: 1;
-            height: 6px;
-            background: #1a1a3a;
-            border-radius: 4px;
-            overflow: hidden;
+        .confirm-modal .modal-content {
+            background: rgba(10, 10, 30, 0.95);
+            padding: 30px;
+            border-radius: 25px;
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+            border: 1px solid rgba(0, 255, 153, 0.2);
         }
-
-        .sentiment-bar .fill {
-            height: 100%;
-            border-radius: 4px;
-            transition: width 0.5s ease;
-        }
-
-        .sentiment-bar .fill.positive {
-            background: linear-gradient(90deg, #00ff99, #00ccff);
-        }
-
-        .sentiment-bar .fill.neutral {
-            background: linear-gradient(90deg, #ffaa00, #ffcc66);
-        }
-
-        .sentiment-bar .fill.negative {
-            background: linear-gradient(90deg, #ff3333, #ff6b6b);
-        }
-
-        .entity-tag {
-            display: inline-block;
-            background: rgba(155, 89, 182, 0.3);
-            padding: 2px 10px;
-            border-radius: 12px;
-            font-size: 0.6rem;
-            margin: 2px 4px 2px 0;
-            border: 1px solid rgba(155, 89, 182, 0.3);
-        }
-
-        .typing-indicator {
-            display: none;
-            padding: 8px 0;
+        .confirm-modal .modal-content h2 {
             color: #00ff99;
-            font-size: 0.7rem;
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+        }
+        .confirm-modal .modal-content p {
+            color: #a8b2d1;
+            font-size: 0.9rem;
+            margin: 15px 0;
+        }
+        .confirm-modal .modal-content .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        .confirm-modal .modal-content .btn-group button {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 12px;
+            font-family: 'Orbitron';
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .confirm-modal .modal-content .btn-group .btn-yes {
+            background: linear-gradient(135deg, #ff3333, #cc0000);
+            color: white;
+        }
+        .confirm-modal .modal-content .btn-group .btn-yes:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 30px rgba(255, 51, 51, 0.3);
+        }
+        .confirm-modal .modal-content .btn-group .btn-no {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .confirm-modal .modal-content .btn-group .btn-no:hover {
+            background: rgba(255, 255, 255, 0.2);
         }
 
-        .typing-indicator.active {
-            display: block;
-        }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: #1a1a3a; }
+        ::-webkit-scrollbar-thumb { background: #9b59b6; }
 
-        .typing-indicator span {
-            display: inline-block;
-            animation: typingDot 1.4s infinite;
-        }
-
-        .typing-indicator span:nth-child(2) {
-            animation-delay: 0.2s;
-        }
-        .typing-indicator span:nth-child(3) {
-            animation-delay: 0.4s;
-        }
-
-        @keyframes typingDot {
-            0%,
-            60%,
-            100% {
-                opacity: 0.2;
+        @media (max-width: 1100px) {
+            .dashboard-main { flex-direction: column; }
+            .col-left, .col-right, .col-center {
+                flex: 1;
+                min-width: 0;
+                max-height: 300px;
             }
-            30% {
-                opacity: 1;
-            }
+            .col-center { min-height: 350px; max-height: 400px; }
+            .header-title { font-size: 35px; top: 70px; }
+            .menu { gap: 10px; padding: 6px 12px; }
+            .menu a { font-size: 0.65rem; }
+            .modal-box { padding: 25px 20px; width: 95%; }
+            .info-content { padding: 25px; }
+            .info-content h2 { font-size: 1.3rem; }
         }
-
-        .context-badge {
-            background: rgba(0, 255, 153, 0.15);
-            border: 1px solid rgba(0, 255, 153, 0.3);
-            border-radius: 20px;
-            padding: 2px 12px;
-            font-size: 0.6rem;
-            display: inline-block;
-            margin-right: 6px;
+        @media (max-width: 600px) {
+            .dashboard-container { padding: 12px; height: 95vh; width: 98%; border-radius: 20px; }
+            .header-title { font-size: 24px; top: 60px; letter-spacing: 2px; }
+            .chat-input-area { flex-wrap: wrap; padding: 8px 10px; }
+            .chat-input-area .ai-textarea { min-height: 36px; font-size: 0.65rem; }
+            .chat-input-area .send-btn { padding: 6px 14px; font-size: 0.6rem; }
+            .chat-input-area .icon-btn { width: 34px; height: 34px; font-size: 0.8rem; }
+            .security-grid { grid-template-columns: 1fr 1fr; }
+            .menu { display: none; }
+            .additional-menu a { font-size: 10px; padding: 6px 12px; }
+            .logo { width: 80px; top: 10px; left: 10px; }
+            .contact-info { font-size: 12px; padding: 6px 15px; bottom: 10px; }
+            .modal-box h2 { font-size: 1.2rem; }
+            .modal-box input { padding: 10px 14px; font-size: 0.7rem; }
+            .language-selector { top: 10px; right: 10px; }
+            .globe-btn { font-size: 10px; padding: 5px 10px; }
+            .info-content { padding: 20px; }
+            .info-content h2 { font-size: 1.1rem; }
+            .info-content p { font-size: 0.75rem; }
+            .info-content .info-features { grid-template-columns: 1fr 1fr; }
         }
     </style>
 </head>
 <body>
+    <canvas id="three-canvas"></canvas>
+
     <header>
         <img src="https://bradicoin.com/wp-content/uploads/2025/02/Screenshot_20250217-154739.png" alt="Logo" class="logo">
         <div class="menu">
@@ -808,6 +1030,7 @@
             <a href="#" id="contact-link" data-i18n="menu.contact">Contact</a>
         </div>
     </header>
+
     <div class="language-selector" id="langSelector">
         <button class="globe-btn" id="language-button">🌐 EN</button>
         <div class="lang-dropdown">
@@ -817,6 +1040,7 @@
             <button data-lang="ar">🇸🇦 العربية</button>
         </div>
     </div>
+
     <h1 class="header-title" data-i18n="title">Holoxorn</h1>
     <div class="additional-menu">
         <a href="#" id="about-link" data-i18n="menu.about">About Holoxorn</a>
@@ -829,10 +1053,67 @@
         <a href="#" id="ai-link" data-i18n="menu.innovations">AI Innovations</a>
     </div>
     <div class="contact-info">
-        <p data-i18n="contact.info">Contact: <a href="mailto:contact@holoxorn.com" style="color:#00ff99;">contact@holoxorn.com</a></p>
+        <p data-i18n="contact.info">Contact: <a href="mailto:contact@holoxorn.com">contact@holoxorn.com</a></p>
     </div>
 
-    <!-- DASHBOARD HOLOXORN -->
+    <!-- ===== MODAL LOGIN ===== -->
+    <div id="loginModal" class="modal-overlay">
+        <div class="modal-box">
+            <div class="modal-icon">🧠</div>
+            <h2>HOLOXORN</h2>
+            <p class="subtitle">Neural AI Dashboard</p>
+            <input type="email" id="emailInput" placeholder="Email" value="contact@bradicoin.com">
+            <input type="password" id="passwordInput" placeholder="Password" value="36124589Bdc">
+            <button class="btn-primary" id="loginBtn">🚀 ENTER</button>
+            <button class="btn-google" id="googleLoginBtn">🔐 Google Login</button>
+            <button class="btn-close" id="closeLoginBtn">Close</button>
+            <div class="warning" id="loginWarning"></div>
+            <div class="hint">🔑 <span>contact@bradicoin.com</span> / <span>36124589Bdc</span></div>
+        </div>
+    </div>
+
+    <!-- ===== MODAL REGISTER ===== -->
+    <div id="registerModal" class="modal-overlay">
+        <div class="modal-box">
+            <div class="modal-icon">📝</div>
+            <h2>CREATE ACCOUNT</h2>
+            <p class="subtitle">Join the Holoxorn AI Community</p>
+            <input type="text" id="regName" placeholder="Full Name">
+            <input type="email" id="regEmail" placeholder="Email">
+            <input type="password" id="regPassword" placeholder="Password">
+            <input type="password" id="regConfirmPassword" placeholder="Confirm Password">
+            <button class="btn-primary purple" id="registerBtn">✨ SIGN UP</button>
+            <button class="btn-close" id="closeRegisterBtn">Close</button>
+            <div class="warning" id="registerWarning"></div>
+            <div class="success" id="registerSuccess"></div>
+        </div>
+    </div>
+
+    <!-- ===== PÁGINAS DE INFORMAÇÃO ===== -->
+    <div id="infoPage" class="info-page">
+        <div class="info-content" id="infoContent">
+            <span class="info-icon" id="infoIcon">🚀</span>
+            <h2 id="infoTitle">Holoxorn</h2>
+            <div id="infoBody">
+                <p>Informações sobre a Holoxorn.</p>
+            </div>
+            <button class="btn-close-info" id="closeInfoBtn">✕ CLOSE</button>
+        </div>
+    </div>
+
+    <!-- ===== MODAL CONFIRMAÇÃO ===== -->
+    <div id="confirmLogoutModal" class="confirm-modal">
+        <div class="modal-content">
+            <h2>⚠️ CONFIRM LOGOUT</h2>
+            <p>Are you sure you want to logout from Holoxorn?</p>
+            <div class="btn-group">
+                <button class="btn-yes" id="confirmLogoutYes">YES</button>
+                <button class="btn-no" id="confirmLogoutNo">NO</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== DASHBOARD ===== -->
     <div id="dashboardContainer" class="dashboard-container">
         <div class="dashboard-header">
             <h2><i class="fas fa-brain"></i> HOLOXORN NEURAL DASHBOARD</h2>
@@ -843,547 +1124,847 @@
         </div>
         <div class="dashboard-main">
             <div class="col-left">
-                <div class="dash-card ai-interaction-area">
-                    <div class="card-title"><i class="fas fa-comment-dots"></i> INTERACT WITH HOLOXORN AI</div>
-                    <div class="ai-input-group">
-                        <textarea id="aiMessageInput" class="ai-textarea" rows="2" placeholder="Type your message, command or question for Holoxorn AI..."></textarea>
-                        <div class="action-buttons">
-                            <button id="micActionBtn" class="icon-btn" title="Voice Input (Microphone)"><i class="fas fa-microphone"></i></button>
-                            <button id="uploadActionBtn" class="icon-btn" title="Upload Files (Images, Videos, Documents)"><i class="fas fa-paperclip"></i></button>
-                            <button id="clearChatBtn" class="icon-btn" title="Clear Conversation" style="background:linear-gradient(135deg,#e74c8b,#ff6b6b);"><i class="fas fa-eraser"></i></button>
+                <div class="dash-card">
+                    <div class="card-title"><i class="fas fa-microphone-alt"></i> VOICE</div>
+                    <div style="display:flex; align-items:center; gap:10px; margin:4px 0;">
+                        <button id="micButton" style="width:36px; height:36px; font-size:1rem; background:linear-gradient(135deg,#e74c8b,#9b59b6); border:none; border-radius:50%; cursor:pointer; color:white;"><i class="fas fa-microphone"></i></button>
+                        <span id="micStatus" style="font-size:0.55rem; opacity:0.8;">⚪ Click</span>
+                    </div>
+                    <div id="transcriptText" style="background:rgba(0,0,0,0.3); border-radius:10px; padding:6px; font-size:0.6rem; max-height:40px; overflow-y:auto; min-height:25px;">Voice transcript...</div>
+                </div>
+                <div class="dash-card">
+                    <div class="card-title"><i class="fas fa-server"></i> SYSTEM</div>
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:3px; font-size:0.55rem;">
+                        <div><span class="status-indicator online"></span> Core: <span id="aiStatusText">Online</span></div>
+                        <div><span class="status-indicator online"></span> Memory: <span id="memoryStatus">Optimal</span></div>
+                        <div><span class="status-indicator online"></span> Neural: Active</div>
+                        <div><span class="status-indicator online"></span> Learning: Active</div>
+                    </div>
+                    <div class="progress-bar"><div class="fill" id="systemLoadBar" style="width:42%;"></div></div>
+                    <div style="display:flex; justify-content:space-between; font-size:0.5rem; margin-top:3px;">
+                        <span>Load</span><span id="systemLoadText">42%</span>
+                    </div>
+                </div>
+                <div class="dash-card">
+                    <div class="card-title"><i class="fas fa-tags"></i> ENTITIES</div>
+                    <div id="entityList" style="min-height:20px; font-size:0.55rem;">
+                        <span class="entity-tag">Holoxorn</span>
+                        <span class="entity-tag">AI</span>
+                        <span class="entity-tag">Neural</span>
+                    </div>
+                </div>
+                <div class="dash-card">
+                    <div class="card-title"><i class="fas fa-history"></i> HISTORY</div>
+                    <div id="conversationHistory" style="max-height:70px; overflow-y:auto; font-size:0.55rem;">
+                        <div class="history-item" style="opacity:0.6;"><i class="fas fa-robot"></i> Welcome to Holoxorn AI</div>
+                    </div>
+                    <button id="clearHistoryBtn" style="margin-top:4px; background:#2d2d5e; border:none; padding:3px 10px; border-radius:15px; font-size:0.5rem; cursor:pointer; color:white;">Clear</button>
+                </div>
+            </div>
+
+            <div class="col-center">
+                <div class="card-title" style="border-left-color:#00ff99; padding-left:10px; margin-bottom:5px;">
+                    <i class="fas fa-comment-dots"></i> HOLOXORN AI CHAT
+                </div>
+                <div class="chat-container">
+                    <div class="chat-toolbar">
+                        <span style="font-size:0.6rem; color:#a8b2d1;"><i class="fas fa-circle" style="color:#00ff99; font-size:0.4rem;"></i> Live</span>
+                        <div class="chat-actions">
+                            <button id="clearChatBtn" class="danger"><i class="fas fa-trash"></i> Clear</button>
+                            <button id="exportChatBtn"><i class="fas fa-download"></i> Export</button>
                         </div>
                     </div>
-                    <button id="sendAiMessageBtn" class="send-btn-large"><i class="fas fa-paper-plane"></i> SEND TO HOLOXORN AI</button>
+                    <div id="chatMessages" class="chat-messages">
+                        <div class="chat-msg assistant">
+                            <i class="fas fa-robot msg-icon"></i> Welcome to Holoxorn AI! How can I assist you today?
+                            <span class="msg-time">Just now</span>
+                        </div>
+                    </div>
                     <div id="typingIndicator" class="typing-indicator">
                         <span>●</span><span>●</span><span>●</span> Holoxorn is thinking...
                     </div>
-                    <div id="aiResponseBox" class="ai-response-box"><i class="fas fa-robot"></i> Holoxorn AI is ready. Type or speak your command...</div>
-                </div>
-
-                <div class="dash-card">
-                    <div class="card-title"><i class="fas fa-microphone-alt"></i> VOICE RECOGNITION</div>
-                    <div class="mic-area">
-                        <button id="micButton" class="mic-btn"><i class="fas fa-microphone"></i></button>
-                        <span id="micStatus" class="mic-status">⚪ Click to start recording</span>
-                    </div>
-                    <div id="transcriptText" class="transcript-area">Voice transcript will appear here. Speak clearly!</div>
-                    <div style="font-size:0.65rem; margin-top:8px;"><i class="fas fa-info-circle"></i> Supports English, Portuguese, Spanish. Click mic, speak, and AI will auto-respond.</div>
-                </div>
-
-                <!-- NOVO CARD: HISTÓRICO DE CONVERSA -->
-                <div class="dash-card">
-                    <div class="card-title"><i class="fas fa-history"></i> CONVERSATION HISTORY</div>
-                    <div id="conversationHistory" style="max-height:120px; overflow-y:auto; font-size:0.7rem;">
-                        <div class="history-item" style="opacity:0.6;"><i class="fas fa-robot"></i> Welcome to Holoxorn AI</div>
-                    </div>
-                    <button id="clearHistoryBtn" style="margin-top:8px; background:#2d2d5e; border:none; padding:4px 12px; border-radius:20px; font-size:0.6rem; cursor:pointer; color:white;">Clear History</button>
-                </div>
-
-                <!-- NOVO CARD: STATUS DO SISTEMA -->
-                <div class="dash-card">
-                    <div class="card-title"><i class="fas fa-server"></i> SYSTEM STATUS</div>
-                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; font-size:0.65rem;">
-                        <div><span class="status-indicator online"></span> AI Core: <span id="aiStatusText">Online</span></div>
-                        <div><span class="status-indicator online"></span> Neural Network: Active</div>
-                        <div><span class="status-indicator online"></span> Memory: <span id="memoryStatus">Optimal</span></div>
-                        <div><span class="status-indicator online"></span> Learning: Active</div>
-                    </div>
-                    <div class="progress-bar" style="margin-top:10px;">
-                        <div class="fill" id="systemLoadBar" style="width:42%;"></div>
-                    </div>
-                    <div style="display:flex; justify-content:space-between; font-size:0.55rem; margin-top:4px;">
-                        <span>System Load</span>
-                        <span id="systemLoadText">42%</span>
+                    <div class="chat-input-area">
+                        <textarea id="aiMessageInput" class="ai-textarea" rows="1" placeholder="Type your message..."></textarea>
+                        <div class="action-buttons">
+                            <button id="micActionBtn" class="icon-btn" title="Voice"><i class="fas fa-microphone"></i></button>
+                            <button id="uploadActionBtn" class="icon-btn" title="Upload"><i class="fas fa-paperclip"></i></button>
+                        </div>
+                        <button id="sendAiMessageBtn" class="send-btn"><i class="fas fa-paper-plane"></i> SEND</button>
                     </div>
                 </div>
             </div>
 
             <div class="col-right">
                 <div class="dash-card">
-                    <div class="card-title"><i class="fas fa-sliders-h"></i> AI CONFIGURATIONS (9 Features)</div>
+                    <div class="card-title"><i class="fas fa-cog"></i> CONFIG (17)</div>
+                    <div class="security-grid">
+                        <div class="security-item"><label><i class="fas fa-language"></i> Tradutor</label><div class="toggle-neon" id="secTranslator"></div></div>
+                        <div class="security-item"><label><i class="fas fa-lock"></i> 2FA Auth</label><div class="toggle-neon" id="sec2fa"></div></div>
+                        <div class="security-item"><label><i class="fas fa-key"></i> Biometric</label><div class="toggle-neon" id="secBio"></div></div>
+                        <div class="security-item"><label><i class="fas fa-fingerprint"></i> Identity</label><div class="toggle-neon" id="secIdentity"></div></div>
+                        <div class="security-item"><label><i class="fas fa-shield-virus"></i> Anti-Malware</label><div class="toggle-neon" id="secMalware"></div></div>
+                        <div class="security-item"><label><i class="fas fa-user-secret"></i> Anonymity</label><div class="toggle-neon" id="secAnon"></div></div>
+                        <div class="security-item"><label><i class="fas fa-encryption"></i> Data Encrypt</label><div class="toggle-neon" id="secEncrypt"></div></div>
+                        <div class="security-item"><label><i class="fas fa-network-wired"></i> VPN Tunnel</label><div class="toggle-neon" id="secVpn"></div></div>
+                        <div class="security-item"><label><i class="fas fa-firewall"></i> Firewall</label><div class="toggle-neon" id="secFirewall"></div></div>
+                        <div class="security-item"><label><i class="fas fa-bug"></i> Threat Scan</label><div class="toggle-neon" id="secThreat"></div></div>
+                        <div class="security-item"><label><i class="fas fa-eye-slash"></i> Privacy Mode</label><div class="toggle-neon" id="secPrivacy"></div></div>
+                        <div class="security-item"><label><i class="fas fa-sync-alt"></i> Auto-Update</label><div class="toggle-neon" id="secUpdate"></div></div>
+                        <div class="security-item"><label><i class="fas fa-clock"></i> Session Timeout</label><div class="toggle-neon" id="secTimeout"></div></div>
+                        <div class="security-item"><label><i class="fas fa-ban"></i> Brute Force</label><div class="toggle-neon" id="secBrute"></div></div>
+                        <div class="security-item"><label><i class="fas fa-history"></i> Audit Log</label><div class="toggle-neon" id="secAudit"></div></div>
+                        <div class="security-item"><label><i class="fas fa-qrcode"></i> QR Auth</label><div class="toggle-neon" id="secQr"></div></div>
+                        <div class="security-item"><label><i class="fas fa-cloud-upload-alt"></i> Cloud Backup</label><div class="toggle-neon" id="secCloud"></div></div>
+                    </div>
+                </div>
+                <div class="dash-card">
+                    <div class="card-title"><i class="fas fa-sliders-h"></i> AI (9)</div>
                     <div class="settings-grid">
-                        <div class="setting-item"><label><i class="fas fa-brain"></i> Deep Learning</label><div class="toggle-neon" id="deepToggle"></div></div>
-                        <div class="setting-item"><label><i class="fas fa-eye"></i> Visual Recognition</label><div class="toggle-neon" id="visionToggle"></div></div>
-                        <div class="setting-item"><label><i class="fas fa-language"></i> NLP Optimizer</label><div class="toggle-neon" id="nlpTogglex"></div></div>
-                        <div class="setting-item"><label><i class="fas fa-robot"></i> Auto-Learning</label><div class="toggle-neon" id="autoToggle"></div></div>
-                        <div class="setting-item"><label><i class="fas fa-chart-line"></i> Predictive Analytics</label><div class="toggle-neon" id="predictToggle"></div></div>
-                        <div class="setting-item"><label><i class="fas fa-database"></i> Neural Cache</label><div class="toggle-neon" id="cacheToggle"></div></div>
-                        <div class="setting-item"><label><i class="fas fa-shield-virus"></i> Anomaly Detect</label><div class="toggle-neon" id="anomalyToggle"></div></div>
-                        <div class="setting-item"><label><i class="fas fa-cloud-upload-alt"></i> Auto-Sync Cloud</label><div class="toggle-neon" id="cloudToggle"></div></div>
-                        <div class="setting-item"><label><i class="fas fa-bolt"></i> Quantum Boost</label><div class="toggle-neon" id="quantumBoostToggle"></div></div>
+                        <div class="setting-item"><label><i class="fas fa-brain"></i> Deep</label><div class="toggle-neon" id="deepToggle"></div></div>
+                        <div class="setting-item"><label><i class="fas fa-eye"></i> Vision</label><div class="toggle-neon" id="visionToggle"></div></div>
+                        <div class="setting-item"><label><i class="fas fa-language"></i> NLP</label><div class="toggle-neon" id="nlpTogglex"></div></div>
+                        <div class="setting-item"><label><i class="fas fa-robot"></i> Learn</label><div class="toggle-neon" id="autoToggle"></div></div>
+                        <div class="setting-item"><label><i class="fas fa-chart-line"></i> Predict</label><div class="toggle-neon" id="predictToggle"></div></div>
+                        <div class="setting-item"><label><i class="fas fa-database"></i> Cache</label><div class="toggle-neon" id="cacheToggle"></div></div>
+                        <div class="setting-item"><label><i class="fas fa-shield-virus"></i> Anomaly</label><div class="toggle-neon" id="anomalyToggle"></div></div>
+                        <div class="setting-item"><label><i class="fas fa-cloud-upload-alt"></i> Sync</label><div class="toggle-neon" id="cloudToggle"></div></div>
+                        <div class="setting-item"><label><i class="fas fa-bolt"></i> Quantum</label><div class="toggle-neon" id="quantumBoostToggle"></div></div>
                     </div>
                 </div>
-
-                <!-- NOVO CARD: AÇÕES RÁPIDAS -->
                 <div class="dash-card">
-                    <div class="card-title"><i class="fas fa-bolt"></i> QUICK ACTIONS</div>
-                    <div class="quick-actions">
-                        <button class="quick-action-btn" data-action="analyze"><i class="fas fa-chart-pie"></i>Analyze</button>
-                        <button class="quick-action-btn" data-action="summarize"><i class="fas fa-compress-alt"></i>Summarize</button>
-                        <button class="quick-action-btn" data-action="translate"><i class="fas fa-language"></i>Translate</button>
-                        <button class="quick-action-btn" data-action="sentiment"><i class="fas fa-smile"></i>Sentiment</button>
-                        <button class="quick-action-btn" data-action="entities"><i class="fas fa-tags"></i>Entities</button>
-                        <button class="quick-action-btn" data-action="generate"><i class="fas fa-magic"></i>Generate</button>
-                    </div>
-                </div>
-
-                <!-- NOVO CARD: ANÁLISE DE SENTIMENTO -->
-                <div class="dash-card">
-                    <div class="card-title"><i class="fas fa-chart-bar"></i> SENTIMENT ANALYSIS</div>
-                    <div class="sentiment-indicator">
-                        <span style="font-size:0.65rem;">😊 Positive</span>
-                        <div class="sentiment-bar"><div class="fill positive" id="sentimentPositive" style="width:65%;"></div></div>
-                        <span style="font-size:0.65rem; min-width:30px;" id="sentimentPositiveText">65%</span>
-                    </div>
-                    <div class="sentiment-indicator">
-                        <span style="font-size:0.65rem;">😐 Neutral</span>
-                        <div class="sentiment-bar"><div class="fill neutral" id="sentimentNeutral" style="width:25%;"></div></div>
-                        <span style="font-size:0.65rem; min-width:30px;" id="sentimentNeutralText">25%</span>
-                    </div>
-                    <div class="sentiment-indicator">
-                        <span style="font-size:0.65rem;">😞 Negative</span>
-                        <div class="sentiment-bar"><div class="fill negative" id="sentimentNegative" style="width:10%;"></div></div>
-                        <span style="font-size:0.65rem; min-width:30px;" id="sentimentNegativeText">10%</span>
-                    </div>
-                    <div style="font-size:0.6rem; margin-top:6px; opacity:0.7;">Based on recent conversations</div>
-                </div>
-
-                <!-- NOVO CARD: BASE DE CONHECIMENTO -->
-                <div class="dash-card">
-                    <div class="card-title"><i class="fas fa-database"></i> KNOWLEDGE BASE</div>
-                    <div id="knowledgeBase" style="max-height:100px; overflow-y:auto;">
-                        <div class="knowledge-base-item" data-topic="neural">🧠 Neural Networks <span class="tag">AI</span></div>
-                        <div class="knowledge-base-item" data-topic="quantum">⚛️ Quantum Computing <span class="tag">Tech</span></div>
-                        <div class="knowledge-base-item" data-topic="nlp">💬 Natural Language <span class="tag">NLP</span></div>
-                        <div class="knowledge-base-item" data-topic="vision">👁️ Computer Vision <span class="tag">CV</span></div>
-                        <div class="knowledge-base-item" data-topic="robotics">🤖 Robotics <span class="tag">Robotics</span></div>
-                    </div>
-                    <div style="font-size:0.6rem; margin-top:6px; opacity:0.7;">Click a topic to learn more</div>
-                </div>
-
-                <!-- NOVO CARD: ENTIDADES DETECTADAS -->
-                <div class="dash-card">
-                    <div class="card-title"><i class="fas fa-tags"></i> DETECTED ENTITIES</div>
-                    <div id="entityList" style="min-height:30px; font-size:0.7rem;">
-                        <span class="entity-tag">Holoxorn</span>
-                        <span class="entity-tag">AI</span>
-                        <span class="entity-tag">Neural</span>
-                        <span class="entity-tag">Quantum</span>
-                    </div>
-                    <div style="font-size:0.55rem; opacity:0.6; margin-top:4px;">Entities are extracted from conversations</div>
-                </div>
-
-                <div class="dash-card">
-                    <div class="card-title"><i class="fas fa-chart-simple"></i> SYSTEM METRICS</div>
-                    <div class="config-row"><label><i class="fas fa-microchip"></i> AI Core Temp</label><span id="aiTemp">42°C</span></div>
-                    <div class="config-row"><label><i class="fas fa-memory"></i> Neural Load</label><span id="neuralLoad">28%</span></div>
-                    <div class="config-row"><label><i class="fas fa-hdd"></i> Storage Used</label><span id="storageInfoDash">0 MB</span></div>
+                    <div class="card-title"><i class="fas fa-chart-simple"></i> METRICS</div>
+                    <div class="config-row"><label><i class="fas fa-microchip"></i> Temp</label><span id="aiTemp">42°C</span></div>
+                    <div class="config-row"><label><i class="fas fa-memory"></i> Load</label><span id="neuralLoad">28%</span></div>
+                    <div class="config-row"><label><i class="fas fa-hdd"></i> Storage</label><span id="storageInfoDash">0 MB</span></div>
                     <div class="config-row"><label><i class="fas fa-clock"></i> Uptime</label><span id="uptime">00:00:00</span></div>
-                    <div class="config-row"><label><i class="fas fa-comments"></i> Messages</label><span id="messageCount">0</span></div>
+                    <div class="config-row"><label><i class="fas fa-comments"></i> Msgs</label><span id="messageCount">0</span></div>
                 </div>
-
-                <div class="dash-card">
-                    <div class="card-title"><i class="fas fa-palette"></i> VISUAL PREFERENCES</div>
-                    <div class="config-row"><label>✨ Neon Intensity</label><select id="glowSelect" class="config-select"><option>Low</option><option selected>Medium</option><option>High</option></select></div>
-                    <div class="config-row"><label>🌀 HUD Animation</label><div class="toggle-neon" id="hudAnim"></div></div>
-                    <div class="config-row"><label>🔒 Quantum Encryption</label><div class="toggle-neon" id="encryptToggle"></div></div>
-                </div>
-
                 <div class="dash-card">
                     <div class="card-title"><i class="fas fa-bell"></i> NOTIFICATIONS</div>
-                    <div id="notificationList" style="font-size:0.7rem; max-height: 120px; overflow-y: auto;">⚡ System online.<br>🤖 Holoxorn AI ready.</div>
-                    <button id="clearNotifBtn" style="margin-top:8px; background:#2d2d5e; border:none; padding:6px; border-radius:20px; font-size:0.7rem; cursor:pointer; width:100%;">Clear All</button>
+                    <div id="notificationList" style="font-size:0.55rem; max-height:60px; overflow-y:auto;">⚡ System online.<br>🤖 Holoxorn AI ready.</div>
+                    <button id="clearNotifBtn" style="margin-top:4px; background:rgba(45,45,94,0.5); border:1px solid rgba(155,89,182,0.2); padding:3px; border-radius:15px; font-size:0.5rem; cursor:pointer; width:100%; color:white;">Clear</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- MODAIS LOGIN COM CONTA ÚNICA -->
-    <div id="loginModal" class="modal">
-        <div class="modal-content">
-            <h2>Login</h2>
-            <form id="loginForm">
-                <input type="email" id="email" placeholder="Email">
-                <input type="password" id="password" placeholder="Password">
-                <button type="submit">Enter</button>
-            </form>
-            <button id="googleLoginBtn" class="google-auth-btn">🔐 Google Login</button>
-            <button class="close-modal-btn close-login">Close</button>
-            <div id="loginWarning" style="font-size:10px; margin-top:10px; color:#ffaa00;"></div>
-        </div>
-    </div>
-    <div id="registrationModal" class="modal">
-        <div class="modal-content">
-            <h2>Sign Up</h2>
-            <form id="registerForm">
-                <input type="email" id="regEmail" placeholder="Email">
-                <input type="password" id="regPassword" placeholder="Password">
-                <button type="submit">Sign Up</button>
-            </form>
-            <button id="googleRegisterBtn" class="google-auth-btn">✨ Google Signup</button>
-            <button class="close-modal-btn close-register">Close</button>
-            <div id="registerWarning" class="warning-message"></div>
-        </div>
-    </div>
+    <input type="file" id="fileInput" multiple style="display:none">
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js">
     </script>
     <script>
-        // ========== SISTEMA DE LOGIN COM CONTA ÚNICA ==========
+        // ===== ANIMAÇÃO 3D =====
+        (function init3D() {
+            const canvas = document.getElementById('three-canvas');
+            if (!canvas) return;
+
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.z = 5;
+            
+            const renderer = new THREE.WebGLRenderer({ 
+                canvas: canvas,
+                alpha: false,
+                antialias: true
+            });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            renderer.setClearColor(0x000000, 1);
+
+            const cubeMaterial = new THREE.MeshStandardMaterial({ 
+                color: 0x7f00ff, 
+                emissive: 0x3f51b5, 
+                emissiveIntensity: 0.6,
+                roughness: 0.5, 
+                metalness: 0.8 
+            });
+            
+            const cubes = [];
+            const cubeCount = window.innerWidth < 768 ? 800 : 1500;
+
+            for (let i = 0; i < cubeCount; i++) {
+                const geometry = new THREE.BoxGeometry(0.5, 0.5, 0.5);
+                const cube = new THREE.Mesh(geometry, cubeMaterial.clone());
+                cube.position.x = (Math.random() - 0.5) * 80;
+                cube.position.y = (Math.random() - 0.5) * 80;
+                cube.position.z = (Math.random() - 0.5) * 80;
+                cube.rotation.x = Math.random() * Math.PI;
+                cube.rotation.y = Math.random() * Math.PI;
+                scene.add(cube);
+                cubes.push(cube);
+            }
+
+            const light = new THREE.PointLight(0xffffff, 1, 100);
+            light.position.set(10, 10, 10);
+            scene.add(light);
+            const ambientLight = new THREE.AmbientLight(0x404040);
+            scene.add(ambientLight);
+            const backLight = new THREE.PointLight(0x7f00ff, 0.5);
+            backLight.position.set(-5, -5, -5);
+            scene.add(backLight);
+
+            let mouseX = 0, mouseY = 0;
+            document.addEventListener('mousemove', (e) => {
+                mouseX = (e.clientX / window.innerWidth) * 2 - 1;
+                mouseY = -(e.clientY / window.innerHeight) * 2 + 1;
+            });
+
+            function animate() {
+                requestAnimationFrame(animate);
+                cubes.forEach(cube => {
+                    cube.rotation.x += 0.01;
+                    cube.rotation.y += 0.01;
+                    cube.rotation.z += 0.005;
+                });
+                camera.position.x += (mouseX * 2 - camera.position.x) * 0.03;
+                camera.position.y += (-mouseY * 2 - camera.position.y) * 0.03;
+                camera.lookAt(scene.position);
+                renderer.render(scene, camera);
+            }
+            animate();
+
+            window.addEventListener('resize', () => {
+                renderer.setSize(window.innerWidth, window.innerHeight);
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+            });
+        })();
+
+        // ===== TRADUTOR CORRIGIDO =====
+        const translations = {
+            en: {
+                menu: {
+                    home: "Home",
+                    login: "Login",
+                    registration: "Registration",
+                    contact: "Contact",
+                    about: "About Holoxorn",
+                    projects: "Holoxorn Projects",
+                    technology: "Holoxorn Technology",
+                    research: "Research & Development",
+                    robotics: "Intelligent Robotics",
+                    "machine-learning": "Machine Learning",
+                    automation: "Automation",
+                    innovations: "AI Innovations"
+                },
+                title: "Holoxorn",
+                contact: { info: "Contact: <a href='mailto:contact@holoxorn.com'>contact@holoxorn.com</a>" },
+                info: {
+                    about: "Holoxorn is a cutting-edge Artificial Intelligence platform designed to revolutionize how humans interact with technology. Our mission is to create intelligent systems that can understand, learn, and adapt to human needs.",
+                    projects: "Holoxorn Projects encompass a wide range of AI initiatives including neural network development, quantum computing research, and intelligent automation systems that are shaping the future of technology.",
+                    technology: "Holoxorn Technology combines advanced machine learning algorithms, quantum computing capabilities, and neural network architectures to create powerful AI solutions for complex problems.",
+                    research: "Research & Development at Holoxorn focuses on pushing the boundaries of AI, exploring new frontiers in deep learning, reinforcement learning, and cognitive computing.",
+                    robotics: "Intelligent Robotics at Holoxorn develops autonomous systems that can perceive, reason, and act in complex environments, bringing AI into the physical world.",
+                    ml: "Machine Learning is the core of Holoxorn's AI capabilities, utilizing advanced algorithms for pattern recognition, predictive analytics, and adaptive learning systems.",
+                    automation: "Holoxorn Automation solutions leverage AI to optimize workflows, reduce manual intervention, and increase efficiency across various industries.",
+                    innovations: "AI Innovations at Holoxorn are driving the next generation of intelligent systems, from natural language processing to computer vision and beyond."
+                }
+            },
+            pt: {
+                menu: {
+                    home: "Início",
+                    login: "Login",
+                    registration: "Cadastro",
+                    contact: "Contato",
+                    about: "Sobre Holoxorn",
+                    projects: "Projetos Holoxorn",
+                    technology: "Tecnologia Holoxorn",
+                    research: "Pesquisa & Desenvolvimento",
+                    robotics: "Robótica Inteligente",
+                    "machine-learning": "Aprendizado de Máquina",
+                    automation: "Automação",
+                    innovations: "Inovações em IA"
+                },
+                title: "Holoxorn",
+                contact: { info: "Contato: <a href='mailto:contact@holoxorn.com'>contact@holoxorn.com</a>" },
+                info: {
+                    about: "Holoxorn é uma plataforma de Inteligência Artificial de ponta projetada para revolucionar a forma como os humanos interagem com a tecnologia. Nossa missão é criar sistemas inteligentes que possam entender, aprender e se adaptar às necessidades humanas.",
+                    projects: "Os Projetos Holoxorn abrangem uma ampla gama de iniciativas de IA, incluindo desenvolvimento de redes neurais, pesquisa em computação quântica e sistemas de automação inteligente que estão moldando o futuro da tecnologia.",
+                    technology: "A Tecnologia Holoxorn combina algoritmos avançados de aprendizado de máquina, capacidades de computação quântica e arquiteturas de redes neurais para criar soluções de IA poderosas para problemas complexos.",
+                    research: "A Pesquisa & Desenvolvimento na Holoxorn se concentra em expandir os limites da IA, explorando novas fronteiras em aprendizado profundo, aprendizado por reforço e computação cognitiva.",
+                    robotics: "A Robótica Inteligente na Holoxorn desenvolve sistemas autônomos que podem perceber, raciocinar e agir em ambientes complexos, trazendo a IA para o mundo físico.",
+                    ml: "O Aprendizado de Máquina é o núcleo das capacidades de IA da Holoxorn, utilizando algoritmos avançados para reconhecimento de padrões, análise preditiva e sistemas de aprendizado adaptativo.",
+                    automation: "As soluções de Automação da Holoxorn aproveitam a IA para otimizar fluxos de trabalho, reduzir a intervenção manual e aumentar a eficiência em vários setores.",
+                    innovations: "As Inovações em IA na Holoxorn estão impulsionando a próxima geração de sistemas inteligentes, desde processamento de linguagem natural até visão computacional e além."
+                }
+            },
+            es: {
+                menu: {
+                    home: "Inicio",
+                    login: "Iniciar",
+                    registration: "Registro",
+                    contact: "Contacto",
+                    about: "Acerca de Holoxorn",
+                    projects: "Proyectos Holoxorn",
+                    technology: "Tecnología Holoxorn",
+                    research: "Investigación & Desarrollo",
+                    robotics: "Robótica Inteligente",
+                    "machine-learning": "Aprendizaje Automático",
+                    automation: "Automatización",
+                    innovations: "Innovaciones en IA"
+                },
+                title: "Holoxorn",
+                contact: { info: "Contacto: <a href='mailto:contact@holoxorn.com'>contact@holoxorn.com</a>" },
+                info: {
+                    about: "Holoxorn es una plataforma de Inteligencia Artificial de vanguardia diseñada para revolucionar la forma en que los humanos interactúan con la tecnología. Nuestra misión es crear sistemas inteligentes que puedan comprender, aprender y adaptarse a las necesidades humanas.",
+                    projects: "Los Proyectos Holoxorn abarcan una amplia gama de iniciativas de IA, incluido el desarrollo de redes neuronales, investigación en computación cuántica y sistemas de automatización inteligente que están dando forma al futuro de la tecnología.",
+                    technology: "La Tecnología Holoxorn combina algoritmos avanzados de aprendizaje automático, capacidades de computación cuántica y arquitecturas de redes neuronales para crear soluciones de IA potentes para problemas complejos.",
+                    research: "La Investigación y Desarrollo en Holoxorn se enfoca en expandir los límites de la IA, explorando nuevas fronteras en aprendizaje profundo, aprendizaje por refuerzo y computación cognitiva.",
+                    robotics: "La Robótica Inteligente en Holoxorn desarrolla sistemas autónomos que pueden percibir, razonar y actuar en entornos complejos, llevando la IA al mundo físico.",
+                    ml: "El Aprendizaje Automático es el núcleo de las capacidades de IA de Holoxorn, utilizando algoritmos avanzados para reconocimiento de patrones, análisis predictivo y sistemas de aprendizaje adaptativo.",
+                    automation: "Las soluciones de Automatización de Holoxorn aprovechan la IA para optimizar flujos de trabajo, reducir la intervención manual y aumentar la eficiencia en diversas industrias.",
+                    innovations: "Las Innovaciones en IA en Holoxorn están impulsando la próxima generación de sistemas inteligentes, desde el procesamiento del lenguaje natural hasta la visión por computadora y más."
+                }
+            },
+            ar: {
+                menu: {
+                    home: "الرئيسية",
+                    login: "دخول",
+                    registration: "تسجيل",
+                    contact: "اتصل",
+                    about: "عن هولوكسورن",
+                    projects: "مشاريع هولوكسورن",
+                    technology: "تكنولوجيا هولوكسورن",
+                    research: "البحث والتطوير",
+                    robotics: "الروبوتات الذكية",
+                    "machine-learning": "تعلم الآلة",
+                    automation: "الأتمتة",
+                    innovations: "ابتكارات الذكاء الاصطناعي"
+                },
+                title: "هولوكسورن",
+                contact: { info: "اتصال: <a href='mailto:contact@holoxorn.com'>contact@holoxorn.com</a>" },
+                info: {
+                    about: "هولوكسورن هي منصة متطورة للذكاء الاصطناعي مصممة لإحداث ثورة في طريقة تفاعل البشر مع التكنولوجيا. مهمتنا هي إنشاء أنظمة ذكية يمكنها فهم واحتياجات الإنسان والتكيف معها.",
+                    projects: "تشمل مشاريع هولوكسورن مجموعة واسعة من مبادرات الذكاء الاصطناعي بما في ذلك تطوير الشبكات العصبية وبحوث الحوسبة الكمومية وأنظمة الأتمتة الذكية التي تشكل مستقبل التكنولوجيا.",
+                    technology: "تجمع تكنولوجيا هولوكسورن بين خوارزميات التعلم الآلي المتقدمة وقدرات الحوسبة الكمومية وهياكل الشبكات العصبية لإنشاء حلول ذكاء اصطناعي قوية للمشاكل المعقدة.",
+                    research: "يركز البحث والتطوير في هولوكسورن على دفع حدود الذكاء الاصطناعي واستكشاف آفاق جديدة في التعلم العميق والتعلم المعزز والحوسبة المعرفية.",
+                    robotics: "تطور الروبوتات الذكية في هولوكسورن أنظمة مستقلة يمكنها الإدراك والتفكير والتصرف في بيئات معقدة، مما يجعل الذكاء الاصطناعي في العالم المادي.",
+                    ml: "التعلم الآلي هو جوهر قدرات الذكاء الاصطناعي في هولوكسورن، باستخدام خوارزميات متقدمة للتعرف على الأنماط والتحليلات التنبؤية وأنظمة التعلم التكيفي.",
+                    automation: "تستفيد حلول الأتمتة في هولوكسورن من الذكاء الاصطناعي لتحسين سير العمل وتقليل التدخل اليدوي وزيادة الكفاءة في مختلف الصناعات.",
+                    innovations: "تقود ابتكارات الذكاء الاصطناعي في هولوكسورن الجيل التالي من الأنظمة الذكية، من معالجة اللغة الطبيعية إلى رؤية الكمبيوتر وما بعدها."
+                }
+            }
+        };
+
+        let currentLang = 'en';
+
+        function updateTexts() {
+            const t = translations[currentLang];
+            if (!t) return;
+            
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                const val = key.split('.').reduce((o, i) => o?.[i], t);
+                if (val !== undefined && val !== null) {
+                    if (el.innerHTML && el.innerHTML.includes('href')) {
+                        el.innerHTML = val;
+                    } else {
+                        el.textContent = val;
+                    }
+                }
+            });
+            
+            const langBtn = document.getElementById('language-button');
+            if (langBtn) {
+                const langNames = { en: 'EN', pt: 'PT', es: 'ES', ar: 'AR' };
+                langBtn.innerHTML = `🌐 ${langNames[currentLang] || 'EN'}`;
+            }
+        }
+
+        // ===== SELETOR DE IDIOMA =====
+        document.querySelectorAll('.lang-dropdown button').forEach(btn => {
+            btn.addEventListener('click', () => {
+                currentLang = btn.getAttribute('data-lang');
+                updateTexts();
+                document.getElementById('langSelector').classList.remove('active');
+                addNotif(`🌐 Language changed to ${currentLang.toUpperCase()}`);
+            });
+        });
+
+        document.getElementById('language-button').addEventListener('click', (e) => {
+            e.stopPropagation();
+            document.getElementById('langSelector').classList.toggle('active');
+        });
+
+        document.addEventListener('click', () => {
+            document.getElementById('langSelector')?.classList.remove('active');
+        });
+
+        // ===== PÁGINAS DE INFORMAÇÃO =====
+        const infoData = {
+            about: {
+                icon: '🚀',
+                title: 'About Holoxorn',
+                content: 'Holoxorn is a cutting-edge Artificial Intelligence platform designed to revolutionize how humans interact with technology. Our mission is to create intelligent systems that can understand, learn, and adapt to human needs. With a focus on innovation and excellence, Holoxorn is at the forefront of AI research and development.'
+            },
+            projects: {
+                icon: '📊',
+                title: 'Holoxorn Projects',
+                content: 'Holoxorn Projects encompass a wide range of AI initiatives including neural network development, quantum computing research, and intelligent automation systems. Each project is designed to push the boundaries of what\'s possible with artificial intelligence, creating solutions that address real-world challenges.'
+            },
+            technology: {
+                icon: '⚡',
+                title: 'Holoxorn Technology',
+                content: 'Holoxorn Technology combines advanced machine learning algorithms, quantum computing capabilities, and neural network architectures to create powerful AI solutions. Our technology stack includes state-of-the-art frameworks and tools that enable rapid development and deployment of intelligent systems.'
+            },
+            research: {
+                icon: '🔬',
+                title: 'Research & Development',
+                content: 'Research & Development at Holoxorn focuses on pushing the boundaries of AI, exploring new frontiers in deep learning, reinforcement learning, and cognitive computing. Our R&D team works on groundbreaking projects that have the potential to transform industries and improve lives.'
+            },
+            robotics: {
+                icon: '🤖',
+                title: 'Intelligent Robotics',
+                content: 'Intelligent Robotics at Holoxorn develops autonomous systems that can perceive, reason, and act in complex environments. Our robotics solutions combine computer vision, machine learning, and control systems to create robots that can interact with the physical world intelligently.'
+            },
+            'machine-learning': {
+                icon: '📈',
+                title: 'Machine Learning',
+                content: 'Machine Learning is the core of Holoxorn\'s AI capabilities, utilizing advanced algorithms for pattern recognition, predictive analytics, and adaptive learning systems. Our ML models are trained on vast datasets to deliver accurate and reliable results across various applications.'
+            },
+            automation: {
+                icon: '⚙️',
+                title: 'Automation',
+                content: 'Holoxorn Automation solutions leverage AI to optimize workflows, reduce manual intervention, and increase efficiency across various industries. Our automation systems are designed to handle complex tasks with minimal human oversight, freeing up resources for more strategic initiatives.'
+            },
+            innovations: {
+                icon: '💡',
+                title: 'AI Innovations',
+                content: 'AI Innovations at Holoxorn are driving the next generation of intelligent systems, from natural language processing to computer vision and beyond. We are constantly exploring new ways to apply AI to solve problems and create value for our users and partners.'
+            }
+        };
+
+        function showInfoPage(type) {
+            const data = infoData[type];
+            if (!data) return;
+            
+            const page = document.getElementById('infoPage');
+            document.getElementById('infoIcon').textContent = data.icon;
+            document.getElementById('infoTitle').textContent = data.title;
+            
+            // Traduzir o conteúdo se disponível
+            const t = translations[currentLang];
+            let content = data.content;
+            if (t && t.info && t.info[type]) {
+                content = t.info[type];
+            }
+            
+            document.getElementById('infoBody').innerHTML = `
+                <p>${content}</p>
+                <div class="info-features">
+                    <div class="feature">
+                        <i class="fas fa-brain"></i>
+                        <h4>${currentLang === 'en' ? 'AI Powered' : currentLang === 'pt' ? 'Alimentado por IA' : currentLang === 'es' ? 'Impulsado por IA' : 'مدعوم بالذكاء الاصطناعي'}</h4>
+                        <p>${currentLang === 'en' ? 'Advanced artificial intelligence' : currentLang === 'pt' ? 'Inteligência artificial avançada' : currentLang === 'es' ? 'Inteligencia artificial avanzada' : 'ذكاء اصطناعي متقدم'}</p>
+                    </div>
+                    <div class="feature">
+                        <i class="fas fa-cloud"></i>
+                        <h4>${currentLang === 'en' ? 'Cloud Ready' : currentLang === 'pt' ? 'Pronto para Nuvem' : currentLang === 'es' ? 'Listo para la Nube' : 'جاهز للسحابة'}</h4>
+                        <p>${currentLang === 'en' ? 'Scalable solutions' : currentLang === 'pt' ? 'Soluções escaláveis' : currentLang === 'es' ? 'Soluciones escalables' : 'حلول قابلة للتطوير'}</p>
+                    </div>
+                    <div class="feature">
+                        <i class="fas fa-shield-alt"></i>
+                        <h4>${currentLang === 'en' ? 'Secure' : currentLang === 'pt' ? 'Seguro' : currentLang === 'es' ? 'Seguro' : 'آمن'}</h4>
+                        <p>${currentLang === 'en' ? 'Enterprise-grade security' : currentLang === 'pt' ? 'Segurança de nível empresarial' : currentLang === 'es' ? 'Seguridad de nivel empresarial' : 'أمان على مستوى المؤسسات'}</p>
+                    </div>
+                </div>
+            `;
+            
+            page.classList.add('active');
+        }
+
+        function closeInfoPage() {
+            document.getElementById('infoPage').classList.remove('active');
+        }
+
+        // ===== EVENTOS DAS PÁGINAS DE INFORMAÇÃO =====
+        document.getElementById('about-link').addEventListener('click', (e) => {
+            e.preventDefault();
+            showInfoPage('about');
+        });
+        document.getElementById('projects-link').addEventListener('click', (e) => {
+            e.preventDefault();
+            showInfoPage('projects');
+        });
+        document.getElementById('tech-link').addEventListener('click', (e) => {
+            e.preventDefault();
+            showInfoPage('technology');
+        });
+        document.getElementById('research-link').addEventListener('click', (e) => {
+            e.preventDefault();
+            showInfoPage('research');
+        });
+        document.getElementById('robotics-link').addEventListener('click', (e) => {
+            e.preventDefault();
+            showInfoPage('robotics');
+        });
+        document.getElementById('ml-link').addEventListener('click', (e) => {
+            e.preventDefault();
+            showInfoPage('machine-learning');
+        });
+        document.getElementById('automation-link').addEventListener('click', (e) => {
+            e.preventDefault();
+            showInfoPage('automation');
+        });
+        document.getElementById('ai-link').addEventListener('click', (e) => {
+            e.preventDefault();
+            showInfoPage('innovations');
+        });
+
+        document.getElementById('closeInfoBtn').addEventListener('click', closeInfoPage);
+        document.getElementById('infoPage').addEventListener('click', (e) => {
+            if (e.target === e.currentTarget) closeInfoPage();
+        });
+
+        // ===== SISTEMA DE LOGIN =====
         const ALLOWED_EMAIL = "contact@bradicoin.com";
         const ALLOWED_PASSWORD = "36124589Bdc";
+        let registeredUsers = JSON.parse(localStorage.getItem('holoxorn_users') || '[]');
 
-        let isLoggedIn = false,
-            currentUserEmail = "Explorer";
-        const dashboard = document.getElementById('dashboardContainer');
-        const loginModalEl = document.getElementById('loginModal'),
-            registerModalEl = document.getElementById('registrationModal');
+        const loginModal = document.getElementById('loginModal');
+        const registerModal = document.getElementById('registerModal');
+        const loginBtn = document.getElementById('loginBtn');
+        const registerBtn = document.getElementById('registerBtn');
+        const emailInput = document.getElementById('emailInput');
+        const passwordInput = document.getElementById('passwordInput');
+        const regName = document.getElementById('regName');
+        const regEmail = document.getElementById('regEmail');
+        const regPassword = document.getElementById('regPassword');
+        const regConfirmPassword = document.getElementById('regConfirmPassword');
         const loginWarning = document.getElementById('loginWarning');
         const registerWarning = document.getElementById('registerWarning');
-        let messageCounter = 0;
-        let conversationHistory = [];
-        let systemMessages = 0;
-
-        function updateUI() {
-            if (isLoggedIn) {
-                dashboard.classList.add('show');
-                loginModalEl.style.display = 'none';
-                registerModalEl.style.display = 'none';
-                document.getElementById('userAvatar').innerHTML = currentUserEmail.charAt(0).toUpperCase();
-                addNotif(`✅ Welcome ${currentUserEmail}`);
-                loginModalEl.style.display = 'none';
-                registerModalEl.style.display = 'none';
-            } else {
-                dashboard.classList.remove('show');
-            }
-        }
-
-        function logoutFunc() {
-            isLoggedIn = false;
-            currentUserEmail = "Explorer";
-            updateUI();
-            addNotif("🔓 User logged out");
-            alert("🔓 Logged out from Holoxorn.");
-            loginModalEl.style.display = 'none';
-            registerModalEl.style.display = 'none';
-        }
-
-        function validateLogin(email, password) {
-            if (email === ALLOWED_EMAIL && password === ALLOWED_PASSWORD) {
-                currentUserEmail = email;
-                isLoggedIn = true;
-                updateUI();
-                alert("✅ Login successful! Welcome to Holoxorn.");
-                return true;
-            } else {
-                if (loginWarning) loginWarning.innerHTML = "❌ Invalid credentials! Only authorized account can access.";
-                return false;
-            }
-        }
-
-        function validateRegistration(email, password) {
-            if (email && password) {
-                if (registerWarning) {
-                    registerWarning.innerHTML = "⚠️ REGISTRATION BLOCKED! ⚠️<br>Only one authorized account exists.<br>Please use the provided login credentials.";
-                    registerWarning.style.display = 'block';
-                }
-                alert("⚠️ REGISTRATION DISABLED! Only the authorized account can access this system.");
-                return false;
-            }
-            return false;
-        }
-
-        document.getElementById('loginForm')?.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            if (email && password) {
-                validateLogin(email, password);
-            } else {
-                if (loginWarning) loginWarning.innerHTML = "❌ Please fill both fields";
-            }
-        });
-
-        document.getElementById('registerForm')?.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const email = document.getElementById('regEmail').value;
-            const password = document.getElementById('regPassword').value;
-            validateRegistration(email, password);
-        });
-
-        function googleAuth() {
-            alert("⚠️ Google Login disabled. Only the authorized account can access this system.");
-            if (registerWarning) {
-                registerWarning.innerHTML = "⚠️ Only one authorized account exists! Use provided credentials.";
-                registerWarning.style.display = 'block';
-            }
-        }
-
-        document.getElementById('googleLoginBtn')?.addEventListener('click', googleAuth);
-        document.getElementById('googleRegisterBtn')?.addEventListener('click', googleAuth);
-        document.getElementById('logoutDashboardBtn')?.addEventListener('click', logoutFunc);
-
-        document.getElementById('login-link')?.addEventListener('click', (e) => {
-            e.preventDefault();
-            if (!isLoggedIn) {
-                loginModalEl.style.display = 'flex';
-                if (registerWarning) registerWarning.style.display = 'none';
-                if (loginWarning) loginWarning.innerHTML = '';
-                registerModalEl.style.display = 'none';
-            } else {
-                alert("Already logged in");
-            }
-        });
-
-        document.getElementById('registration-link')?.addEventListener('click', (e) => {
-            e.preventDefault();
-            if (!isLoggedIn) {
-                registerModalEl.style.display = 'flex';
-                if (registerWarning) {
-                    registerWarning.innerHTML = "⚠️ REGISTRATION BLOCKED!<br>Only ONE authorized account exists.<br>Use Login with: " + ALLOWED_EMAIL;
-                    registerWarning.style.display = 'block';
-                }
-                loginModalEl.style.display = 'none';
-            } else {
-                alert("Already logged in");
-            }
-        });
-
-        document.querySelectorAll('.close-login, .close-register, .close-modal-btn').forEach(btn => btn.addEventListener('click', () => {
-            loginModalEl.style.display = 'none';
-            registerModalEl.style.display = 'none';
-        }));
-
-        window.onclick = (e) => {
-            if (e.target === loginModalEl) loginModalEl.style.display = 'none';
-            if (e.target === registerModalEl) registerModalEl.style.display = 'none';
-        };
-
-        document.getElementById('home-link')?.addEventListener('click', (e) => { e.preventDefault();
-            window.scrollTo({ top: 0, behavior: 'smooth' }); });
-        document.getElementById('contact-link')?.addEventListener('click', (e) => { e.preventDefault();
-            document.querySelector('.contact-info')?.scrollIntoView({ behavior: 'smooth' }); });
-        ['about-link', 'projects-link', 'tech-link', 'research-link', 'robotics-link', 'ml-link', 'automation-link', 'ai-link']
-        .forEach(id => {
-            document.getElementById(id)?.addEventListener('click', (e) => { e.preventDefault();
-                addNotif(`📡 ${id} module coming soon`);
-                alert(`📡 Coming soon`); });
-        });
-
-        // ========== INTERAÇÃO COM IA MELHORADA ==========
+        const registerSuccess = document.getElementById('registerSuccess');
+        const closeLoginBtn = document.getElementById('closeLoginBtn');
+        const closeRegisterBtn = document.getElementById('closeRegisterBtn');
+        const dashboard = document.getElementById('dashboardContainer');
+        const logoutBtn = document.getElementById('logoutDashboardBtn');
+        const userAvatar = document.getElementById('userAvatar');
+        const chatMessages = document.getElementById('chatMessages');
         const aiInput = document.getElementById('aiMessageInput');
         const sendBtn = document.getElementById('sendAiMessageBtn');
-        const aiResponseBox = document.getElementById('aiResponseBox');
         const typingIndicator = document.getElementById('typingIndicator');
-        const conversationHistoryDiv = document.getElementById('conversationHistory');
         const messageCountSpan = document.getElementById('messageCount');
+        const conversationHistoryDiv = document.getElementById('conversationHistory');
 
-        const knowledgeBaseData = {
-            neural: "🧠 Neural Networks are computing systems inspired by biological neural networks. They are used for pattern recognition and machine learning.",
-            quantum: "⚛️ Quantum Computing uses quantum-mechanical phenomena like superposition and entanglement to perform computation.",
-            nlp: "💬 Natural Language Processing (NLP) enables computers to understand, interpret, and respond to human language.",
-            vision: "👁️ Computer Vision enables machines to interpret and understand visual information from the world.",
-            robotics: "🤖 Robotics combines engineering, computer science, and AI to create intelligent machines."
-        };
+        let isLoggedIn = false;
+        let currentUserEmail = "Explorer";
+        let systemMessages = 0;
+        let uploadedFiles = [];
 
-        const responses = [
-            "🤖 Holoxorn AI: I've analyzed your input. My neural networks are processing the information. How can I assist you further?",
-            "✨ AI Core: Quantum response ready. I've optimized my learning algorithms based on your query.",
-            "🧠 Holoxorn: Thank you for your message. I'm enhancing my understanding through deep learning.",
-            "⚡ AI Interface active: Your message has been logged and analyzed by the neural network.",
-            "🌌 Neural insight: Holoxorn is continuously improving its knowledge base.",
-            "🔮 Holoxorn AI: I've detected patterns in your request. My predictive analytics are activated.",
-            "💡 Holoxorn: Great question! I'm processing it through my NLP optimizer.",
-            "🚀 Holoxorn: Your input is being analyzed by the quantum boost engine.",
-            "🎯 Holoxorn: I've identified key entities in your message. My visual recognition is also scanning.",
-            "🌟 Holoxorn: The neural cache has been updated with your interaction."
-        ];
+        // ===== FUNÇÕES =====
+        function showLogin() {
+            loginModal.classList.add('active');
+            registerModal.classList.remove('active');
+            loginWarning.textContent = '';
+        }
 
-        function addToHistory(role, text) {
+        function showRegister() {
+            registerModal.classList.add('active');
+            loginModal.classList.remove('active');
+            registerWarning.textContent = '';
+            registerSuccess.textContent = '';
+        }
+
+        function hideAllModals() {
+            loginModal.classList.remove('active');
+            registerModal.classList.remove('active');
+        }
+
+        function performLogin() {
+            const email = emailInput.value.trim();
+            const password = passwordInput.value.trim();
+
+            if (!email || !password) {
+                loginWarning.textContent = "❌ Please fill both fields";
+                return;
+            }
+
+            const userFound = registeredUsers.find(u => u.email === email && u.password === password);
+            
+            if (userFound || (email === ALLOWED_EMAIL && password === ALLOWED_PASSWORD)) {
+                isLoggedIn = true;
+                currentUserEmail = email;
+                hideAllModals();
+                dashboard.classList.add('show');
+                userAvatar.textContent = email.charAt(0).toUpperCase();
+                loginWarning.textContent = '';
+                addNotif(`✅ Welcome ${email}`);
+                addChatMessage('assistant', 'Welcome back! Holoxorn AI is ready to assist you.');
+                console.log("✅ Login successful!");
+            } else {
+                loginWarning.textContent = "❌ Invalid credentials! Use: contact@bradicoin.com / 36124589Bdc or register";
+                console.log("❌ Login failed");
+            }
+        }
+
+        function performRegister() {
+            const name = regName.value.trim();
+            const email = regEmail.value.trim();
+            const password = regPassword.value.trim();
+            const confirm = regConfirmPassword.value.trim();
+
+            registerWarning.textContent = '';
+            registerSuccess.textContent = '';
+
+            if (!name || !email || !password || !confirm) {
+                registerWarning.textContent = "❌ Please fill all fields";
+                return;
+            }
+
+            if (password.length < 6) {
+                registerWarning.textContent = "❌ Password must be at least 6 characters";
+                return;
+            }
+
+            if (password !== confirm) {
+                registerWarning.textContent = "❌ Passwords do not match";
+                return;
+            }
+
+            if (registeredUsers.find(u => u.email === email)) {
+                registerWarning.textContent = "❌ Email already registered! Please login.";
+                return;
+            }
+
+            registeredUsers.push({ name, email, password });
+            localStorage.setItem('holoxorn_users', JSON.stringify(registeredUsers));
+            
+            registerSuccess.textContent = "✅ Account created successfully! Please login.";
+            registerWarning.textContent = '';
+            
+            regName.value = '';
+            regEmail.value = '';
+            regPassword.value = '';
+            regConfirmPassword.value = '';
+            
+            setTimeout(() => {
+                registerModal.classList.remove('active');
+                loginModal.classList.add('active');
+                registerSuccess.textContent = '';
+            }, 1500);
+        }
+
+        function performLogout() {
+            document.getElementById('confirmLogoutModal').classList.add('show');
+        }
+
+        function confirmLogout() {
+            isLoggedIn = false;
+            currentUserEmail = "Explorer";
+            dashboard.classList.remove('show');
+            document.getElementById('confirmLogoutModal').classList.remove('show');
+            addNotif("🔓 User logged out");
+            
+            chatMessages.innerHTML = `
+                <div class="chat-msg assistant">
+                    <i class="fas fa-robot msg-icon"></i> Welcome to Holoxorn AI! How can I assist you today?
+                    <span class="msg-time">Just now</span>
+                </div>
+            `;
+            systemMessages = 0;
+            messageCountSpan.textContent = '0';
+            document.getElementById('entityList').innerHTML = `
+                <span class="entity-tag">Holoxorn</span>
+                <span class="entity-tag">AI</span>
+                <span class="entity-tag">Neural</span>
+            `;
+            conversationHistoryDiv.innerHTML = `
+                <div class="history-item" style="opacity:0.6;"><i class="fas fa-robot"></i> Welcome to Holoxorn AI</div>
+            `;
+            console.log("🔓 Logged out");
+        }
+
+        // ===== EVENTOS =====
+        document.getElementById('login-link').addEventListener('click', (e) => {
+            e.preventDefault();
+            if (!isLoggedIn) showLogin();
+            else alert("Already logged in");
+        });
+
+        document.getElementById('registration-link').addEventListener('click', (e) => {
+            e.preventDefault();
+            if (!isLoggedIn) showRegister();
+            else alert("Already logged in");
+        });
+
+        document.getElementById('home-link').addEventListener('click', (e) => {
+            e.preventDefault();
+            if (isLoggedIn) {
+                dashboard.classList.add('show');
+                hideAllModals();
+            }
+        });
+
+        document.getElementById('contact-link').addEventListener('click', (e) => {
+            e.preventDefault();
+            document.querySelector('.contact-info')?.scrollIntoView({ behavior: 'smooth' });
+        });
+
+        loginBtn.addEventListener('click', performLogin);
+        registerBtn.addEventListener('click', performRegister);
+        logoutBtn.addEventListener('click', performLogout);
+
+        closeLoginBtn.addEventListener('click', hideAllModals);
+        closeRegisterBtn.addEventListener('click', hideAllModals);
+
+        emailInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') passwordInput.focus(); });
+        passwordInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') performLogin(); });
+        regConfirmPassword.addEventListener('keypress', (e) => { if (e.key === 'Enter') performRegister(); });
+
+        document.getElementById('googleLoginBtn').addEventListener('click', () => {
+            alert("⚠️ Google Login disabled. Use: contact@bradicoin.com / 36124589Bdc or register");
+        });
+
+        document.getElementById('confirmLogoutYes').addEventListener('click', confirmLogout);
+        document.getElementById('confirmLogoutNo').addEventListener('click', () => {
+            document.getElementById('confirmLogoutModal').classList.remove('show');
+        });
+
+        // ===== CHAT =====
+        function addChatMessage(role, text) {
+            const msgDiv = document.createElement('div');
+            msgDiv.className = `chat-msg ${role}`;
+            const icon = role === 'user' ? '<i class="fas fa-user msg-icon"></i>' : '<i class="fas fa-robot msg-icon"></i>';
             const time = new Date().toLocaleTimeString();
-            const entry = { role, text, time };
-            conversationHistory.push(entry);
-            if (conversationHistory.length > 50) conversationHistory.shift();
-
-            const historyItem = document.createElement('div');
-            historyItem.className = 'history-item';
-            const icon = role === 'user' ? '<i class="fas fa-user"></i>' : '<i class="fas fa-robot"></i>';
-            historyItem.innerHTML = `${icon} [${time}] ${text.substring(0, 80)}${text.length > 80 ? '...' : ''}`;
-            conversationHistoryDiv.appendChild(historyItem);
-            conversationHistoryDiv.scrollTop = conversationHistoryDiv.scrollHeight;
+            msgDiv.innerHTML = `${icon} ${text} <span class="msg-time">${time}</span>`;
+            chatMessages.appendChild(msgDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
 
             systemMessages++;
             messageCountSpan.textContent = systemMessages;
 
-            // Atualizar entidades detectadas
-            extractEntities(text);
+            const historyItem = document.createElement('div');
+            historyItem.className = 'history-item';
+            const hIcon = role === 'user' ? '<i class="fas fa-user"></i>' : '<i class="fas fa-robot"></i>';
+            historyItem.innerHTML = `${hIcon} [${time}] ${text.substring(0, 60)}${text.length > 60 ? '...' : ''}`;
+            conversationHistoryDiv.appendChild(historyItem);
+            conversationHistoryDiv.scrollTop = conversationHistoryDiv.scrollHeight;
+
+            if (role === 'assistant') extractEntities(text);
         }
 
         function extractEntities(text) {
             const entityList = document.getElementById('entityList');
             const entities = text.match(/\b[A-Z][a-z]+\b/g) || [];
-            const techTerms = ['AI', 'NLP', 'ML', 'Quantum', 'Neural', 'Robotics', 'Vision', 'Deep Learning', 'Machine Learning',
-                'Algorithm'
-            ];
+            const techTerms = ['AI', 'NLP', 'ML', 'Quantum', 'Neural', 'Robotics', 'Vision'];
 
-            let foundEntities = [];
-            entities.forEach(e => {
-                if (e.length > 2 && !foundEntities.includes(e)) {
-                    foundEntities.push(e);
-                }
-            });
+            let found = [];
+            entities.forEach(e => { if (e.length > 2 && !found.includes(e)) found.push(e); });
             techTerms.forEach(term => {
-                if (text.toLowerCase().includes(term.toLowerCase()) && !foundEntities.includes(term)) {
-                    foundEntities.push(term);
-                }
+                if (text.includes(term) && !found.includes(term)) found.push(term);
             });
 
-            if (foundEntities.length > 0) {
-                const existingTags = entityList.querySelectorAll('.entity-tag');
-                const existingTexts = Array.from(existingTags).map(tag => tag.textContent);
-                foundEntities.forEach(entity => {
-                    if (!existingTexts.includes(entity) && entityList.children.length < 15) {
-                        const tag = document.createElement('span');
-                        tag.className = 'entity-tag';
-                        tag.textContent = entity;
-                        entityList.appendChild(tag);
-                    }
-                });
-            }
+            found.forEach(entity => {
+                const existing = entityList.querySelectorAll('.entity-tag');
+                const existTexts = Array.from(existing).map(t => t.textContent);
+                if (!existTexts.includes(entity) && entityList.children.length < 12) {
+                    const tag = document.createElement('span');
+                    tag.className = 'entity-tag';
+                    tag.textContent = entity;
+                    entityList.appendChild(tag);
+                }
+            });
         }
 
         function sendToAI() {
             let msg = aiInput.value.trim();
-            if (!msg) { alert("Please type or speak a message"); return; }
+            if (!msg) { alert("Please type a message"); return; }
 
-            addToHistory('user', msg);
-
+            addChatMessage('user', msg);
+            aiInput.value = '';
             typingIndicator.classList.add('active');
-            aiResponseBox.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Holoxorn AI is processing...`;
 
             setTimeout(() => {
                 typingIndicator.classList.remove('active');
 
-                // Análise de sentimento simulada
-                updateSentiment(msg);
+                const responses = [
+                    "🤖 I've analyzed your input. How can I assist you further?",
+                    "✨ Quantum response ready. My neural networks are processing.",
+                    "🧠 Thank you for your message. I'm enhancing my understanding.",
+                    "⚡ Your message has been logged and analyzed.",
+                    "🌌 Neural insight: I'm continuously improving my knowledge.",
+                    "🔮 I've detected patterns in your request. Predictive analytics active.",
+                    "💡 Great question! Processing through NLP optimizer.",
+                    "🚀 Your input is being analyzed by the quantum boost engine.",
+                    "🎯 I've identified key entities in your message.",
+                    "🌟 Neural cache has been updated with your interaction."
+                ];
 
-                // Resposta baseada no conteúdo
                 let response = responses[Math.floor(Math.random() * responses.length)];
 
-                // Verificar se a mensagem contém palavras-chave para respostas específicas
                 const lowerMsg = msg.toLowerCase();
-                if (lowerMsg.includes('hello') || lowerMsg.includes('hi') || lowerMsg.includes('hey')) {
-                    response = "👋 Hello! Welcome to Holoxorn AI. I'm here to assist you with any questions or tasks.";
-                } else if (lowerMsg.includes('help') || lowerMsg.includes('support')) {
-                    response =
-                    "🆘 I'm here to help! I can assist with data analysis, natural language processing, visual recognition, and more. What specific assistance do you need?";
-                } else if (lowerMsg.includes('who are you') || lowerMsg.includes('what are you')) {
-                    response =
-                    "🤖 I am Holoxorn AI, a multi-functional artificial intelligence designed to help with complex tasks, data analysis, and intelligent automation.";
+                if (lowerMsg.includes('hello') || lowerMsg.includes('hi')) {
+                    response = "👋 Hello! Welcome to Holoxorn AI. How can I assist you?";
+                } else if (lowerMsg.includes('help')) {
+                    response = "🆘 I can assist with data analysis, NLP, visual recognition, and more. What do you need?";
+                } else if (lowerMsg.includes('who are you')) {
+                    response = "🤖 I am Holoxorn AI, a multi-functional artificial intelligence.";
                 } else if (lowerMsg.includes('capabilities') || lowerMsg.includes('features')) {
-                    response =
-                    "✨ My capabilities include: Natural Language Processing, Computer Vision, Predictive Analytics, Quantum Computing simulations, Neural Networks, and Intelligent Automation.";
+                    response = "✨ My capabilities: NLP, Computer Vision, Predictive Analytics, Quantum Computing, Neural Networks.";
                 } else if (lowerMsg.includes('thank')) {
-                    response = "🙌 You're welcome! I'm always here to assist. Feel free to ask me anything.";
-                } else if (lowerMsg.includes('bye') || lowerMsg.includes('goodbye')) {
-                    response = "👋 Goodbye! It was a pleasure assisting you. Come back anytime!";
+                    response = "🙌 You're welcome! I'm always here to assist.";
+                } else if (lowerMsg.includes('bye')) {
+                    response = "👋 Goodbye! Come back anytime!";
                 }
 
-                aiResponseBox.innerHTML = `<i class="fas fa-robot"></i> ${response}`;
-                addToHistory('assistant', response);
-
-                // Atualizar estatísticas do sistema
+                addChatMessage('assistant', response);
                 updateSystemStats();
-
-                aiInput.value = '';
-                addNotif(`💬 AI responded to your message`);
-
-                // Verificar se a resposta contém entidades
-                extractEntities(response);
-
-            }, 1000 + Math.random() * 800);
-        }
-
-        function updateSentiment(text) {
-            // Simulação simples de análise de sentimento
-            const positiveWords = ['good', 'great', 'excellent', 'amazing', 'wonderful', 'fantastic', 'love', 'happy', 'excited',
-                'awesome', 'best'
-            ];
-            const negativeWords = ['bad', 'terrible', 'awful', 'horrible', 'hate', 'sad', 'angry', 'frustrated', 'worst',
-                'disappointing'
-            ];
-
-            let posScore = 0,
-                negScore = 0;
-            const words = text.toLowerCase().split(' ');
-
-            words.forEach(word => {
-                if (positiveWords.includes(word)) posScore++;
-                if (negativeWords.includes(word)) negScore++;
-            });
-
-            // Atualizar barras de sentimento com pequena variação
-            const basePos = parseInt(document.getElementById('sentimentPositive').style.width) || 65;
-            const baseNeut = parseInt(document.getElementById('sentimentNeutral').style.width) || 25;
-            const baseNeg = parseInt(document.getElementById('sentimentNegative').style.width) || 10;
-
-            let newPos = Math.max(5, Math.min(95, basePos + (posScore - negScore) * 3));
-            let newNeg = Math.max(5, Math.min(50, baseNeg + (negScore - posScore) * 3));
-            let newNeut = Math.max(5, Math.min(70, 100 - newPos - newNeg));
-
-            // Normalizar para 100%
-            const total = newPos + newNeut + newNeg;
-            newPos = (newPos / total) * 100;
-            newNeut = (newNeut / total) * 100;
-            newNeg = (newNeg / total) * 100;
-
-            document.getElementById('sentimentPositive').style.width = newPos + '%';
-            document.getElementById('sentimentNeutral').style.width = newNeut + '%';
-            document.getElementById('sentimentNegative').style.width = newNeg + '%';
-            document.getElementById('sentimentPositiveText').textContent = Math.round(newPos) + '%';
-            document.getElementById('sentimentNeutralText').textContent = Math.round(newNeut) + '%';
-            document.getElementById('sentimentNegativeText').textContent = Math.round(newNeg) + '%';
-        }
-
-        function updateSystemStats() {
-            // Simular carga variável
-            const load = 20 + Math.random() * 50;
-            document.getElementById('systemLoadBar').style.width = load + '%';
-            document.getElementById('systemLoadText').textContent = Math.round(load) + '%';
-
-            const temp = 38 + Math.random() * 12;
-            document.getElementById('aiTemp').textContent = Math.round(temp) + '°C';
-
-            const neuralLoad = 15 + Math.random() * 45;
-            document.getElementById('neuralLoad').textContent = Math.round(neuralLoad) + '%';
-
-            // Status da IA
-            const statusTexts = ['Online', 'Optimizing', 'Learning', 'Processing', 'Idle'];
-            const status = statusTexts[Math.floor(Math.random() * statusTexts.length)];
-            document.getElementById('aiStatusText').textContent = status;
+                addNotif('💬 AI responded');
+            }, 800 + Math.random() * 700);
         }
 
         sendBtn.addEventListener('click', sendToAI);
-        aiInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendToAI(); });
-
-        // ========== BOTÃO LIMPAR CHAT ==========
-        document.getElementById('clearChatBtn')?.addEventListener('click', () => {
-            aiInput.value = '';
-            aiResponseBox.innerHTML = '<i class="fas fa-robot"></i> Chat cleared. Holoxorn AI is ready.';
-            document.getElementById('conversationHistory').innerHTML =
-                '<div class="history-item" style="opacity:0.6;"><i class="fas fa-robot"></i> Welcome to Holoxorn AI</div>';
-            conversationHistory = [];
-            addNotif('🗑️ Chat cleared');
+        aiInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendToAI();
+            }
         });
 
-        document.getElementById('clearHistoryBtn')?.addEventListener('click', () => {
-            document.getElementById('conversationHistory').innerHTML =
-                '<div class="history-item" style="opacity:0.6;"><i class="fas fa-robot"></i> Welcome to Holoxorn AI</div>';
-            conversationHistory = [];
-            addNotif('🗑️ History cleared');
+        // ===== LIMPAR CHAT =====
+        document.getElementById('clearChatBtn').addEventListener('click', () => {
+            if (confirm('Are you sure you want to clear all chat messages?')) {
+                chatMessages.innerHTML = `
+                    <div class="chat-msg assistant">
+                        <i class="fas fa-robot msg-icon"></i> Chat cleared. Holoxorn AI is ready.
+                        <span class="msg-time">Just now</span>
+                    </div>
+                `;
+                systemMessages = 0;
+                messageCountSpan.textContent = '0';
+                addNotif('🗑️ Chat cleared');
+            }
         });
 
-        // ========== MICROFONE ==========
+        document.getElementById('exportChatBtn').addEventListener('click', () => {
+            const messages = chatMessages.querySelectorAll('.chat-msg');
+            let text = '=== HOLOXORN AI CHAT LOG ===\n';
+            text += `Date: ${new Date().toLocaleString()}\n\n`;
+            messages.forEach(msg => {
+                const role = msg.classList.contains('user') ? 'USER' : 'HOLOXORN AI';
+                const content = msg.textContent.replace(/\d{1,2}:\d{2}:\d{2} (AM|PM)/, '').trim();
+                text += `[${role}] ${content}\n`;
+            });
+            const blob = new Blob([text], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `holoxorn_chat_${new Date().toISOString().slice(0,10)}.txt`;
+            a.click();
+            URL.revokeObjectURL(url);
+            addNotif('📤 Chat exported successfully');
+        });
+
+        document.getElementById('clearHistoryBtn').addEventListener('click', () => {
+            if (confirm('Clear conversation history?')) {
+                conversationHistoryDiv.innerHTML = `
+                    <div class="history-item" style="opacity:0.6;"><i class="fas fa-robot"></i> Welcome to Holoxorn AI</div>
+                `;
+                addNotif('🗑️ History cleared');
+            }
+        });
+
+        // ===== MICROFONE =====
         const micBtn = document.getElementById('micButton');
         const micActionBtn = document.getElementById('micActionBtn');
         const micStatus = document.getElementById('micStatus');
@@ -1398,104 +1979,76 @@
                 recognition.continuous = false;
                 recognition.interimResults = true;
                 recognition.lang = 'en-US';
-                recognition.onstart = () => { micStatus.innerHTML = '🔴 Recording... Speak now';
-                    micBtn.classList.add('recording'); if (micActionBtn) micActionBtn.classList.add('recording');
-                    isRecordingMic = true; };
+                recognition.onstart = () => {
+                    micStatus.innerHTML = '🔴 Recording...';
+                    micBtn.style.background = '#ff3333';
+                    micBtn.style.boxShadow = '0 0 30px red';
+                    isRecordingMic = true;
+                };
                 recognition.onresult = (event) => {
                     let transcript = Array.from(event.results).map(r => r[0].transcript).join('');
-                    transcriptDiv.innerHTML = `🎤 You said: "${transcript}"`;
+                    transcriptDiv.innerHTML = `🎤 "${transcript}"`;
                     micStatus.innerHTML = '✅ Processed';
                     aiInput.value = transcript;
                     sendToAI();
                     addNotif(`🎤 Voice input: ${transcript.substring(0,40)}`);
                     stopRecording();
                 };
-                recognition.onerror = (e) => { micStatus.innerHTML = '⚠️ Error, try again';
-                    stopRecording(); };
+                recognition.onerror = () => {
+                    micStatus.innerHTML = '⚠️ Error';
+                    stopRecording();
+                };
                 recognition.onend = () => { stopRecording(); };
             } else {
                 micStatus.innerHTML = '❌ Not supported';
-                if (micBtn) micBtn.disabled = true;
-                if (micActionBtn) micActionBtn.disabled = true;
+                micBtn.disabled = true;
+                micActionBtn.disabled = true;
             }
         }
 
         function stopRecording() {
             if (recognition) try { recognition.stop(); } catch (e) {}
-            micBtn.classList.remove('recording');
-            if (micActionBtn) micActionBtn.classList.remove('recording');
-            if (micStatus.innerHTML.includes('Recording')) micStatus.innerHTML = '⚪ Ready';
+            micBtn.style.background = 'linear-gradient(135deg,#e74c8b,#9b59b6)';
+            micBtn.style.boxShadow = 'none';
+            if (!micStatus.innerHTML.includes('Processed')) micStatus.innerHTML = '⚪ Ready';
             isRecordingMic = false;
         }
 
-        function startRecording() {
-            if (recognition) { try { recognition.start(); } catch (e) { micStatus.innerHTML = '⚠️ Already recording'; } } else { alert(
-                    "Speech recognition not supported"); }
+        function toggleMic() {
+            if (isRecordingMic) stopRecording();
+            else if (recognition) try { recognition.start(); } catch (e) {}
         }
 
-        function toggleMic() { if (isRecordingMic) stopRecording();
-            else startRecording(); }
         initSpeechRecognition();
-        if (micBtn) micBtn.addEventListener('click', toggleMic);
-        if (micActionBtn) micActionBtn.addEventListener('click', toggleMic);
+        micBtn.addEventListener('click', toggleMic);
+        micActionBtn.addEventListener('click', toggleMic);
 
-        // ========== UPLOAD ==========
-        let uploadedFiles = [];
-        const uploadArea = document.getElementById('uploadArea');
-        const fileInputEl = document.getElementById('fileInput');
-        const fileListDiv = document.getElementById('fileList');
-        const mediaPreviewDiv = document.getElementById('mediaPreview');
+        // ===== UPLOAD =====
         const uploadActionBtn = document.getElementById('uploadActionBtn');
+        const fileInputEl = document.getElementById('fileInput');
 
-        function triggerUpload() { fileInputEl.click(); }
-        uploadArea?.addEventListener('click', triggerUpload);
-        uploadActionBtn?.addEventListener('click', triggerUpload);
-        uploadArea?.addEventListener('dragover', e => e.preventDefault());
-        uploadArea?.addEventListener('drop', e => { e.preventDefault();
-            handleFiles(e.dataTransfer.files); });
-        fileInputEl?.addEventListener('change', e => handleFiles(e.target.files));
+        uploadActionBtn.addEventListener('click', () => fileInputEl.click());
 
-        function handleFiles(files) {
-            Array.from(files).forEach(file => {
+        fileInputEl.addEventListener('change', (e) => {
+            Array.from(e.target.files).forEach(file => {
+                if (file.size > 10 * 1024 * 1024) {
+                    addNotif(`❌ ${file.name} too large`);
+                    return;
+                }
                 const reader = new FileReader();
                 reader.onload = (ev) => {
                     uploadedFiles.push({ name: file.name, type: file.type, data: ev.target.result });
-                    updateFileListUI();
                     updateStorageMetric();
-                    addPreview(file.type, ev.target.result);
                     addNotif(`📎 Uploaded: ${file.name}`);
-                    // Analisar arquivo com IA (simulação)
-                    aiResponseBox.innerHTML =
-                        `<i class="fas fa-robot"></i> 📄 I've received your file: "${file.name}". Analyzing content...`;
+                    addChatMessage('assistant', `📄 I've received your file: "${file.name}". Analyzing content...`);
                     setTimeout(() => {
-                        aiResponseBox.innerHTML =
-                            `<i class="fas fa-robot"></i> ✅ File "${file.name}" has been processed. I can help you analyze its contents.`;
-                    }, 1500);
+                        addChatMessage('assistant', `✅ File "${file.name}" has been processed.`);
+                    }, 1200);
                 };
                 reader.readAsDataURL(file);
             });
-        }
-
-        function updateFileListUI() {
-            fileListDiv.innerHTML = uploadedFiles.map((f, idx) =>
-                    `<div class="file-item"><div><i class="fas fa-${f.type.includes('image')?'image':f.type.includes('video')?'video':'file'}"></i> ${f.name.substring(0,25)}</div><i class="fas fa-trash delete-file" data-idx="${idx}"></i></div>`
-                    ).join('');
-            document.querySelectorAll('.delete-file').forEach(el => { el.addEventListener('click', (e) => { let idx = parseInt(el
-                        .getAttribute('data-idx'));
-                    uploadedFiles.splice(idx, 1);
-                    updateFileListUI();
-                    updateStorageMetric();
-                    addNotif(`🗑️ File removed`); }); });
-        }
-
-        function addPreview(type, data) {
-            let html = '';
-            if (type.includes('image')) html = `<img src="${data}" alt="preview">`;
-            else if (type.includes('video')) html = `<video controls><source src="${data}"></video>`;
-            else html = `<div style="background:#2d2d5e; padding:5px; border-radius:8px;"><i class="fas fa-file-alt"></i> Document</div>`;
-            if (html) mediaPreviewDiv.innerHTML = html + mediaPreviewDiv.innerHTML;
-            if (mediaPreviewDiv.children.length > 4) mediaPreviewDiv.removeChild(mediaPreviewDiv.lastChild);
-        }
+            fileInputEl.value = '';
+        });
 
         function updateStorageMetric() {
             let total = uploadedFiles.reduce((s, f) => s + (f.data?.length || 0), 0);
@@ -1503,26 +2056,57 @@
             document.getElementById('storageInfoDash').innerText = `${mb} MB (${uploadedFiles.length} files)`;
         }
 
-        // ========== TOGGLES ==========
-        const toggles = ['deepToggle', 'visionToggle', 'nlpTogglex', 'autoToggle', 'predictToggle', 'cacheToggle',
-            'anomalyToggle', 'cloudToggle', 'quantumBoostToggle', 'hudAnim', 'encryptToggle'
+        // ===== TOGGLES =====
+        const allToggles = [
+            'secTranslator', 'sec2fa', 'secBio', 'secIdentity', 'secMalware', 'secAnon', 'secEncrypt',
+            'secVpn', 'secFirewall', 'secThreat', 'secPrivacy', 'secUpdate', 'secTimeout',
+            'secBrute', 'secAudit', 'secQr', 'secCloud',
+            'deepToggle', 'visionToggle', 'nlpTogglex', 'autoToggle', 'predictToggle',
+            'cacheToggle', 'anomalyToggle', 'cloudToggle', 'quantumBoostToggle'
         ];
-        toggles.forEach(id => { let el = document.getElementById(id); if (el) el.addEventListener('click', function() { this
-                    .classList.toggle('active');
-                addNotif(`⚙️ ${id.replace('Toggle','')} ${this.classList.contains('active')?'ON':'OFF'}`); }); });
-        document.getElementById('glowSelect')?.addEventListener('change', (e) => addNotif(`✨ Neon intensity: ${e.target.value}`));
-        document.getElementById('clearNotifBtn')?.addEventListener('click', () => { document.getElementById('notificationList')
-                .innerHTML = '✨ Notifications cleared.';
-            addNotif("Notifications cleared"); });
 
+        allToggles.forEach(id => {
+            const el = document.getElementById(id);
+            if (el) {
+                el.addEventListener('click', function() {
+                    this.classList.toggle('active');
+                    const name = id.replace('sec', '').replace('Toggle', '');
+                    addNotif(`🔘 ${name} ${this.classList.contains('active') ? 'ON' : 'OFF'}`);
+                });
+            }
+        });
+
+        // ===== NOTIFICAÇÕES =====
         function addNotif(msg) {
-            let notifDiv = document.getElementById('notificationList');
-            let newMsg = `<div>🔔 ${new Date().toLocaleTimeString()} - ${msg}</div>`;
-            notifDiv.innerHTML = newMsg + notifDiv.innerHTML;
-            if (notifDiv.children.length > 6) notifDiv.removeChild(notifDiv.lastChild);
+            const notifDiv = document.getElementById('notificationList');
+            notifDiv.innerHTML = `🔔 ${new Date().toLocaleTimeString()} - ${msg}<br>` + notifDiv.innerHTML;
+            if (notifDiv.children.length > 8) notifDiv.removeChild(notifDiv.lastChild);
         }
 
-        // ========== MÉTRICAS ==========
+        document.getElementById('clearNotifBtn').addEventListener('click', () => {
+            document.getElementById('notificationList').innerHTML = '✨ Notifications cleared.';
+            addNotif("Notifications cleared");
+        });
+
+        // ===== MÉTRICAS =====
+        function updateSystemStats() {
+            const load = 15 + Math.random() * 45;
+            document.getElementById('systemLoadBar').style.width = load + '%';
+            document.getElementById('systemLoadText').textContent = Math.round(load) + '%';
+
+            const temp = 38 + Math.random() * 12;
+            document.getElementById('aiTemp').textContent = Math.round(temp) + '°C';
+
+            const neuralLoad = 15 + Math.random() * 45;
+            document.getElementById('neuralLoad').textContent = Math.round(neuralLoad) + '%';
+
+            const statuses = ['Online', 'Optimizing', 'Learning', 'Processing'];
+            document.getElementById('aiStatusText').textContent = statuses[Math.floor(Math.random() * statuses.length)];
+
+            const memStatuses = ['Optimal', 'Good', 'Moderate'];
+            document.getElementById('memoryStatus').textContent = memStatuses[Math.floor(Math.random() * memStatuses.length)];
+        }
+
         let startTime = Date.now();
         setInterval(() => {
             let seconds = Math.floor((Date.now() - startTime) / 1000);
@@ -1534,148 +2118,16 @@
             updateSystemStats();
         }, 4000);
 
-        // ========== TRADUTOR ==========
-        const trans = {
-            en: { menu: { home: "Home", login: "Login", registration: "Register", contact: "Contact", about: "About",
-                    projects: "Projects", technology: "Tech", research: "Research", robotics: "Robotics",
-                    "machine-learning": "ML", automation: "Auto", innovations: "AI" }, title: "Holoxorn",
-                contact: { info: "Contact: <a href='mailto:contact@holoxorn.com' style='color:#00ff99;'>contact@holoxorn.com</a>" } },
-            pt: { menu: { home: "Início", login: "Login", registration: "Cadastro", contact: "Contato", about: "Sobre",
-                    projects: "Projetos", technology: "Tecnologia", research: "Pesquisa", robotics: "Robótica",
-                    "machine-learning": "ML", automation: "Automação", innovations: "Inovações" }, title: "Holoxorn",
-                contact: { info: "Contato: <a href='mailto:contact@holoxorn.com' style='color:#00ff99;'>contact@holoxorn.com</a>" } },
-            es: { menu: { home: "Inicio", login: "Iniciar", registration: "Registro", contact: "Contacto", about: "Acerca",
-                    projects: "Proyectos", technology: "Tecnología", research: "Investigación", robotics: "Robótica",
-                    "machine-learning": "ML", automation: "Automación", innovations: "Innovaciones" }, title: "Holoxorn",
-                contact: { info: "Contacto: <a href='mailto:contact@holoxorn.com' style='color:#00ff99;'>contact@holoxorn.com</a>" } },
-            ar: { menu: { home: "الرئيسية", login: "دخول", registration: "تسجيل", contact: "اتصل", about: "عن",
-                    projects: "مشاريع", technology: "تقنية", research: "بحث", robotics: "روبوتات",
-                    "machine-learning": "تعلم آلة", automation: "أتمتة", innovations: "ابتكارات" }, title: "هولوكسورن",
-                contact: { info: "اتصال: <a href='mailto:contact@holoxorn.com' style='color:#00ff99;'>contact@holoxorn.com</a>" } }
-        };
-        let curLang = 'en';
-
-        function updateTexts() {
-            let t = trans[curLang];
-            if (!t) return;
-            document.querySelectorAll('[data-i18n]').forEach(el => {
-                let key = el.getAttribute('data-i18n');
-                let val = key.split('.').reduce((o, i) => o?.[i], t);
-                if (val) { if (el.innerHTML.includes('href')) el.innerHTML = val;
-                    else el.innerText = val; }
-            });
-            document.getElementById('language-button').innerHTML = `🌐 ${curLang.toUpperCase()}`;
-        }
-        document.querySelectorAll('.lang-dropdown button').forEach(btn => { btn.addEventListener('click', (e) => { curLang = btn
-                    .getAttribute('data-lang');
-                updateTexts();
-                document.getElementById('langSelector').classList.remove('active'); }); });
-        document.getElementById('language-button')?.addEventListener('click', (e) => { e.stopPropagation();
-            document.getElementById('langSelector').classList.toggle('active'); });
-        document.addEventListener('click', () => document.getElementById('langSelector')?.classList.remove('active'));
+        // ===== INICIALIZAÇÃO =====
         updateTexts();
-
-        // ========== QUICK ACTIONS ==========
-        document.querySelectorAll('.quick-action-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const action = this.dataset.action;
-                const input = aiInput;
-
-                const actionMessages = {
-                    analyze: "Analyze the data and provide insights.",
-                    summarize: "Summarize the key points.",
-                    translate: "Translate this to English.",
-                    sentiment: "Analyze the sentiment of this text.",
-                    entities: "Extract all named entities from this text.",
-                    generate: "Generate creative content based on this."
-                };
-
-                if (input.value.trim()) {
-                    input.value = actionMessages[action] + " " + input.value;
-                } else {
-                    input.value = actionMessages[action];
-                }
-                sendToAI();
-                addNotif(`⚡ Quick action: ${action}`);
-            });
-        });
-
-        // ========== KNOWLEDGE BASE ==========
-        document.querySelectorAll('.knowledge-base-item').forEach(item => {
-            item.addEventListener('click', function() {
-                const topic = this.dataset.topic;
-                const info = knowledgeBaseData[topic] || "Information about this topic is being processed.";
-                aiInput.value = `Tell me more about ${topic}`;
-                sendToAI();
-                addNotif(`📚 Knowledge: ${topic}`);
-            });
-        });
-
-        // ========== ANIMAÇÃO 3D CUBOS (ORIGINAL) ==========
-        let scene, camera, renderer, cubes = [],
-            mouseX = 0,
-            mouseY = 0;
-
-        function init3D() {
-            scene = new THREE.Scene();
-            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-            camera.position.z = 5;
-            renderer = new THREE.WebGLRenderer({ alpha: false });
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            renderer.setClearColor(0x000000, 0);
-            document.body.appendChild(renderer.domElement);
-            const cubeMaterial = new THREE.MeshStandardMaterial({ color: 0x7f00ff, emissive: 0x3f51b5, emissiveIntensity: 0.6,
-                roughness: 0.5, metalness: 0.8 });
-            for (let i = 0; i < 1500; i++) {
-                const geometry = new THREE.BoxGeometry(0.5, 0.5, 0.5);
-                const cube = new THREE.Mesh(geometry, cubeMaterial);
-                cube.position.x = (Math.random() - 0.5) * 80;
-                cube.position.y = (Math.random() - 0.5) * 80;
-                cube.position.z = (Math.random() - 0.5) * 80;
-                cube.rotation.x = Math.random() * Math.PI;
-                cube.rotation.y = Math.random() * Math.PI;
-                scene.add(cube);
-                cubes.push(cube);
-            }
-            const light = new THREE.PointLight(0xffffff, 1, 100);
-            light.position.set(10, 10, 10);
-            scene.add(light);
-            const ambientLight = new THREE.AmbientLight(0x404040);
-            scene.add(ambientLight);
-            const backLight = new THREE.PointLight(0x7f00ff, 0.5);
-            backLight.position.set(-5, -5, -5);
-            scene.add(backLight);
-            window.addEventListener('mousemove', onMouseMove, false);
-            animate();
-        }
-
-        function onMouseMove(event) {
-            mouseX = (event.clientX / window.innerWidth) * 2 - 1;
-            mouseY = -(event.clientY / window.innerHeight) * 2 + 1;
-        }
-
-        function animate() {
-            requestAnimationFrame(animate);
-            cubes.forEach(cube => {
-                cube.rotation.x += 0.01;
-                cube.rotation.y += 0.01;
-                cube.rotation.z += 0.005;
-            });
-            camera.position.x += (mouseX * 2 - camera.position.x) * 0.03;
-            camera.position.y += (-mouseY * 2 - camera.position.y) * 0.03;
-            camera.lookAt(scene.position);
-            renderer.render(scene, camera);
-        }
-        window.addEventListener('resize', () => {
-            if (renderer) {
-                renderer.setSize(window.innerWidth, window.innerHeight);
-                camera.aspect = window.innerWidth / window.innerHeight;
-                camera.updateProjectionMatrix();
-            }
-        });
-        init3D();
-        updateUI();
         updateStorageMetric();
+
+        console.log("🔐 Holoxorn iniciado!");
+        console.log("📌 Credenciais: contact@bradicoin.com / 36124589Bdc");
+        console.log("📌 Clique em 'Login' para abrir o modal");
+        console.log("📌 Clique em 'Registration' para criar conta");
+        console.log("📌 Clique nos links informativos para saber mais sobre a Holoxorn");
+        console.log("📌 Idiomas disponíveis: English, Português, Español, العربية");
     </script>
 </body>
 </html>
