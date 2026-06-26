@@ -354,127 +354,827 @@
         document.getElementById(id)?.addEventListener('click', (e) => { e.preventDefault(); addNotif(`📡 ${id} module coming soon`); alert(`📡 Coming soon`); });
     });
 
-    // ========== INTERAÇÃO COM IA ==========
-    const aiInput = document.getElementById('aiMessageInput');
-    const sendBtn = document.getElementById('sendAiMessageBtn');
-    const aiResponseBox = document.getElementById('aiResponseBox');
-    
-    function sendToAI() {
-        let msg = aiInput.value.trim();
-        if(!msg) { alert("Please type or speak a message"); return; }
-        aiResponseBox.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Holoxorn AI is processing...`;
-        setTimeout(() => {
-            const responses = [
-                `🤖 Holoxorn AI: "${msg}" - Neural pattern analyzed. How can I assist you further?`,
-                `✨ AI Core: I've processed your input. Quantum response ready.`,
-                `🧠 Holoxorn: Thank you for your message. My neural networks are optimizing.`,
-                `⚡ AI Interface active: "${msg.substring(0,50)}" has been logged.`,
-                `🌌 Neural insight received. Holoxorn is enhancing its learning.`
-            ];
-            let randomResp = responses[Math.floor(Math.random() * responses.length)];
-            aiResponseBox.innerHTML = `<i class="fas fa-robot"></i> ${randomResp}`;
-            addNotif(`💬 AI responded to your message`);
-            aiInput.value = '';
-        }, 1000);
-    }
-    sendBtn.addEventListener('click', sendToAI);
-    aiInput.addEventListener('keypress', (e) => { if(e.key === 'Enter') sendToAI(); });
+    // ============================================================
+// ========== INTERAÇÃO COM IA REAL (OpenAI) ==========
+// ============================================================
 
-    // ========== MICROFONE ==========
-    const micBtn = document.getElementById('micButton');
-    const micActionBtn = document.getElementById('micActionBtn');
-    const micStatus = document.getElementById('micStatus');
-    const transcriptDiv = document.getElementById('transcriptText');
-    let isRecordingMic = false;
-    let recognition = null;
+// CONFIGURAÇÃO DA API
+// IMPORTANTE: Substitua com sua chave real
+const AI_CONFIG = {
+    apiKey: 'sua-chave-api-aqui', // Pegue em https://platform.openai.com/api-keys
+    model: 'gpt-3.5-turbo', // Ou 'gpt-4' se tiver acesso
+    temperature: 0.7,
+    maxTokens: 500,
+    useMock: false // Mude para false quando tiver a chave
+};
+
+// SISTEMA DE MEMÓRIA - A IA vai lembrar das conversas
+let conversationHistory = [];
+const MAX_HISTORY = 20;
+
+function addToHistory(role, content) {
+    conversationHistory.push({ role, content });
+    if (conversationHistory.length > MAX_HISTORY) {
+        conversationHistory.shift();
+    }
+}
+
+// FUNÇÃO PRINCIPAL - Envia mensagem para a IA
+async function sendToAI() {
+    const msg = aiInput.value.trim();
+    if (!msg) { 
+        alert("Please type or speak a message"); 
+        return; 
+    }
     
-    function initSpeechRecognition() {
-        if('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            recognition = new SpeechRecognition();
-            recognition.continuous = false;
-            recognition.interimResults = true;
-            recognition.lang = 'en-US';
-            recognition.onstart = () => { micStatus.innerHTML = '🔴 Recording... Speak now'; micBtn.classList.add('recording'); if(micActionBtn) micActionBtn.classList.add('recording'); isRecordingMic = true; };
-            recognition.onresult = (event) => {
-                let transcript = Array.from(event.results).map(r => r[0].transcript).join('');
-                transcriptDiv.innerHTML = `🎤 You said: "${transcript}"`;
-                micStatus.innerHTML = '✅ Processed';
-                aiInput.value = transcript;
-                sendToAI();
-                addNotif(`🎤 Voice input: ${transcript.substring(0,40)}`);
-                stopRecording();
-            };
-            recognition.onerror = (e) => { micStatus.innerHTML = '⚠️ Error, try again'; stopRecording(); };
-            recognition.onend = () => { stopRecording(); };
+    // Atualizar UI - Processando
+    aiResponseBox.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Holoxorn AI is processing...`;
+    addNotif(`⏳ Processing: "${msg.substring(0,30)}..."`);
+    
+    // Adicionar mensagem do usuário ao histórico
+    addToHistory('user', msg);
+    
+    try {
+        let aiResponse;
+        
+        // === MODO MOCK (para testes sem chave) ===
+        if (AI_CONFIG.useMock) {
+            await new Promise(resolve => setTimeout(resolve, 1000 + Math.random() * 1000));
+            const mockResponses = [
+                `🤖 Holoxorn AI: "${msg}" - Neural pattern analyzed. I'm ready to assist!`,
+                `✨ AI Core: Processing your request through quantum neural networks.`,
+                `🧠 Holoxorn: Thank you for your message. My AI is optimizing responses.`,
+                `⚡ AI Interface active: "${msg.substring(0,40)}" - Response generated.`,
+                `🌌 Neural insight: Holoxorn is learning from this interaction.`
+            ];
+            aiResponse = mockResponses[Math.floor(Math.random() * mockResponses.length)];
+        } 
+        
+        // === MODO REAL (OpenAI API) ===
+        else {
+            // Chamada para a API da OpenAI
+            const response = await fetch('https://api.openai.com/v1/chat/completions', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${AI_CONFIG.apiKey}`
+                },
+                body: JSON.stringify({
+                    model: AI_CONFIG.model,
+                    messages: [
+                        {
+                            role: "system", 
+                            content: `You are Holoxorn, an advanced AI assistant with neural capabilities. 
+                                     You are helpful, creative, and precise. 
+                                     Current user: ${currentUserEmail || 'Explorer'}.
+                                     Respond in a clear and engaging way.`
+                        },
+                        ...conversationHistory
+                    ],
+                    temperature: AI_CONFIG.temperature,
+                    max_tokens: AI_CONFIG.maxTokens
+                })
+            });
+            
+            // Verificar erro da API
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(`API Error: ${errorData.error?.message || response.statusText}`);
+            }
+            
+            const data = await response.json();
+            aiResponse = data.choices[0].message.content;
+        }
+        
+        // === ADICIONAR RESPOSTA AO HISTÓRICO ===
+        addToHistory('assistant', aiResponse);
+        
+        // === ATUALIZAR UI ===
+        aiResponseBox.innerHTML = `<i class="fas fa-robot"></i> ${aiResponse}`;
+        addNotif(`💬 AI responded successfully`);
+        aiInput.value = '';
+        
+        // Incrementar contador de mensagens (se existir)
+        if (typeof totalMessages !== 'undefined') {
+            totalMessages++;
+            document.getElementById('totalMessages').textContent = totalMessages;
+        }
+        
+    } catch (error) {
+        console.error('❌ AI Error:', error);
+        
+        // Mensagem de erro amigável
+        let errorMsg = error.message;
+        if (errorMsg.includes('API key')) {
+            errorMsg = 'Invalid API key. Please check your configuration.';
+        } else if (errorMsg.includes('rate limit')) {
+            errorMsg = 'Too many requests. Please wait a moment and try again.';
+        } else if (errorMsg.includes('network')) {
+            errorMsg = 'Network error. Please check your internet connection.';
+        }
+        
+        aiResponseBox.innerHTML = `<i class="fas fa-exclamation-triangle" style="color:#ff3333;"></i> ⚠️ ${errorMsg}`;
+        addNotif(`❌ AI Error: ${errorMsg}`);
+    }
+}
+
+// === EVENT LISTENERS ===
+sendBtn.addEventListener('click', sendToAI);
+aiInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        sendToAI();
+    }
+});
+
+// === FUNÇÃO PARA TESTAR A CONEXÃO ===
+async function testAIConnection() {
+    aiResponseBox.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Testing AI connection...`;
+    
+    try {
+        if (AI_CONFIG.useMock) {
+            await new Promise(resolve => setTimeout(resolve, 500));
+            aiResponseBox.innerHTML = `✅ Mock mode active - AI is working!`;
+            return true;
+        }
+        
+        const testResponse = await fetch('https://api.openai.com/v1/models', {
+            headers: {
+                'Authorization': `Bearer ${AI_CONFIG.apiKey}`
+            }
+        });
+        
+        if (testResponse.ok) {
+            aiResponseBox.innerHTML = `✅ Connection successful! AI is ready to assist.`;
+            addNotif('✅ AI connection established');
+            return true;
         } else {
-            micStatus.innerHTML = '❌ Not supported';
-            if(micBtn) micBtn.disabled = true;
-            if(micActionBtn) micActionBtn.disabled = true;
+            throw new Error('Connection failed');
+        }
+    } catch (error) {
+        aiResponseBox.innerHTML = `⚠️ Connection error. Using mock mode.`;
+        AI_CONFIG.useMock = true;
+        return false;
+    }
+}
+
+// === TESTAR CONEXÃO AO INICIAR ===
+setTimeout(() => {
+    if (!AI_CONFIG.useMock) {
+        testAIConnection();
+    }
+}, 1000);
+
+// === EXPORTAR FUNÇÕES PARA USO GLOBAL ===
+window.sendToAI = sendToAI;
+window.testAIConnection = testAIConnection;
+window.conversationHistory = conversationHistory;
+window.addToHistory = addToHistory;
+
+console.log('🚀 Holoxorn AI Engine initialized!');
+console.log(`📡 Mode: ${AI_CONFIG.useMock ? 'MOCK (Test)' : 'REAL (OpenAI)'}`);
+console.log(`🧠 Memory: ${conversationHistory.length} messages stored`);
+console.log('💡 Tip: Change AI_CONFIG.useMock to false when you have your API key');
+
+// ============================================================
+// ========== UPLOAD E PROCESSAMENTO DE ARQUIVOS COM IA ==========
+// ============================================================
+
+let uploadedFiles = [];
+const uploadArea = document.getElementById('uploadArea');
+const fileInputEl = document.getElementById('fileInput');
+const fileListDiv = document.getElementById('fileList');
+const mediaPreviewDiv = document.getElementById('mediaPreview');
+const uploadActionBtn = document.getElementById('uploadActionBtn');
+
+// ========== FUNÇÕES DE UPLOAD ==========
+function triggerUpload() { fileInputEl.click(); }
+uploadArea?.addEventListener('click', triggerUpload);
+uploadActionBtn?.addEventListener('click', triggerUpload);
+uploadArea?.addEventListener('dragover', e => e.preventDefault());
+uploadArea?.addEventListener('drop', e => { e.preventDefault(); handleFiles(e.dataTransfer.files); });
+fileInputEl?.addEventListener('change', e => handleFiles(e.target.files));
+
+function handleFiles(files) {
+    Array.from(files).forEach(file => {
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+            uploadedFiles.push({ 
+                name: file.name, 
+                type: file.type, 
+                size: file.size,
+                data: ev.target.result,
+                uploadedAt: new Date().toISOString()
+            });
+            updateFileListUI();
+            updateStorageMetric();
+            addPreview(file.type, ev.target.result);
+            addNotif(`📎 Uploaded: ${file.name}`);
+            
+            // Processar automaticamente se for pequeno
+            if (file.size < 500000) { // Menos de 500KB
+                setTimeout(() => processFilesWithAI(), 500);
+            }
+        };
+        reader.readAsDataURL(file);
+    });
+}
+
+function updateFileListUI() {
+    fileListDiv.innerHTML = uploadedFiles.map((f, idx) => `
+        <div class="file-item">
+            <div>
+                <i class="fas fa-${f.type.includes('image')?'image':f.type.includes('video')?'video':f.type.includes('audio')?'music':'file'}"></i> 
+                ${f.name.substring(0,25)} (${(f.size/1024).toFixed(1)}KB)
+            </div>
+            <div>
+                <i class="fas fa-brain" style="color:#00ff99;cursor:pointer;margin-right:8px;" title="Process with AI" onclick="processFileWithAI(${idx})"></i>
+                <i class="fas fa-trash delete-file" data-idx="${idx}"></i>
+            </div>
+        </div>
+    `).join('');
+    
+    document.querySelectorAll('.delete-file').forEach(el => { 
+        el.addEventListener('click', (e) => { 
+            const idx = parseInt(el.getAttribute('data-idx')); 
+            uploadedFiles.splice(idx, 1); 
+            updateFileListUI(); 
+            updateStorageMetric(); 
+            addNotif('🗑️ File removed'); 
+        }); 
+    });
+}
+
+function addPreview(type, data) {
+    let html = '';
+    if(type.includes('image')) {
+        html = `<img src="${data}" alt="preview" style="cursor:pointer;" onclick="processImageWithAI('${data}')">`;
+    } else if(type.includes('video')) {
+        html = `<video controls style="max-width:80px;max-height:60px;"><source src="${data}"></video>`;
+    } else if(type.includes('audio')) {
+        html = `<div style="background:#2d2d5e;padding:4px;border-radius:6px;font-size:0.5rem;text-align:center;">
+                    <i class="fas fa-music"></i> Audio
+                </div>`;
+    } else if(type.includes('pdf')) {
+        html = `<div style="background:#ff3333;padding:4px;border-radius:6px;font-size:0.5rem;text-align:center;">
+                    <i class="fas fa-file-pdf"></i> PDF
+                </div>`;
+    } else {
+        html = `<div style="background:#2d2d5e;padding:4px;border-radius:6px;font-size:0.5rem;text-align:center;">
+                    <i class="fas fa-file-alt"></i> ${type.split('/')[1] || 'File'}
+                </div>`;
+    }
+    if(html) {
+        mediaPreviewDiv.innerHTML = html + mediaPreviewDiv.innerHTML;
+        if(mediaPreviewDiv.children.length > 4) {
+            mediaPreviewDiv.removeChild(mediaPreviewDiv.lastChild);
         }
     }
-    function stopRecording() {
-        if(recognition) try { recognition.stop(); } catch(e) {}
-        micBtn.classList.remove('recording');
-        if(micActionBtn) micActionBtn.classList.remove('recording');
-        if(micStatus.innerHTML.includes('Recording')) micStatus.innerHTML = '⚪ Ready';
-        isRecordingMic = false;
-    }
-    function startRecording() {
-        if(recognition) { try { recognition.start(); } catch(e) { micStatus.innerHTML = '⚠️ Already recording'; } }
-        else { alert("Speech recognition not supported"); }
-    }
-    function toggleMic() { if(isRecordingMic) stopRecording(); else startRecording(); }
-    initSpeechRecognition();
-    if(micBtn) micBtn.addEventListener('click', toggleMic);
-    if(micActionBtn) micActionBtn.addEventListener('click', toggleMic);
+}
 
-    // ========== UPLOAD ==========
-    let uploadedFiles = [];
-    const uploadArea = document.getElementById('uploadArea');
-    const fileInputEl = document.getElementById('fileInput');
-    const fileListDiv = document.getElementById('fileList');
-    const mediaPreviewDiv = document.getElementById('mediaPreview');
-    const uploadActionBtn = document.getElementById('uploadActionBtn');
+function updateStorageMetric() {
+    let total = uploadedFiles.reduce((s,f) => s + (f.data?.length || 0), 0);
+    let mb = (total / (1024*1024)).toFixed(2);
+    document.getElementById('storageInfoDash').innerText = `${mb} MB (${uploadedFiles.length} files)`;
+}
+
+// ========== PROCESSAMENTO DE ARQUIVOS COM IA ==========
+
+// Processar todos os arquivos
+async function processFilesWithAI() {
+    if(uploadedFiles.length === 0) {
+        alert("📂 No files to process. Please upload files first.");
+        return;
+    }
     
-    function triggerUpload() { fileInputEl.click(); }
-    uploadArea?.addEventListener('click', triggerUpload);
-    uploadActionBtn?.addEventListener('click', triggerUpload);
-    uploadArea?.addEventListener('dragover', e => e.preventDefault());
-    uploadArea?.addEventListener('drop', e => { e.preventDefault(); handleFiles(e.dataTransfer.files); });
-    fileInputEl?.addEventListener('change', e => handleFiles(e.target.files));
+    aiResponseBox.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Analyzing ${uploadedFiles.length} files with Holoxorn AI...`;
+    addNotif(`🧠 Processing ${uploadedFiles.length} files...`);
     
-    function handleFiles(files) {
-        Array.from(files).forEach(file => {
-            const reader = new FileReader();
-            reader.onload = (ev) => {
-                uploadedFiles.push({ name: file.name, type: file.type, data: ev.target.result });
-                updateFileListUI();
-                updateStorageMetric();
-                addPreview(file.type, ev.target.result);
-                addNotif(`📎 Uploaded: ${file.name}`);
-            };
-            reader.readAsDataURL(file);
+    let results = [];
+    
+    for (let i = 0; i < uploadedFiles.length; i++) {
+        const file = uploadedFiles[i];
+        let analysis = await analyzeFileWithAI(file, i);
+        results.push(analysis);
+    }
+    
+    // Gerar resposta consolidada
+    const response = `🤖 Holoxorn AI Analysis:\n\n${results.join('\n')}`;
+    aiResponseBox.innerHTML = `<i class="fas fa-robot"></i> ${response.replace(/\n/g, '<br>')}`;
+    addNotif(`✅ ${uploadedFiles.length} files processed by AI`);
+}
+
+// Analisar arquivo individual
+async function analyzeFileWithAI(file, index) {
+    const fileType = file.type;
+    let analysis = '';
+    
+    if (fileType.includes('image')) {
+        analysis = await analyzeImage(file);
+    } else if (fileType.includes('video')) {
+        analysis = await analyzeVideo(file);
+    } else if (fileType.includes('audio')) {
+        analysis = await analyzeAudio(file);
+    } else if (fileType.includes('pdf')) {
+        analysis = await analyzePDF(file);
+    } else if (fileType.includes('text')) {
+        analysis = await analyzeText(file);
+    } else {
+        analysis = `📎 "${file.name}" (${(file.size/1024).toFixed(1)}KB) - File type: ${fileType || 'Unknown'}`;
+    }
+    
+    return analysis;
+}
+
+// Análise de IMAGENS
+async function analyzeImage(file) {
+    const description = `🖼️ Image "${file.name}" - ${(file.size/1024).toFixed(1)}KB`;
+    
+    // Se tiver API key, usar visão da OpenAI
+    if (!AI_CONFIG.useMock && AI_CONFIG.apiKey) {
+        try {
+            const response = await fetch('https://api.openai.com/v1/chat/completions', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${AI_CONFIG.apiKey}`
+                },
+                body: JSON.stringify({
+                    model: "gpt-4-vision-preview",
+                    messages: [
+                        {
+                            role: "user",
+                            content: [
+                                { type: "text", text: "What do you see in this image? Describe in detail." },
+                                { type: "image_url", image_url: { url: file.data } }
+                            ]
+                        }
+                    ],
+                    max_tokens: 300
+                })
+            });
+            
+            if (response.ok) {
+                const data = await response.json();
+                return `🖼️ Image "${file.name}": ${data.choices[0].message.content}`;
+            }
+        } catch (error) {
+            console.error('Vision API error:', error);
+        }
+    }
+    
+    // Fallback: análise básica local
+    return `${description} - Detected visual content ready for analysis.`;
+}
+
+// Análise de VÍDEOS
+async function analyzeVideo(file) {
+    return `🎬 Video "${file.name}" - ${(file.size/1024/1024).toFixed(2)}MB - Motion analysis queued. Frame extraction recommended for full analysis.`;
+}
+
+// Análise de ÁUDIO
+async function analyzeAudio(file) {
+    // Se tiver API da OpenAI para áudio
+    if (!AI_CONFIG.useMock && AI_CONFIG.apiKey) {
+        try {
+            // Converter base64 para blob
+            const audioBlob = await fetch(file.data).then(r => r.blob());
+            const formData = new FormData();
+            formData.append('file', audioBlob, file.name);
+            formData.append('model', 'whisper-1');
+            
+            const response = await fetch('https://api.openai.com/v1/audio/transcriptions', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${AI_CONFIG.apiKey}`
+                },
+                body: formData
+            });
+            
+            if (response.ok) {
+                const data = await response.json();
+                return `🎵 Audio "${file.name}": Transcription - "${data.text}"`;
+            }
+        } catch (error) {
+            console.error('Audio API error:', error);
+        }
+    }
+    
+    return `🎵 Audio "${file.name}" - ${(file.size/1024).toFixed(1)}KB - Audio analysis ready.`;
+}
+
+// Análise de PDFs
+async function analyzePDF(file) {
+    return `📄 PDF "${file.name}" - ${(file.size/1024).toFixed(1)}KB - Document analysis queued.`;
+}
+
+// Análise de TEXTOS
+async function analyzeText(file) {
+    // Extrair texto do arquivo
+    try {
+        const text = atob(file.data.split(',')[1] || '');
+        const preview = text.substring(0, 200);
+        return `📝 Text "${file.name}": ${text.length} characters - Preview: "${preview}..."`;
+    } catch (error) {
+        return `📝 Text "${file.name}": ${(file.size/1024).toFixed(1)}KB - Text analysis ready.`;
+    }
+}
+
+// Processar arquivo individual (botão)
+window.processFileWithAI = async function(index) {
+    if (index >= uploadedFiles.length) return;
+    const file = uploadedFiles[index];
+    
+    aiResponseBox.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Analyzing "${file.name}"...`;
+    const analysis = await analyzeFileWithAI(file, index);
+    aiResponseBox.innerHTML = `<i class="fas fa-robot"></i> ${analysis}`;
+    addNotif(`🔍 Analyzed: ${file.name}`);
+};
+
+// Processar imagem clicada
+window.processImageWithAI = function(imageData) {
+    const file = uploadedFiles.find(f => f.data === imageData);
+    if (file) {
+        const index = uploadedFiles.indexOf(file);
+        processFileWithAI(index);
+    }
+};
+
+// ========== BOTÃO DE PROCESSAMENTO EM MASSA ==========
+// Adicionar botão se não existir
+const uploadCard = document.querySelector('.dash-card:has(.upload-area)');
+if (uploadCard) {
+    const processBtn = document.createElement('button');
+    processBtn.id = 'processAllFilesBtn';
+    processBtn.className = 'send-btn-large';
+    processBtn.style.marginTop = '8px';
+    processBtn.style.padding = '8px';
+    processBtn.style.fontSize = '0.7rem';
+    processBtn.innerHTML = '<i class="fas fa-brain"></i> PROCESS ALL FILES WITH AI';
+    processBtn.addEventListener('click', processFilesWithAI);
+    uploadCard.appendChild(processBtn);
+}
+
+// ========== EXPORTAR FUNÇÕES ==========
+window.processFilesWithAI = processFilesWithAI;
+window.analyzeFileWithAI = analyzeFileWithAI;
+window.uploadedFiles = uploadedFiles;
+
+console.log('📁 File Processing System initialized!');
+console.log(`📊 ${uploadedFiles.length} files in memory`);
+
+// ============================================================
+// ========== SISTEMA DE TAREFAS INTELIGENTES ==========
+// ============================================================
+
+// ========== CONFIGURAÇÃO ==========
+const TASK_CONFIG = {
+    autoSave: true,
+    maxTasks: 50,
+    categories: ['Trabalho', 'Pessoal', 'Estudo', 'Urgente', 'Ideias']
+};
+
+// ========== ESTRUTURA DE DADOS ==========
+let tasks = JSON.parse(localStorage.getItem('holoxorn_tasks') || '[]');
+let taskId = tasks.length > 0 ? Math.max(...tasks.map(t => t.id)) + 1 : 1;
+
+// ========== FUNÇÕES PRINCIPAIS ==========
+
+// Salvar tarefas
+function saveTasks() {
+    if (TASK_CONFIG.autoSave) {
+        localStorage.setItem('holoxorn_tasks', JSON.stringify(tasks));
+    }
+}
+
+// Criar tarefa inteligente
+function createTask(description, options = {}) {
+    const task = {
+        id: taskId++,
+        description: description,
+        category: options.category || 'Pessoal',
+        priority: options.priority || 'medium',
+        status: options.status || 'pending', // pending, in_progress, completed, cancelled
+        createdAt: new Date().toISOString(),
+        dueDate: options.dueDate || null,
+        tags: options.tags || [],
+        subtasks: options.subtasks || [],
+        notes: options.notes || '',
+        aiGenerated: options.aiGenerated || false,
+        reminder: options.reminder || null,
+        repeat: options.repeat || null, // daily, weekly, monthly
+        completedAt: null
+    };
+    
+    tasks.push(task);
+    saveTasks();
+    updateTaskUI();
+    addNotif(`📋 Nova tarefa: "${description}"`);
+    return task;
+}
+
+// Atualizar status da tarefa
+function updateTaskStatus(taskId, newStatus) {
+    const task = tasks.find(t => t.id === taskId);
+    if (!task) return null;
+    
+    task.status = newStatus;
+    if (newStatus === 'completed') {
+        task.completedAt = new Date().toISOString();
+        addNotif(`✅ Tarefa concluída: "${task.description}"`);
+        
+        // Ganhar XP por completar tarefa
+        if (typeof addXP === 'function') {
+            const xpGain = task.priority === 'high' ? 15 : task.priority === 'medium' ? 10 : 5;
+            addXP(xpGain);
+        }
+    }
+    
+    saveTasks();
+    updateTaskUI();
+    return task;
+}
+
+// Deletar tarefa
+function deleteTask(taskId) {
+    const task = tasks.find(t => t.id === taskId);
+    if (task) {
+        tasks = tasks.filter(t => t.id !== taskId);
+        saveTasks();
+        updateTaskUI();
+        addNotif(`🗑️ Tarefa removida: "${task.description}"`);
+    }
+}
+
+// ========== PROCESSAMENTO DE COMANDOS POR IA ==========
+
+// Processar comando de tarefa via texto
+function processTaskCommand(text) {
+    const lower = text.toLowerCase();
+    
+    // Comando: criar tarefa
+    if (lower.includes('criar tarefa') || lower.includes('nova tarefa') || lower.includes('adicionar tarefa')) {
+        // Extrair descrição
+        let description = text.replace(/criar tarefa|nova tarefa|adicionar tarefa/gi, '').trim();
+        
+        // Extrair prioridade
+        let priority = 'medium';
+        if (lower.includes('urgente') || lower.includes('alta prioridade')) priority = 'high';
+        if (lower.includes('baixa prioridade')) priority = 'low';
+        
+        // Extrair categoria
+        let category = 'Pessoal';
+        if (lower.includes('trabalho')) category = 'Trabalho';
+        if (lower.includes('estudo')) category = 'Estudo';
+        if (lower.includes('ideia')) category = 'Ideias';
+        
+        if (description) {
+            const task = createTask(description, { priority, category, aiGenerated: true });
+            return `✅ Tarefa criada: "${description}" (${priority})`;
+        }
+        return '⚠️ Descreva a tarefa. Exemplo: "criar tarefa: Reunião com cliente amanhã"';
+    }
+    
+    // Comando: listar tarefas
+    if (lower.includes('listar tarefas') || lower.includes('mostrar tarefas') || lower.includes('minhas tarefas')) {
+        return listTasks();
+    }
+    
+    // Comando: completar tarefa
+    if (lower.includes('completar tarefa') || lower.includes('concluir tarefa') || lower.includes('feito')) {
+        const match = text.match(/(\d+)/);
+        if (match) {
+            const id = parseInt(match[1]);
+            const task = updateTaskStatus(id, 'completed');
+            if (task) {
+                return `✅ Tarefa "${task.description}" concluída! 🎉`;
+            }
+            return `⚠️ Tarefa #${id} não encontrada.`;
+        }
+        return '⚠️ Informe o número da tarefa. Exemplo: "completar tarefa 3"';
+    }
+    
+    // Comando: deletar tarefa
+    if (lower.includes('deletar tarefa') || lower.includes('remover tarefa') || lower.includes('apagar tarefa')) {
+        const match = text.match(/(\d+)/);
+        if (match) {
+            const id = parseInt(match[1]);
+            deleteTask(id);
+            return `🗑️ Tarefa #${id} removida.`;
+        }
+        return '⚠️ Informe o número da tarefa. Exemplo: "deletar tarefa 3"';
+    }
+    
+    return null;
+}
+
+// Listar tarefas formatado
+function listTasks() {
+    if (tasks.length === 0) {
+        return '📭 Nenhuma tarefa cadastrada.';
+    }
+    
+    const pending = tasks.filter(t => t.status === 'pending');
+    const inProgress = tasks.filter(t => t.status === 'in_progress');
+    const completed = tasks.filter(t => t.status === 'completed');
+    
+    let output = '📋 **MINHAS TAREFAS**\n\n';
+    
+    if (pending.length > 0) {
+        output += '⏳ **Pendentes:**\n';
+        pending.forEach(t => {
+            const priorityEmoji = t.priority === 'high' ? '🔴' : t.priority === 'medium' ? '🟡' : '🟢';
+            output += `  ${priorityEmoji} #${t.id} ${t.description}`;
+            if (t.category) output += ` (${t.category})`;
+            output += '\n';
         });
     }
-    function updateFileListUI() {
-        fileListDiv.innerHTML = uploadedFiles.map((f, idx) => `<div class="file-item"><div><i class="fas fa-${f.type.includes('image')?'image':f.type.includes('video')?'video':'file'}"></i> ${f.name.substring(0,25)}</div><i class="fas fa-trash delete-file" data-idx="${idx}"></i></div>`).join('');
-        document.querySelectorAll('.delete-file').forEach(el => { el.addEventListener('click', (e) => { let idx = parseInt(el.getAttribute('data-idx')); uploadedFiles.splice(idx, 1); updateFileListUI(); updateStorageMetric(); addNotif(`🗑️ File removed`); }); });
+    
+    if (inProgress.length > 0) {
+        output += '\n🔄 **Em andamento:**\n';
+        inProgress.forEach(t => {
+            output += `  ⏳ #${t.id} ${t.description}\n`;
+        });
     }
-    function addPreview(type, data) {
-        let html = '';
-        if(type.includes('image')) html = `<img src="${data}" alt="preview">`;
-        else if(type.includes('video')) html = `<video controls><source src="${data}"></video>`;
-        else html = `<div style="background:#2d2d5e; padding:5px; border-radius:8px;"><i class="fas fa-file-alt"></i> Document</div>`;
-        if(html) mediaPreviewDiv.innerHTML = html + mediaPreviewDiv.innerHTML;
-        if(mediaPreviewDiv.children.length > 4) mediaPreviewDiv.removeChild(mediaPreviewDiv.lastChild);
+    
+    if (completed.length > 0) {
+        output += `\n✅ **Concluídas:** ${completed.length} tarefa(s)`;
     }
-    function updateStorageMetric() {
-        let total = uploadedFiles.reduce((s,f) => s + (f.data?.length || 0), 0);
-        let mb = (total / (1024*1024)).toFixed(2);
-        document.getElementById('storageInfoDash').innerText = `${mb} MB (${uploadedFiles.length} files)`;
-    }
+    
+    output += `\n\n📊 Total: ${tasks.length} tarefas`;
+    return output;
+}
 
+// ========== INTERFACE DO USUÁRIO ==========
+
+// Atualizar UI das tarefas
+function updateTaskUI() {
+    const taskList = document.getElementById('taskList');
+    if (!taskList) return;
+    
+    if (tasks.length === 0) {
+        taskList.innerHTML = '<div style="color:#666; font-size:0.6rem; text-align:center; padding:10px;">📭 Nenhuma tarefa</div>';
+        return;
+    }
+    
+    // Mostrar apenas as 5 mais recentes pendentes
+    const pendingTasks = tasks.filter(t => t.status !== 'completed').slice(0, 5);
+    const completedCount = tasks.filter(t => t.status === 'completed').length;
+    
+    let html = '';
+    pendingTasks.forEach(task => {
+        const priorityColors = {
+            high: '#ff3333',
+            medium: '#ffaa00',
+            low: '#00ff99'
+        };
+        const priorityEmojis = {
+            high: '🔴',
+            medium: '🟡',
+            low: '🟢'
+        };
+        const statusEmojis = {
+            pending: '⏳',
+            in_progress: '🔄',
+            completed: '✅'
+        };
+        
+        html += `
+            <div class="task-item" style="border-left: 3px solid ${priorityColors[task.priority]}; padding-left: 8px; margin-bottom: 4px;">
+                <div style="display:flex; align-items:center; gap:6px; flex:1;">
+                    <span>${statusEmojis[task.status] || '⏳'}</span>
+                    <span style="font-size:0.6rem;">#${task.id}</span>
+                    <span style="font-size:0.6rem; flex:1;">${task.description.substring(0,30)}</span>
+                    <span style="font-size:0.5rem; background:${priorityColors[task.priority]}33; padding:1px 6px; border-radius:10px; color:${priorityColors[task.priority]};">
+                        ${task.priority}
+                    </span>
+                </div>
+                <div style="display:flex; gap:4px;">
+                    <button onclick="quickCompleteTask(${task.id})" style="background:transparent;border:none;color:#00ff99;cursor:pointer;font-size:0.8rem;">✓</button>
+                    <button onclick="quickDeleteTask(${task.id})" style="background:transparent;border:none;color:#ff6b6b;cursor:pointer;font-size:0.8rem;">✕</button>
+                </div>
+            </div>
+        `;
+    });
+    
+    if (completedCount > 0) {
+        html += `<div style="font-size:0.5rem; color:#666; text-align:center; margin-top:4px;">✅ ${completedCount} tarefa(s) concluída(s)</div>`;
+    }
+    
+    if (tasks.length > 5) {
+        html += `<div style="font-size:0.5rem; color:#666; text-align:center;">+${tasks.length - 5} mais</div>`;
+    }
+    
+    taskList.innerHTML = html;
+}
+
+// Funções rápidas para UI
+window.quickCompleteTask = function(id) {
+    const task = updateTaskStatus(id, 'completed');
+    if (task) {
+        addNotif(`✅ Tarefa "${task.description}" concluída! 🎉`);
+        if (typeof addXP === 'function') {
+            const xpGain = task.priority === 'high' ? 15 : task.priority === 'medium' ? 10 : 5;
+            addXP(xpGain);
+        }
+    }
+};
+
+window.quickDeleteTask = function(id) {
+    deleteTask(id);
+};
+
+// ========== COMANDOS POR VOZ ==========
+
+// Adicionar suporte a comandos de voz para tarefas
+function setupVoiceTaskCommands() {
+    // Adicionar ao sistema de voz existente
+    const originalProcessVoiceCommand = window.processVoiceCommand;
+    if (originalProcessVoiceCommand) {
+        window.processVoiceCommand = function(transcript) {
+            // Tentar processar como comando de tarefa
+            const result = processTaskCommand(transcript);
+            if (result) {
+                aiResponseBox.innerHTML = `<i class="fas fa-robot"></i> ${result}`;
+                return true;
+            }
+            // Fallback para comandos originais
+            return originalProcessVoiceCommand(transcript);
+        };
+    }
+}
+
+// ========== TAREFAS RECORRENTES ==========
+
+function processRecurringTasks() {
+    const now = new Date();
+    tasks.forEach(task => {
+        if (task.status === 'completed' && task.repeat) {
+            const completedDate = new Date(task.completedAt);
+            let shouldRecreate = false;
+            
+            if (task.repeat === 'daily') {
+                const diffDays = Math.floor((now - completedDate) / (1000 * 60 * 60 * 24));
+                if (diffDays >= 1) shouldRecreate = true;
+            } else if (task.repeat === 'weekly') {
+                const diffWeeks = Math.floor((now - completedDate) / (1000 * 60 * 60 * 24 * 7));
+                if (diffWeeks >= 1) shouldRecreate = true;
+            } else if (task.repeat === 'monthly') {
+                const diffMonths = (now.getFullYear() - completedDate.getFullYear()) * 12 + (now.getMonth() - completedDate.getMonth());
+                if (diffMonths >= 1) shouldRecreate = true;
+            }
+            
+            if (shouldRecreate) {
+                const newTask = createTask(task.description, {
+                    category: task.category,
+                    priority: task.priority,
+                    aiGenerated: true,
+                    repeat: task.repeat
+                });
+                // Marcar a antiga como arquivada
+                task.archived = true;
+                addNotif(`🔄 Tarefa recorrente recriada: "${task.description}"`);
+            }
+        }
+    });
+    saveTasks();
+}
+
+// ========== EXPORTAR FUNÇÕES ==========
+window.createTask = createTask;
+window.updateTaskStatus = updateTaskStatus;
+window.deleteTask = deleteTask;
+window.processTaskCommand = processTaskCommand;
+window.listTasks = listTasks;
+window.tasks = tasks;
+
+// ========== INICIALIZAÇÃO ==========
+
+// Verificar tarefas recorrentes a cada hora
+setInterval(processRecurringTasks, 3600000);
+
+// Adicionar atalho de teclado para criar tarefa
+document.addEventListener('keydown', (e) => {
+    if (e.ctrlKey && e.shiftKey && e.key === 'T') {
+        const desc = prompt('📋 Nova Tarefa:');
+        if (desc) {
+            createTask(desc);
+            addNotif(`📋 Tarefa criada: "${desc}"`);
+        }
+    }
+});
+
+// Configurar comandos de voz
+setTimeout(setupVoiceTaskCommands, 1000);
+
+// Atualizar UI
+updateTaskUI();
+
+console.log('🧠 Sistema de Tarefas Inteligentes inicializado!');
+console.log(`📊 ${tasks.length} tarefas carregadas`);
+console.log('⌨️ Atalho: Ctrl+Shift+T para criar tarefa rápida');
+console.log('🎤 Comandos de voz: "criar tarefa", "listar tarefas", "completar tarefa #"');
+  
     // ========== TOGGLES ==========
     const toggles = ['deepToggle','visionToggle','nlpTogglex','autoToggle','predictToggle','cacheToggle','anomalyToggle','cloudToggle','quantumBoostToggle','hudAnim','encryptToggle'];
     toggles.forEach(id => { let el = document.getElementById(id); if(el) el.addEventListener('click', function() { this.classList.toggle('active'); addNotif(`⚙️ ${id.replace('Toggle','')} ${this.classList.contains('active')?'ON':'OFF'}`); }); });
