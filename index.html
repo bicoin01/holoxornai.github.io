@@ -6,10 +6,16 @@
     <title>Holoxorn - AI Interactive Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <script src="https://unpkg.com/i18next@21.10.0/dist/umd/i18next.min.js"></script>
-    <script src="https://unpkg.com/i18next-browser-languagedetector@7.0.0/dist/umd/i18nextBrowserLanguageDetector.min.js"></script>
+    <script src="https://unpkg.com/i18next@21.10.0/dist/umd/i18next.min.js">
+    </script>
+    <script src="https://unpkg.com/i18next-browser-languagedetector@7.0.0/dist/umd/i18nextBrowserLanguageDetector.min.js">
+    </script>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
         body {
             margin: 0;
             overflow: hidden;
@@ -17,571 +23,1659 @@
             color: white;
             font-family: 'Orbitron', sans-serif;
         }
-        header { position: absolute; top: 0; width: 100%; padding: 20px; display: flex; justify-content: space-between; align-items: center; z-index: 10; }
-        .logo { width: 150px; position: fixed; top: 20px; left: 20px; z-index: 100; }
-        .menu { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); display: flex; gap: 20px; z-index: 100; }
-        .menu a { color: white; text-decoration: none; font-weight: 700; cursor: pointer; }
-        .header-title { position: absolute; top: 100px; left: 50%; transform: translateX(-50%); font-size: 70px; font-weight: bold; color: #00ff99; text-align: center; text-transform: uppercase; letter-spacing: 5px; text-shadow: 0 0 10px #00ff99, 0 0 20px #00ff99, 0 0 30px #00ff99; animation: fadeIn 2s ease-out, glow 1.5s infinite alternate; z-index: 10; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(-50px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes glow { 0% { text-shadow: 0 0 10px #00ff99, 0 0 20px #00ff99, 0 0 30px #00ff99; } 50% { text-shadow: 0 0 20px #ff00ff, 0 0 40px #ff00ff, 0 0 60px #ff00ff; } 100% { text-shadow: 0 0 10px #00ff99, 0 0 20px #00ff99, 0 0 30px #00ff99; } }
-        .additional-menu { position: absolute; top: 250px; left: 50%; transform: translateX(-50%); display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; z-index: 10; max-width: 90%; }
-        .additional-menu a { color: white; text-decoration: none; padding: 8px 15px; border: 2px solid white; border-radius: 20px; font-weight: 700; transition: 0.3s; cursor: pointer; font-size: 14px; }
-        .additional-menu a:hover { background-color: rgba(255,255,255,0.2); }
-        .contact-info { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); font-size: 18px; color: white; text-align: center; font-weight: 700; z-index: 10; }
-        .language-selector { position: fixed; top: 20px; right: 20px; z-index: 1000; }
-        .globe-btn { background: transparent; border: 2px solid #00ff99; color: #00ff99; padding: 8px 16px; font-family: 'Orbitron'; font-size: 14px; cursor: pointer; border-radius: 20px; display: flex; align-items: center; gap: 8px; }
-        .globe-btn:hover { background: #00ff99; color: #000; }
-        .lang-dropdown { position: absolute; top: 45px; right: 0; background: rgba(0,0,0,0.95); backdrop-filter: blur(10px); border-radius: 15px; border: 1px solid #00ff99; display: none; flex-direction: column; min-width: 140px; z-index: 1001; }
-        .lang-dropdown button { background: transparent; border: none; color: white; font-family: 'Orbitron'; padding: 10px 15px; cursor: pointer; }
-        .lang-dropdown button:hover { background: #6a1e9c; color: #00ff99; }
-        .language-selector.active .lang-dropdown { display: flex; }
+        header {
+            position: absolute;
+            top: 0;
+            width: 100%;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 10;
+        }
+        .logo {
+            width: 150px;
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 100;
+        }
+        .menu {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 20px;
+            z-index: 100;
+        }
+        .menu a {
+            color: white;
+            text-decoration: none;
+            font-weight: 700;
+            cursor: pointer;
+        }
+        .header-title {
+            position: absolute;
+            top: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 70px;
+            font-weight: bold;
+            color: #00ff99;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 5px;
+            text-shadow: 0 0 10px #00ff99, 0 0 20px #00ff99, 0 0 30px #00ff99;
+            animation: fadeIn 2s ease-out, glow 1.5s infinite alternate;
+            z-index: 10;
+        }
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        @keyframes glow {
+            0% {
+                text-shadow: 0 0 10px #00ff99, 0 0 20px #00ff99, 0 0 30px #00ff99;
+            }
+            50% {
+                text-shadow: 0 0 20px #ff00ff, 0 0 40px #ff00ff, 0 0 60px #ff00ff;
+            }
+            100% {
+                text-shadow: 0 0 10px #00ff99, 0 0 20px #00ff99, 0 0 30px #00ff99;
+            }
+        }
+        .additional-menu {
+            position: absolute;
+            top: 250px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            z-index: 10;
+            max-width: 90%;
+        }
+        .additional-menu a {
+            color: white;
+            text-decoration: none;
+            padding: 8px 15px;
+            border: 2px solid white;
+            border-radius: 20px;
+            font-weight: 700;
+            transition: 0.3s;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .additional-menu a:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+        .contact-info {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 18px;
+            color: white;
+            text-align: center;
+            font-weight: 700;
+            z-index: 10;
+        }
+        .language-selector {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+        .globe-btn {
+            background: transparent;
+            border: 2px solid #00ff99;
+            color: #00ff99;
+            padding: 8px 16px;
+            font-family: 'Orbitron';
+            font-size: 14px;
+            cursor: pointer;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .globe-btn:hover {
+            background: #00ff99;
+            color: #000;
+        }
+        .lang-dropdown {
+            position: absolute;
+            top: 45px;
+            right: 0;
+            background: rgba(0, 0, 0, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            border: 1px solid #00ff99;
+            display: none;
+            flex-direction: column;
+            min-width: 140px;
+            z-index: 1001;
+        }
+        .lang-dropdown button {
+            background: transparent;
+            border: none;
+            color: white;
+            font-family: 'Orbitron';
+            padding: 10px 15px;
+            cursor: pointer;
+        }
+        .lang-dropdown button:hover {
+            background: #6a1e9c;
+            color: #00ff99;
+        }
+        .language-selector.active .lang-dropdown {
+            display: flex;
+        }
         /* DASHBOARD PRINCIPAL */
-        .dashboard-container { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 92%; max-width: 1400px; height: 88vh; background: rgba(0,0,0,0.92); backdrop-filter: blur(20px); border-radius: 30px; border: 2px solid #9b59b6; box-shadow: 0 0 50px rgba(155,89,182,0.5); z-index: 200; padding: 20px; display: none; flex-direction: column; overflow: hidden; }
-        .dashboard-container.show { display: flex; }
-        .dashboard-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #00ffff; padding-bottom: 15px; margin-bottom: 20px; flex-wrap: wrap; }
-        .dashboard-header h2 { font-size: 1.4rem; background: linear-gradient(135deg, #a855f7, #06b6d4); -webkit-background-clip: text; background-clip: text; color: transparent; }
-        .user-info { display: flex; align-items: center; gap: 15px; }
-        .user-avatar { width: 40px; height: 40px; background: linear-gradient(135deg,#9b59b6,#3498db); border-radius: 50%; display: flex; align-items: center; justify-content: center; }
-        .logout-dash-btn { background: linear-gradient(90deg,#e74c8b,#9b59b6); border: none; padding: 8px 20px; border-radius: 40px; font-family: 'Orbitron'; font-weight: bold; color: white; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: 0.3s; }
-        .logout-dash-btn:hover { transform: scale(1.03); box-shadow: 0 0 15px #ff66cc; }
+        .dashboard-container {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 92%;
+            max-width: 1400px;
+            height: 88vh;
+            background: rgba(0, 0, 0, 0.92);
+            backdrop-filter: blur(20px);
+            border-radius: 30px;
+            border: 2px solid #9b59b6;
+            box-shadow: 0 0 50px rgba(155, 89, 182, 0.5);
+            z-index: 200;
+            padding: 20px;
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .dashboard-container.show {
+            display: flex;
+        }
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #00ffff;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .dashboard-header h2 {
+            font-size: 1.4rem;
+            background: linear-gradient(135deg, #a855f7, #06b6d4);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #9b59b6, #3498db);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .logout-dash-btn {
+            background: linear-gradient(90deg, #e74c8b, #9b59b6);
+            border: none;
+            padding: 8px 20px;
+            border-radius: 40px;
+            font-family: 'Orbitron';
+            font-weight: bold;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: 0.3s;
+        }
+        .logout-dash-btn:hover {
+            transform: scale(1.03);
+            box-shadow: 0 0 15px #ff66cc;
+        }
         /* LAYOUT 2 COLUNAS */
-        .dashboard-main { display: flex; gap: 20px; flex: 1; overflow: hidden; }
-        .col-left { flex: 1.4; display: flex; flex-direction: column; gap: 15px; overflow-y: auto; padding-right: 8px; }
-        .col-right { flex: 1; display: flex; flex-direction: column; gap: 15px; overflow-y: auto; }
-        .dash-card { background: rgba(30,20,50,0.7); border-radius: 20px; padding: 16px; border: 1px solid #9b59b6; transition: 0.2s; }
-        .dash-card:hover { border-color: #00ffff; box-shadow: 0 0 15px rgba(0,255,255,0.2); }
-        .card-title { font-size: 0.9rem; color: #c084fc; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; border-left: 3px solid #00ffff; padding-left: 10px; }
-        .config-row { display: flex; justify-content: space-between; align-items: center; margin: 10px 0; }
-        .toggle-neon { width: 44px; height: 22px; background: #2d2d5e; border-radius: 30px; position: relative; cursor: pointer; }
-        .toggle-neon.active { background: #00ffff; box-shadow: 0 0 10px cyan; }
-        .toggle-neon::after { content: ''; width: 18px; height: 18px; background: white; border-radius: 50%; position: absolute; top: 2px; left: 3px; transition: 0.2s; }
-        .toggle-neon.active::after { left: 23px; background: #1a1a2e; }
-        .config-select { background: #0e0e2a; border: 1px solid #9b59b6; color: white; font-family: 'Orbitron'; padding: 5px 10px; border-radius: 20px; cursor: pointer; font-size: 0.7rem; }
+        .dashboard-main {
+            display: flex;
+            gap: 20px;
+            flex: 1;
+            overflow: hidden;
+        }
+        .col-left {
+            flex: 1.4;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            overflow-y: auto;
+            padding-right: 8px;
+        }
+        .col-right {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            overflow-y: auto;
+        }
+        .dash-card {
+            background: rgba(30, 20, 50, 0.7);
+            border-radius: 20px;
+            padding: 16px;
+            border: 1px solid #9b59b6;
+            transition: 0.2s;
+        }
+        .dash-card:hover {
+            border-color: #00ffff;
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.2);
+        }
+        .card-title {
+            font-size: 0.9rem;
+            color: #c084fc;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-left: 3px solid #00ffff;
+            padding-left: 10px;
+        }
+        .config-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 10px 0;
+        }
+        .toggle-neon {
+            width: 44px;
+            height: 22px;
+            background: #2d2d5e;
+            border-radius: 30px;
+            position: relative;
+            cursor: pointer;
+        }
+        .toggle-neon.active {
+            background: #00ffff;
+            box-shadow: 0 0 10px cyan;
+        }
+        .toggle-neon::after {
+            content: '';
+            width: 18px;
+            height: 18px;
+            background: white;
+            border-radius: 50%;
+            position: absolute;
+            top: 2px;
+            left: 3px;
+            transition: 0.2s;
+        }
+        .toggle-neon.active::after {
+            left: 23px;
+            background: #1a1a2e;
+        }
+        .config-select {
+            background: #0e0e2a;
+            border: 1px solid #9b59b6;
+            color: white;
+            font-family: 'Orbitron';
+            padding: 5px 10px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.7rem;
+        }
         /* Upload area */
-        .upload-area { border: 2px dashed #9b59b6; border-radius: 15px; padding: 15px; text-align: center; cursor: pointer; background: rgba(155,89,182,0.1); transition: 0.2s; }
-        .upload-area:hover { border-color: #00ffff; background: rgba(0,255,255,0.1); }
-        .file-list { margin-top: 10px; max-height: 100px; overflow-y: auto; font-size: 0.7rem; }
-        .file-item { background: rgba(0,0,0,0.5); padding: 5px 8px; margin: 4px 0; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; }
-        .delete-file { cursor: pointer; color: #ff6b6b; transition: 0.2s; }
-        .delete-file:hover { color: #ff0000; }
-        .media-preview { max-height: 100px; overflow-y: auto; margin-top: 8px; display: flex; gap: 8px; flex-wrap: wrap; }
-        .media-preview img, .media-preview video { max-width: 80px; max-height: 70px; border-radius: 8px; }
+        .upload-area {
+            border: 2px dashed #9b59b6;
+            border-radius: 15px;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            background: rgba(155, 89, 182, 0.1);
+            transition: 0.2s;
+        }
+        .upload-area:hover {
+            border-color: #00ffff;
+            background: rgba(0, 255, 255, 0.1);
+        }
+        .file-list {
+            margin-top: 10px;
+            max-height: 100px;
+            overflow-y: auto;
+            font-size: 0.7rem;
+        }
+        .file-item {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 5px 8px;
+            margin: 4px 0;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .delete-file {
+            cursor: pointer;
+            color: #ff6b6b;
+            transition: 0.2s;
+        }
+        .delete-file:hover {
+            color: #ff0000;
+        }
+        .media-preview {
+            max-height: 100px;
+            overflow-y: auto;
+            margin-top: 8px;
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .media-preview img,
+        .media-preview video {
+            max-width: 80px;
+            max-height: 70px;
+            border-radius: 8px;
+        }
         /* MICROFONE */
-        .mic-area { display: flex; align-items: center; gap: 12px; margin: 10px 0; }
-        .mic-btn { background: linear-gradient(135deg,#e74c8b,#9b59b6); border: none; width: 55px; height: 55px; border-radius: 50%; cursor: pointer; font-size: 1.5rem; transition: 0.2s; color: white; }
-        .mic-btn.recording { background: #ff3333; animation: pulse 1s infinite; box-shadow: 0 0 20px red; }
-        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.08); } 100% { transform: scale(1); } }
-        .mic-status { font-size: 0.7rem; opacity: 0.8; }
-        .transcript-area { background: rgba(0,0,0,0.5); border-radius: 12px; padding: 10px; margin-top: 10px; font-size: 0.75rem; max-height: 80px; overflow-y: auto; }
+        .mic-area {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 10px 0;
+        }
+        .mic-btn {
+            background: linear-gradient(135deg, #e74c8b, #9b59b6);
+            border: none;
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.5rem;
+            transition: 0.2s;
+            color: white;
+        }
+        .mic-btn.recording {
+            background: #ff3333;
+            animation: pulse 1s infinite;
+            box-shadow: 0 0 20px red;
+        }
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.08);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+        .mic-status {
+            font-size: 0.7rem;
+            opacity: 0.8;
+        }
+        .transcript-area {
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 12px;
+            padding: 10px;
+            margin-top: 10px;
+            font-size: 0.75rem;
+            max-height: 80px;
+            overflow-y: auto;
+        }
         /* INTERAÇÃO COM IA */
-        .ai-interaction-area { background: rgba(20,20,50,0.6); border-radius: 20px; padding: 15px; }
-        .ai-input-group { display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap; }
-        .ai-textarea { flex: 1; background: rgba(10,10,30,0.9); border: 1px solid #9b59b6; border-radius: 20px; padding: 14px; color: white; font-family: 'Orbitron'; font-size: 0.85rem; resize: vertical; min-height: 70px; }
-        .ai-textarea:focus { outline: none; border-color: #00ffff; box-shadow: 0 0 10px cyan; }
-        .action-buttons { display: flex; gap: 10px; }
-        .icon-btn { background: linear-gradient(135deg, #9b59b6, #3498db); border: none; width: 50px; height: 50px; border-radius: 50%; cursor: pointer; font-size: 1.3rem; transition: 0.2s; color: white; display: flex; align-items: center; justify-content: center; }
-        .icon-btn:hover { transform: scale(1.08); box-shadow: 0 0 15px #00ffff; }
-        .send-btn-large { background: linear-gradient(90deg, #00ff99, #3498db); border: none; padding: 12px 25px; border-radius: 40px; font-family: 'Orbitron'; font-weight: bold; color: #000; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 8px; width: 100%; justify-content: center; margin-top: 12px; }
-        .send-btn-large:hover { transform: scale(1.02); box-shadow: 0 0 20px #00ff99; }
-        .ai-response-box { background: rgba(0,0,0,0.4); border-radius: 16px; padding: 15px; margin-top: 15px; font-size: 0.8rem; border-left: 3px solid #00ffff; min-height: 80px; }
-        .settings-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 8px; }
-        .setting-item { display: flex; justify-content: space-between; align-items: center; font-size: 0.7rem; padding: 6px 0; border-bottom: 1px solid rgba(155,89,182,0.3); }
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); justify-content: center; align-items: center; z-index: 2000; }
-        .modal-content { background: rgba(0,0,0,0.95); padding: 30px; border-radius: 20px; width: 350px; text-align: center; border: 1px solid #00ff99; }
-        .modal-content input { width: 100%; padding: 10px; margin: 8px 0; background: rgba(255,255,255,0.1); border: none; border-radius: 8px; color: white; }
-        .modal-content button { width: 100%; padding: 10px; margin: 8px 0; background: #6a1e9c; border: none; border-radius: 8px; color: white; cursor: pointer; }
-        .google-auth-btn { background: #4285F4 !important; }
-        .warning-message { background: #ff3333; color: white; padding: 10px; border-radius: 8px; margin-top: 10px; font-size: 12px; }
-        ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-track { background: #1a1a3a; }
-        ::-webkit-scrollbar-thumb { background: #9b59b6; }
-        @media (max-width: 900px) { .dashboard-main { flex-direction: column; } .col-left, .col-right { width: 100%; } .header-title { font-size: 40px; top: 80px; } .ai-input-group { flex-direction: column; } .action-buttons { justify-content: center; } }
+        .ai-interaction-area {
+            background: rgba(20, 20, 50, 0.6);
+            border-radius: 20px;
+            padding: 15px;
+        }
+        .ai-input-group {
+            display: flex;
+            gap: 12px;
+            align-items: flex-end;
+            flex-wrap: wrap;
+        }
+        .ai-textarea {
+            flex: 1;
+            background: rgba(10, 10, 30, 0.9);
+            border: 1px solid #9b59b6;
+            border-radius: 20px;
+            padding: 14px;
+            color: white;
+            font-family: 'Orbitron';
+            font-size: 0.85rem;
+            resize: vertical;
+            min-height: 70px;
+        }
+        .ai-textarea:focus {
+            outline: none;
+            border-color: #00ffff;
+            box-shadow: 0 0 10px cyan;
+        }
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        .icon-btn {
+            background: linear-gradient(135deg, #9b59b6, #3498db);
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.3rem;
+            transition: 0.2s;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .icon-btn:hover {
+            transform: scale(1.08);
+            box-shadow: 0 0 15px #00ffff;
+        }
+        .send-btn-large {
+            background: linear-gradient(90deg, #00ff99, #3498db);
+            border: none;
+            padding: 12px 25px;
+            border-radius: 40px;
+            font-family: 'Orbitron';
+            font-weight: bold;
+            color: #000;
+            cursor: pointer;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            width: 100%;
+            justify-content: center;
+            margin-top: 12px;
+        }
+        .send-btn-large:hover {
+            transform: scale(1.02);
+            box-shadow: 0 0 20px #00ff99;
+        }
+        .ai-response-box {
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 16px;
+            padding: 15px;
+            margin-top: 15px;
+            font-size: 0.8rem;
+            border-left: 3px solid #00ffff;
+            min-height: 80px;
+        }
+        .settings-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+        }
+        .setting-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.7rem;
+            padding: 6px 0;
+            border-bottom: 1px solid rgba(155, 89, 182, 0.3);
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+        .modal-content {
+            background: rgba(0, 0, 0, 0.95);
+            padding: 30px;
+            border-radius: 20px;
+            width: 350px;
+            text-align: center;
+            border: 1px solid #00ff99;
+        }
+        .modal-content input {
+            width: 100%;
+            padding: 10px;
+            margin: 8px 0;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            border-radius: 8px;
+            color: white;
+        }
+        .modal-content button {
+            width: 100%;
+            padding: 10px;
+            margin: 8px 0;
+            background: #6a1e9c;
+            border: none;
+            border-radius: 8px;
+            color: white;
+            cursor: pointer;
+        }
+        .google-auth-btn {
+            background: #4285F4 !important;
+        }
+        .warning-message {
+            background: #ff3333;
+            color: white;
+            padding: 10px;
+            border-radius: 8px;
+            margin-top: 10px;
+            font-size: 12px;
+        }
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1a1a3a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #9b59b6;
+        }
+        @media (max-width: 900px) {
+            .dashboard-main {
+                flex-direction: column;
+            }
+            .col-left,
+            .col-right {
+                width: 100%;
+            }
+            .header-title {
+                font-size: 40px;
+                top: 80px;
+            }
+            .ai-input-group {
+                flex-direction: column;
+            }
+            .action-buttons {
+                justify-content: center;
+            }
+        }
+
+        /* NOVOS ESTILOS PARA AS FUNCIONALIDADES ADICIONADAS */
+        .history-item {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 8px 12px;
+            margin: 4px 0;
+            border-radius: 8px;
+            font-size: 0.7rem;
+            border-left: 2px solid #00ff99;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 6px;
+        }
+
+        .status-indicator.online {
+            background: #00ff99;
+            box-shadow: 0 0 10px #00ff99;
+        }
+
+        .status-indicator.offline {
+            background: #ff3333;
+            box-shadow: 0 0 10px #ff3333;
+        }
+
+        .status-indicator.processing {
+            background: #ffaa00;
+            box-shadow: 0 0 10px #ffaa00;
+            animation: pulse 0.8s infinite;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: #1a1a3a;
+            border-radius: 4px;
+            margin-top: 8px;
+            overflow: hidden;
+        }
+
+        .progress-bar .fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00ff99, #3498db);
+            transition: width 0.5s ease;
+            border-radius: 4px;
+        }
+
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .quick-action-btn {
+            background: rgba(155, 89, 182, 0.2);
+            border: 1px solid #9b59b6;
+            border-radius: 12px;
+            padding: 8px 4px;
+            color: white;
+            font-family: 'Orbitron';
+            font-size: 0.6rem;
+            cursor: pointer;
+            transition: 0.2s;
+            text-align: center;
+        }
+
+        .quick-action-btn:hover {
+            background: rgba(155, 89, 182, 0.4);
+            border-color: #00ffff;
+            transform: scale(1.02);
+        }
+
+        .quick-action-btn i {
+            display: block;
+            font-size: 1.2rem;
+            margin-bottom: 4px;
+        }
+
+        .knowledge-base-item {
+            padding: 6px 0;
+            border-bottom: 1px solid rgba(155, 89, 182, 0.2);
+            font-size: 0.7rem;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .knowledge-base-item:hover {
+            color: #00ff99;
+            padding-left: 8px;
+        }
+
+        .knowledge-base-item .tag {
+            background: rgba(0, 255, 153, 0.2);
+            padding: 1px 8px;
+            border-radius: 10px;
+            font-size: 0.6rem;
+            margin-left: 6px;
+        }
+
+        .sentiment-indicator {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 6px 0;
+        }
+
+        .sentiment-bar {
+            flex: 1;
+            height: 6px;
+            background: #1a1a3a;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .sentiment-bar .fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+
+        .sentiment-bar .fill.positive {
+            background: linear-gradient(90deg, #00ff99, #00ccff);
+        }
+
+        .sentiment-bar .fill.neutral {
+            background: linear-gradient(90deg, #ffaa00, #ffcc66);
+        }
+
+        .sentiment-bar .fill.negative {
+            background: linear-gradient(90deg, #ff3333, #ff6b6b);
+        }
+
+        .entity-tag {
+            display: inline-block;
+            background: rgba(155, 89, 182, 0.3);
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 0.6rem;
+            margin: 2px 4px 2px 0;
+            border: 1px solid rgba(155, 89, 182, 0.3);
+        }
+
+        .typing-indicator {
+            display: none;
+            padding: 8px 0;
+            color: #00ff99;
+            font-size: 0.7rem;
+        }
+
+        .typing-indicator.active {
+            display: block;
+        }
+
+        .typing-indicator span {
+            display: inline-block;
+            animation: typingDot 1.4s infinite;
+        }
+
+        .typing-indicator span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        .typing-indicator span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes typingDot {
+            0%,
+            60%,
+            100% {
+                opacity: 0.2;
+            }
+            30% {
+                opacity: 1;
+            }
+        }
+
+        .context-badge {
+            background: rgba(0, 255, 153, 0.15);
+            border: 1px solid rgba(0, 255, 153, 0.3);
+            border-radius: 20px;
+            padding: 2px 12px;
+            font-size: 0.6rem;
+            display: inline-block;
+            margin-right: 6px;
+        }
     </style>
 </head>
 <body>
-<header>
-    <img src="https://bradicoin.com/wp-content/uploads/2025/02/Screenshot_20250217-154739.png" alt="Logo" class="logo">
-    <div class="menu">
-        <a href="#" id="home-link" data-i18n="menu.home">Home</a>
-        <a href="#" id="login-link" data-i18n="menu.login">Login</a>
-        <a href="#" id="registration-link" data-i18n="menu.registration">Registration</a>
-        <a href="#" id="contact-link" data-i18n="menu.contact">Contact</a>
+    <header>
+        <img src="https://bradicoin.com/wp-content/uploads/2025/02/Screenshot_20250217-154739.png" alt="Logo" class="logo">
+        <div class="menu">
+            <a href="#" id="home-link" data-i18n="menu.home">Home</a>
+            <a href="#" id="login-link" data-i18n="menu.login">Login</a>
+            <a href="#" id="registration-link" data-i18n="menu.registration">Registration</a>
+            <a href="#" id="contact-link" data-i18n="menu.contact">Contact</a>
+        </div>
+    </header>
+    <div class="language-selector" id="langSelector">
+        <button class="globe-btn" id="language-button">🌐 EN</button>
+        <div class="lang-dropdown">
+            <button data-lang="en">🇬🇧 English</button>
+            <button data-lang="pt">🇵🇹 Português</button>
+            <button data-lang="es">🇪🇸 Español</button>
+            <button data-lang="ar">🇸🇦 العربية</button>
+        </div>
     </div>
-</header>
-<div class="language-selector" id="langSelector">
-    <button class="globe-btn" id="language-button">🌐 EN</button>
-    <div class="lang-dropdown">
-        <button data-lang="en">🇬🇧 English</button>
-        <button data-lang="pt">🇵🇹 Português</button>
-        <button data-lang="es">🇪🇸 Español</button>
-        <button data-lang="ar">🇸🇦 العربية</button>
+    <h1 class="header-title" data-i18n="title">Holoxorn</h1>
+    <div class="additional-menu">
+        <a href="#" id="about-link" data-i18n="menu.about">About Holoxorn</a>
+        <a href="#" id="projects-link" data-i18n="menu.projects">Holoxorn Projects</a>
+        <a href="#" id="tech-link" data-i18n="menu.technology">Holoxorn Technology</a>
+        <a href="#" id="research-link" data-i18n="menu.research">Research & Development</a>
+        <a href="#" id="robotics-link" data-i18n="menu.robotics">Intelligent Robotics</a>
+        <a href="#" id="ml-link" data-i18n="menu.machine-learning">Machine Learning</a>
+        <a href="#" id="automation-link" data-i18n="menu.automation">Automation</a>
+        <a href="#" id="ai-link" data-i18n="menu.innovations">AI Innovations</a>
     </div>
-</div>
-<h1 class="header-title" data-i18n="title">Holoxorn</h1>
-<div class="additional-menu">
-    <a href="#" id="about-link" data-i18n="menu.about">About Holoxorn</a>
-    <a href="#" id="projects-link" data-i18n="menu.projects">Holoxorn Projects</a>
-    <a href="#" id="tech-link" data-i18n="menu.technology">Holoxorn Technology</a>
-    <a href="#" id="research-link" data-i18n="menu.research">Research & Development</a>
-    <a href="#" id="robotics-link" data-i18n="menu.robotics">Intelligent Robotics</a>
-    <a href="#" id="ml-link" data-i18n="menu.machine-learning">Machine Learning</a>
-    <a href="#" id="automation-link" data-i18n="menu.automation">Automation</a>
-    <a href="#" id="ai-link" data-i18n="menu.innovations">AI Innovations</a>
-</div>
-<div class="contact-info"><p data-i18n="contact.info">Contact: <a href="mailto:contact@holoxorn.com" style="color:#00ff99;">contact@holoxorn.com</a></p></div>
+    <div class="contact-info">
+        <p data-i18n="contact.info">Contact: <a href="mailto:contact@holoxorn.com" style="color:#00ff99;">contact@holoxorn.com</a></p>
+    </div>
 
-<!-- DASHBOARD HOLOXORN -->
-<div id="dashboardContainer" class="dashboard-container">
-    <div class="dashboard-header">
-        <h2><i class="fas fa-brain"></i> HOLOXORN NEURAL DASHBOARD</h2>
-        <div class="user-info"><div class="user-avatar" id="userAvatar">👤</div><button id="logoutDashboardBtn" class="logout-dash-btn"><i class="fas fa-sign-out-alt"></i> LOGOUT</button></div>
-    </div>
-    <div class="dashboard-main">
-        <div class="col-left">
-            <div class="dash-card ai-interaction-area">
-                <div class="card-title"><i class="fas fa-comment-dots"></i> INTERACT WITH HOLOXORN AI</div>
-                <div class="ai-input-group">
-                    <textarea id="aiMessageInput" class="ai-textarea" rows="2" placeholder="Type your message, command or question for Holoxorn AI..."></textarea>
-                    <div class="action-buttons">
-                        <button id="micActionBtn" class="icon-btn" title="Voice Input (Microphone)"><i class="fas fa-microphone"></i></button>
-                        <button id="uploadActionBtn" class="icon-btn" title="Upload Files (Images, Videos, Documents)"><i class="fas fa-paperclip"></i></button>
+    <!-- DASHBOARD HOLOXORN -->
+    <div id="dashboardContainer" class="dashboard-container">
+        <div class="dashboard-header">
+            <h2><i class="fas fa-brain"></i> HOLOXORN NEURAL DASHBOARD</h2>
+            <div class="user-info">
+                <div class="user-avatar" id="userAvatar">👤</div>
+                <button id="logoutDashboardBtn" class="logout-dash-btn"><i class="fas fa-sign-out-alt"></i> LOGOUT</button>
+            </div>
+        </div>
+        <div class="dashboard-main">
+            <div class="col-left">
+                <div class="dash-card ai-interaction-area">
+                    <div class="card-title"><i class="fas fa-comment-dots"></i> INTERACT WITH HOLOXORN AI</div>
+                    <div class="ai-input-group">
+                        <textarea id="aiMessageInput" class="ai-textarea" rows="2" placeholder="Type your message, command or question for Holoxorn AI..."></textarea>
+                        <div class="action-buttons">
+                            <button id="micActionBtn" class="icon-btn" title="Voice Input (Microphone)"><i class="fas fa-microphone"></i></button>
+                            <button id="uploadActionBtn" class="icon-btn" title="Upload Files (Images, Videos, Documents)"><i class="fas fa-paperclip"></i></button>
+                            <button id="clearChatBtn" class="icon-btn" title="Clear Conversation" style="background:linear-gradient(135deg,#e74c8b,#ff6b6b);"><i class="fas fa-eraser"></i></button>
+                        </div>
+                    </div>
+                    <button id="sendAiMessageBtn" class="send-btn-large"><i class="fas fa-paper-plane"></i> SEND TO HOLOXORN AI</button>
+                    <div id="typingIndicator" class="typing-indicator">
+                        <span>●</span><span>●</span><span>●</span> Holoxorn is thinking...
+                    </div>
+                    <div id="aiResponseBox" class="ai-response-box"><i class="fas fa-robot"></i> Holoxorn AI is ready. Type or speak your command...</div>
+                </div>
+
+                <div class="dash-card">
+                    <div class="card-title"><i class="fas fa-microphone-alt"></i> VOICE RECOGNITION</div>
+                    <div class="mic-area">
+                        <button id="micButton" class="mic-btn"><i class="fas fa-microphone"></i></button>
+                        <span id="micStatus" class="mic-status">⚪ Click to start recording</span>
+                    </div>
+                    <div id="transcriptText" class="transcript-area">Voice transcript will appear here. Speak clearly!</div>
+                    <div style="font-size:0.65rem; margin-top:8px;"><i class="fas fa-info-circle"></i> Supports English, Portuguese, Spanish. Click mic, speak, and AI will auto-respond.</div>
+                </div>
+
+                <!-- NOVO CARD: HISTÓRICO DE CONVERSA -->
+                <div class="dash-card">
+                    <div class="card-title"><i class="fas fa-history"></i> CONVERSATION HISTORY</div>
+                    <div id="conversationHistory" style="max-height:120px; overflow-y:auto; font-size:0.7rem;">
+                        <div class="history-item" style="opacity:0.6;"><i class="fas fa-robot"></i> Welcome to Holoxorn AI</div>
+                    </div>
+                    <button id="clearHistoryBtn" style="margin-top:8px; background:#2d2d5e; border:none; padding:4px 12px; border-radius:20px; font-size:0.6rem; cursor:pointer; color:white;">Clear History</button>
+                </div>
+
+                <!-- NOVO CARD: STATUS DO SISTEMA -->
+                <div class="dash-card">
+                    <div class="card-title"><i class="fas fa-server"></i> SYSTEM STATUS</div>
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; font-size:0.65rem;">
+                        <div><span class="status-indicator online"></span> AI Core: <span id="aiStatusText">Online</span></div>
+                        <div><span class="status-indicator online"></span> Neural Network: Active</div>
+                        <div><span class="status-indicator online"></span> Memory: <span id="memoryStatus">Optimal</span></div>
+                        <div><span class="status-indicator online"></span> Learning: Active</div>
+                    </div>
+                    <div class="progress-bar" style="margin-top:10px;">
+                        <div class="fill" id="systemLoadBar" style="width:42%;"></div>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; font-size:0.55rem; margin-top:4px;">
+                        <span>System Load</span>
+                        <span id="systemLoadText">42%</span>
                     </div>
                 </div>
-                <button id="sendAiMessageBtn" class="send-btn-large"><i class="fas fa-paper-plane"></i> SEND TO HOLOXORN AI</button>
-                <div id="aiResponseBox" class="ai-response-box"><i class="fas fa-robot"></i> Holoxorn AI is ready. Type or speak your command...</div>
             </div>
-            <div class="dash-card">
-                <div class="card-title"><i class="fas fa-microphone-alt"></i> VOICE RECOGNITION</div>
-                <div class="mic-area">
-                    <button id="micButton" class="mic-btn"><i class="fas fa-microphone"></i></button>
-                    <span id="micStatus" class="mic-status">⚪ Click to start recording</span>
+
+            <div class="col-right">
+                <div class="dash-card">
+                    <div class="card-title"><i class="fas fa-sliders-h"></i> AI CONFIGURATIONS (9 Features)</div>
+                    <div class="settings-grid">
+                        <div class="setting-item"><label><i class="fas fa-brain"></i> Deep Learning</label><div class="toggle-neon" id="deepToggle"></div></div>
+                        <div class="setting-item"><label><i class="fas fa-eye"></i> Visual Recognition</label><div class="toggle-neon" id="visionToggle"></div></div>
+                        <div class="setting-item"><label><i class="fas fa-language"></i> NLP Optimizer</label><div class="toggle-neon" id="nlpTogglex"></div></div>
+                        <div class="setting-item"><label><i class="fas fa-robot"></i> Auto-Learning</label><div class="toggle-neon" id="autoToggle"></div></div>
+                        <div class="setting-item"><label><i class="fas fa-chart-line"></i> Predictive Analytics</label><div class="toggle-neon" id="predictToggle"></div></div>
+                        <div class="setting-item"><label><i class="fas fa-database"></i> Neural Cache</label><div class="toggle-neon" id="cacheToggle"></div></div>
+                        <div class="setting-item"><label><i class="fas fa-shield-virus"></i> Anomaly Detect</label><div class="toggle-neon" id="anomalyToggle"></div></div>
+                        <div class="setting-item"><label><i class="fas fa-cloud-upload-alt"></i> Auto-Sync Cloud</label><div class="toggle-neon" id="cloudToggle"></div></div>
+                        <div class="setting-item"><label><i class="fas fa-bolt"></i> Quantum Boost</label><div class="toggle-neon" id="quantumBoostToggle"></div></div>
+                    </div>
                 </div>
-                <div id="transcriptText" class="transcript-area">Voice transcript will appear here. Speak clearly!</div>
-                <div style="font-size:0.65rem; margin-top:8px;"><i class="fas fa-info-circle"></i> Supports English, Portuguese, Spanish. Click mic, speak, and AI will auto-respond.</div>
-            </div>
-            <div class="dash-card">
-                <div class="card-title"><i class="fas fa-cloud-upload-alt"></i> FILE UPLOAD CENTER</div>
-                <div class="upload-area" id="uploadArea">
-                    <i class="fas fa-upload" style="font-size: 1.8rem;"></i>
-                    <p>Click or drag & drop files</p>
-                    <small>Images, Videos, Audio, PDF, Documents</small>
-                    <input type="file" id="fileInput" multiple accept="image/*,video/*,audio/*,application/pdf,application/msword,text/plain" style="display:none">
+
+                <!-- NOVO CARD: AÇÕES RÁPIDAS -->
+                <div class="dash-card">
+                    <div class="card-title"><i class="fas fa-bolt"></i> QUICK ACTIONS</div>
+                    <div class="quick-actions">
+                        <button class="quick-action-btn" data-action="analyze"><i class="fas fa-chart-pie"></i>Analyze</button>
+                        <button class="quick-action-btn" data-action="summarize"><i class="fas fa-compress-alt"></i>Summarize</button>
+                        <button class="quick-action-btn" data-action="translate"><i class="fas fa-language"></i>Translate</button>
+                        <button class="quick-action-btn" data-action="sentiment"><i class="fas fa-smile"></i>Sentiment</button>
+                        <button class="quick-action-btn" data-action="entities"><i class="fas fa-tags"></i>Entities</button>
+                        <button class="quick-action-btn" data-action="generate"><i class="fas fa-magic"></i>Generate</button>
+                    </div>
                 </div>
-                <div id="fileList" class="file-list"></div>
-                <div id="mediaPreview" class="media-preview"></div>
-            </div>
-        </div>
-        <div class="col-right">
-            <div class="dash-card">
-                <div class="card-title"><i class="fas fa-sliders-h"></i> AI CONFIGURATIONS (9 Features)</div>
-                <div class="settings-grid">
-                    <div class="setting-item"><label><i class="fas fa-brain"></i> Deep Learning</label><div class="toggle-neon" id="deepToggle"></div></div>
-                    <div class="setting-item"><label><i class="fas fa-eye"></i> Visual Recognition</label><div class="toggle-neon" id="visionToggle"></div></div>
-                    <div class="setting-item"><label><i class="fas fa-language"></i> NLP Optimizer</label><div class="toggle-neon" id="nlpTogglex"></div></div>
-                    <div class="setting-item"><label><i class="fas fa-robot"></i> Auto-Learning</label><div class="toggle-neon" id="autoToggle"></div></div>
-                    <div class="setting-item"><label><i class="fas fa-chart-line"></i> Predictive Analytics</label><div class="toggle-neon" id="predictToggle"></div></div>
-                    <div class="setting-item"><label><i class="fas fa-database"></i> Neural Cache</label><div class="toggle-neon" id="cacheToggle"></div></div>
-                    <div class="setting-item"><label><i class="fas fa-shield-virus"></i> Anomaly Detect</label><div class="toggle-neon" id="anomalyToggle"></div></div>
-                    <div class="setting-item"><label><i class="fas fa-cloud-upload-alt"></i> Auto-Sync Cloud</label><div class="toggle-neon" id="cloudToggle"></div></div>
-                    <div class="setting-item"><label><i class="fas fa-bolt"></i> Quantum Boost</label><div class="toggle-neon" id="quantumBoostToggle"></div></div>
+
+                <!-- NOVO CARD: ANÁLISE DE SENTIMENTO -->
+                <div class="dash-card">
+                    <div class="card-title"><i class="fas fa-chart-bar"></i> SENTIMENT ANALYSIS</div>
+                    <div class="sentiment-indicator">
+                        <span style="font-size:0.65rem;">😊 Positive</span>
+                        <div class="sentiment-bar"><div class="fill positive" id="sentimentPositive" style="width:65%;"></div></div>
+                        <span style="font-size:0.65rem; min-width:30px;" id="sentimentPositiveText">65%</span>
+                    </div>
+                    <div class="sentiment-indicator">
+                        <span style="font-size:0.65rem;">😐 Neutral</span>
+                        <div class="sentiment-bar"><div class="fill neutral" id="sentimentNeutral" style="width:25%;"></div></div>
+                        <span style="font-size:0.65rem; min-width:30px;" id="sentimentNeutralText">25%</span>
+                    </div>
+                    <div class="sentiment-indicator">
+                        <span style="font-size:0.65rem;">😞 Negative</span>
+                        <div class="sentiment-bar"><div class="fill negative" id="sentimentNegative" style="width:10%;"></div></div>
+                        <span style="font-size:0.65rem; min-width:30px;" id="sentimentNegativeText">10%</span>
+                    </div>
+                    <div style="font-size:0.6rem; margin-top:6px; opacity:0.7;">Based on recent conversations</div>
                 </div>
-            </div>
-            <div class="dash-card">
-                <div class="card-title"><i class="fas fa-chart-simple"></i> SYSTEM METRICS</div>
-                <div class="config-row"><label><i class="fas fa-microchip"></i> AI Core Temp</label><span id="aiTemp">42°C</span></div>
-                <div class="config-row"><label><i class="fas fa-memory"></i> Neural Load</label><span id="neuralLoad">28%</span></div>
-                <div class="config-row"><label><i class="fas fa-hdd"></i> Storage Used</label><span id="storageInfoDash">0 MB</span></div>
-                <div class="config-row"><label><i class="fas fa-clock"></i> Uptime</label><span id="uptime">00:00:00</span></div>
-            </div>
-            <div class="dash-card">
-                <div class="card-title"><i class="fas fa-palette"></i> VISUAL PREFERENCES</div>
-                <div class="config-row"><label>✨ Neon Intensity</label><select id="glowSelect" class="config-select"><option>Low</option><option selected>Medium</option><option>High</option></select></div>
-                <div class="config-row"><label>🌀 HUD Animation</label><div class="toggle-neon" id="hudAnim"></div></div>
-                <div class="config-row"><label>🔒 Quantum Encryption</label><div class="toggle-neon" id="encryptToggle"></div></div>
-            </div>
-            <div class="dash-card">
-                <div class="card-title"><i class="fas fa-bell"></i> NOTIFICATIONS</div>
-                <div id="notificationList" style="font-size:0.7rem; max-height: 120px; overflow-y: auto;">⚡ System online.<br>🤖 Holoxorn AI ready.</div>
-                <button id="clearNotifBtn" style="margin-top:8px; background:#2d2d5e; border:none; padding:6px; border-radius:20px; font-size:0.7rem; cursor:pointer; width:100%;">Clear All</button>
+
+                <!-- NOVO CARD: BASE DE CONHECIMENTO -->
+                <div class="dash-card">
+                    <div class="card-title"><i class="fas fa-database"></i> KNOWLEDGE BASE</div>
+                    <div id="knowledgeBase" style="max-height:100px; overflow-y:auto;">
+                        <div class="knowledge-base-item" data-topic="neural">🧠 Neural Networks <span class="tag">AI</span></div>
+                        <div class="knowledge-base-item" data-topic="quantum">⚛️ Quantum Computing <span class="tag">Tech</span></div>
+                        <div class="knowledge-base-item" data-topic="nlp">💬 Natural Language <span class="tag">NLP</span></div>
+                        <div class="knowledge-base-item" data-topic="vision">👁️ Computer Vision <span class="tag">CV</span></div>
+                        <div class="knowledge-base-item" data-topic="robotics">🤖 Robotics <span class="tag">Robotics</span></div>
+                    </div>
+                    <div style="font-size:0.6rem; margin-top:6px; opacity:0.7;">Click a topic to learn more</div>
+                </div>
+
+                <!-- NOVO CARD: ENTIDADES DETECTADAS -->
+                <div class="dash-card">
+                    <div class="card-title"><i class="fas fa-tags"></i> DETECTED ENTITIES</div>
+                    <div id="entityList" style="min-height:30px; font-size:0.7rem;">
+                        <span class="entity-tag">Holoxorn</span>
+                        <span class="entity-tag">AI</span>
+                        <span class="entity-tag">Neural</span>
+                        <span class="entity-tag">Quantum</span>
+                    </div>
+                    <div style="font-size:0.55rem; opacity:0.6; margin-top:4px;">Entities are extracted from conversations</div>
+                </div>
+
+                <div class="dash-card">
+                    <div class="card-title"><i class="fas fa-chart-simple"></i> SYSTEM METRICS</div>
+                    <div class="config-row"><label><i class="fas fa-microchip"></i> AI Core Temp</label><span id="aiTemp">42°C</span></div>
+                    <div class="config-row"><label><i class="fas fa-memory"></i> Neural Load</label><span id="neuralLoad">28%</span></div>
+                    <div class="config-row"><label><i class="fas fa-hdd"></i> Storage Used</label><span id="storageInfoDash">0 MB</span></div>
+                    <div class="config-row"><label><i class="fas fa-clock"></i> Uptime</label><span id="uptime">00:00:00</span></div>
+                    <div class="config-row"><label><i class="fas fa-comments"></i> Messages</label><span id="messageCount">0</span></div>
+                </div>
+
+                <div class="dash-card">
+                    <div class="card-title"><i class="fas fa-palette"></i> VISUAL PREFERENCES</div>
+                    <div class="config-row"><label>✨ Neon Intensity</label><select id="glowSelect" class="config-select"><option>Low</option><option selected>Medium</option><option>High</option></select></div>
+                    <div class="config-row"><label>🌀 HUD Animation</label><div class="toggle-neon" id="hudAnim"></div></div>
+                    <div class="config-row"><label>🔒 Quantum Encryption</label><div class="toggle-neon" id="encryptToggle"></div></div>
+                </div>
+
+                <div class="dash-card">
+                    <div class="card-title"><i class="fas fa-bell"></i> NOTIFICATIONS</div>
+                    <div id="notificationList" style="font-size:0.7rem; max-height: 120px; overflow-y: auto;">⚡ System online.<br>🤖 Holoxorn AI ready.</div>
+                    <button id="clearNotifBtn" style="margin-top:8px; background:#2d2d5e; border:none; padding:6px; border-radius:20px; font-size:0.7rem; cursor:pointer; width:100%;">Clear All</button>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-<!-- MODAIS LOGIN COM CONTA ÚNICA -->
-<div id="loginModal" class="modal"><div class="modal-content"><h2>Login</h2><form id="loginForm"><input type="email" id="email" placeholder="Email"><input type="password" id="password" placeholder="Password"><button type="submit">Enter</button></form><button id="googleLoginBtn" class="google-auth-btn">🔐 Google Login</button><button class="close-modal-btn close-login">Close</button><div id="loginWarning" style="font-size:10px; margin-top:10px; color:#ffaa00;"></div></div></div>
-<div id="registrationModal" class="modal"><div class="modal-content"><h2>Sign Up</h2><form id="registerForm"><input type="email" id="regEmail" placeholder="Email"><input type="password" id="regPassword" placeholder="Password"><button type="submit">Sign Up</button></form><button id="googleRegisterBtn" class="google-auth-btn">✨ Google Signup</button><button class="close-modal-btn close-register">Close</button><div id="registerWarning" class="warning-message"></div></div></div>
+    <!-- MODAIS LOGIN COM CONTA ÚNICA -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <h2>Login</h2>
+            <form id="loginForm">
+                <input type="email" id="email" placeholder="Email">
+                <input type="password" id="password" placeholder="Password">
+                <button type="submit">Enter</button>
+            </form>
+            <button id="googleLoginBtn" class="google-auth-btn">🔐 Google Login</button>
+            <button class="close-modal-btn close-login">Close</button>
+            <div id="loginWarning" style="font-size:10px; margin-top:10px; color:#ffaa00;"></div>
+        </div>
+    </div>
+    <div id="registrationModal" class="modal">
+        <div class="modal-content">
+            <h2>Sign Up</h2>
+            <form id="registerForm">
+                <input type="email" id="regEmail" placeholder="Email">
+                <input type="password" id="regPassword" placeholder="Password">
+                <button type="submit">Sign Up</button>
+            </form>
+            <button id="googleRegisterBtn" class="google-auth-btn">✨ Google Signup</button>
+            <button class="close-modal-btn close-register">Close</button>
+            <div id="registerWarning" class="warning-message"></div>
+        </div>
+    </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script>
-    // ========== SISTEMA DE LOGIN COM CONTA ÚNICA ==========
-    // Conta permitida: contact@bradicoin.com / 36124589Bdc
-    const ALLOWED_EMAIL = "contact@bradicoin.com";
-    const ALLOWED_PASSWORD = "36124589Bdc";
-    
-    let isLoggedIn = false, currentUserEmail = "Explorer";
-    const dashboard = document.getElementById('dashboardContainer');
-    const loginModalEl = document.getElementById('loginModal'), registerModalEl = document.getElementById('registrationModal');
-    const loginWarning = document.getElementById('loginWarning');
-    const registerWarning = document.getElementById('registerWarning');
-    
-    function updateUI() { 
-        if(isLoggedIn) { 
-            dashboard.classList.add('show'); 
-            loginModalEl.style.display='none'; 
-            registerModalEl.style.display='none'; 
-            document.getElementById('userAvatar').innerHTML = currentUserEmail.charAt(0).toUpperCase(); 
-            addNotif(`✅ Welcome ${currentUserEmail}`);
-            // Fechar qualquer modal aberto
-            loginModalEl.style.display = 'none';
-            registerModalEl.style.display = 'none';
-        } else { 
-            dashboard.classList.remove('show'); 
-        } 
-    }
-    
-    function logoutFunc() { 
-        isLoggedIn=false; 
-        currentUserEmail="Explorer"; 
-        updateUI(); 
-        addNotif("🔓 User logged out"); 
-        alert("🔓 Logged out from Holoxorn.");
-        // Garantir que os modais estão fechados
-        loginModalEl.style.display = 'none';
-        registerModalEl.style.display = 'none';
-    }
-    
-    // Função de login com validação da conta única
-    function validateLogin(email, password) {
-        if(email === ALLOWED_EMAIL && password === ALLOWED_PASSWORD) {
-            currentUserEmail = email;
-            isLoggedIn = true;
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js">
+    </script>
+    <script>
+        // ========== SISTEMA DE LOGIN COM CONTA ÚNICA ==========
+        const ALLOWED_EMAIL = "contact@bradicoin.com";
+        const ALLOWED_PASSWORD = "36124589Bdc";
+
+        let isLoggedIn = false,
+            currentUserEmail = "Explorer";
+        const dashboard = document.getElementById('dashboardContainer');
+        const loginModalEl = document.getElementById('loginModal'),
+            registerModalEl = document.getElementById('registrationModal');
+        const loginWarning = document.getElementById('loginWarning');
+        const registerWarning = document.getElementById('registerWarning');
+        let messageCounter = 0;
+        let conversationHistory = [];
+        let systemMessages = 0;
+
+        function updateUI() {
+            if (isLoggedIn) {
+                dashboard.classList.add('show');
+                loginModalEl.style.display = 'none';
+                registerModalEl.style.display = 'none';
+                document.getElementById('userAvatar').innerHTML = currentUserEmail.charAt(0).toUpperCase();
+                addNotif(`✅ Welcome ${currentUserEmail}`);
+                loginModalEl.style.display = 'none';
+                registerModalEl.style.display = 'none';
+            } else {
+                dashboard.classList.remove('show');
+            }
+        }
+
+        function logoutFunc() {
+            isLoggedIn = false;
+            currentUserEmail = "Explorer";
             updateUI();
-            alert("✅ Login successful! Welcome to Holoxorn.");
-            return true;
-        } else {
-            if(loginWarning) loginWarning.innerHTML = "❌ Invalid credentials! Only authorized account can access.";
-            return false;
-        }
-    }
-    
-    // Função de registro - NÃO PERMITIDO
-    function validateRegistration(email, password) {
-        if(email && password) {
-            if(registerWarning) {
-                registerWarning.innerHTML = "⚠️ REGISTRATION BLOCKED! ⚠️<br>Only one authorized account exists.<br>Please use the provided login credentials.";
-                registerWarning.style.display = 'block';
-            }
-            alert("⚠️ REGISTRATION DISABLED! Only the authorized account can access this system.");
-            return false;
-        }
-        return false;
-    }
-    
-    // Event listeners para login
-    document.getElementById('loginForm')?.addEventListener('submit', (e) => {
-        e.preventDefault(); 
-        const email = document.getElementById('email').value;
-        const password = document.getElementById('password').value;
-        if(email && password) {
-            validateLogin(email, password);
-        } else {
-            if(loginWarning) loginWarning.innerHTML = "❌ Please fill both fields";
-        }
-    });
-    
-    // Event listeners para registro - BLOQUEADO
-    document.getElementById('registerForm')?.addEventListener('submit', (e) => {
-        e.preventDefault(); 
-        const email = document.getElementById('regEmail').value;
-        const password = document.getElementById('regPassword').value;
-        validateRegistration(email, password);
-    });
-    
-    // Google Auth - também bloqueado
-    function googleAuth() {
-        alert("⚠️ Google Login disabled. Only the authorized account can access this system.");
-        if(registerWarning) {
-            registerWarning.innerHTML = "⚠️ Only one authorized account exists! Use provided credentials.";
-            registerWarning.style.display = 'block';
-        }
-    }
-    
-    document.getElementById('googleLoginBtn')?.addEventListener('click', googleAuth); 
-    document.getElementById('googleRegisterBtn')?.addEventListener('click', googleAuth);
-    document.getElementById('logoutDashboardBtn')?.addEventListener('click', logoutFunc);
-    
-    // Eventos dos menus
-    document.getElementById('login-link')?.addEventListener('click', (e) => {
-        e.preventDefault(); 
-        if(!isLoggedIn) {
-            loginModalEl.style.display = 'flex';
-            if(registerWarning) registerWarning.style.display = 'none';
-            if(loginWarning) loginWarning.innerHTML = '';
-            registerModalEl.style.display = 'none';
-        } else { 
-            alert("Already logged in"); 
-        }
-    });
-    
-    document.getElementById('registration-link')?.addEventListener('click', (e) => {
-        e.preventDefault(); 
-        if(!isLoggedIn) {
-            registerModalEl.style.display = 'flex';
-            if(registerWarning) {
-                registerWarning.innerHTML = "⚠️ REGISTRATION BLOCKED!<br>Only ONE authorized account exists.<br>Use Login with: " + ALLOWED_EMAIL;
-                registerWarning.style.display = 'block';
-            }
+            addNotif("🔓 User logged out");
+            alert("🔓 Logged out from Holoxorn.");
             loginModalEl.style.display = 'none';
-        } else { 
-            alert("Already logged in"); 
+            registerModalEl.style.display = 'none';
         }
-    });
-    
-    document.querySelectorAll('.close-login, .close-register, .close-modal-btn').forEach(btn => btn.addEventListener('click', () => {
-        loginModalEl.style.display = 'none'; 
-        registerModalEl.style.display = 'none';
-    }));
-    
-    window.onclick = (e) => {
-        if(e.target === loginModalEl) loginModalEl.style.display='none'; 
-        if(e.target === registerModalEl) registerModalEl.style.display='none';
-    };
-    
-    document.getElementById('home-link')?.addEventListener('click', (e) => { e.preventDefault(); window.scrollTo({top:0,behavior:'smooth'}); });
-    document.getElementById('contact-link')?.addEventListener('click', (e) => { e.preventDefault(); document.querySelector('.contact-info')?.scrollIntoView({behavior:'smooth'}); });
-    ['about-link','projects-link','tech-link','research-link','robotics-link','ml-link','automation-link','ai-link'].forEach(id => {
-        document.getElementById(id)?.addEventListener('click', (e) => { e.preventDefault(); addNotif(`📡 ${id} module coming soon`); alert(`📡 Coming soon`); });
-    });
 
-    // ========== INTERAÇÃO COM IA ==========
-    const aiInput = document.getElementById('aiMessageInput');
-    const sendBtn = document.getElementById('sendAiMessageBtn');
-    const aiResponseBox = document.getElementById('aiResponseBox');
-    
-    function sendToAI() {
-        let msg = aiInput.value.trim();
-        if(!msg) { alert("Please type or speak a message"); return; }
-        aiResponseBox.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Holoxorn AI is processing...`;
-        setTimeout(() => {
-            const responses = [
-                `🤖 Holoxorn AI: "${msg}" - Neural pattern analyzed. How can I assist you further?`,
-                `✨ AI Core: I've processed your input. Quantum response ready.`,
-                `🧠 Holoxorn: Thank you for your message. My neural networks are optimizing.`,
-                `⚡ AI Interface active: "${msg.substring(0,50)}" has been logged.`,
-                `🌌 Neural insight received. Holoxorn is enhancing its learning.`
+        function validateLogin(email, password) {
+            if (email === ALLOWED_EMAIL && password === ALLOWED_PASSWORD) {
+                currentUserEmail = email;
+                isLoggedIn = true;
+                updateUI();
+                alert("✅ Login successful! Welcome to Holoxorn.");
+                return true;
+            } else {
+                if (loginWarning) loginWarning.innerHTML = "❌ Invalid credentials! Only authorized account can access.";
+                return false;
+            }
+        }
+
+        function validateRegistration(email, password) {
+            if (email && password) {
+                if (registerWarning) {
+                    registerWarning.innerHTML = "⚠️ REGISTRATION BLOCKED! ⚠️<br>Only one authorized account exists.<br>Please use the provided login credentials.";
+                    registerWarning.style.display = 'block';
+                }
+                alert("⚠️ REGISTRATION DISABLED! Only the authorized account can access this system.");
+                return false;
+            }
+            return false;
+        }
+
+        document.getElementById('loginForm')?.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            if (email && password) {
+                validateLogin(email, password);
+            } else {
+                if (loginWarning) loginWarning.innerHTML = "❌ Please fill both fields";
+            }
+        });
+
+        document.getElementById('registerForm')?.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const email = document.getElementById('regEmail').value;
+            const password = document.getElementById('regPassword').value;
+            validateRegistration(email, password);
+        });
+
+        function googleAuth() {
+            alert("⚠️ Google Login disabled. Only the authorized account can access this system.");
+            if (registerWarning) {
+                registerWarning.innerHTML = "⚠️ Only one authorized account exists! Use provided credentials.";
+                registerWarning.style.display = 'block';
+            }
+        }
+
+        document.getElementById('googleLoginBtn')?.addEventListener('click', googleAuth);
+        document.getElementById('googleRegisterBtn')?.addEventListener('click', googleAuth);
+        document.getElementById('logoutDashboardBtn')?.addEventListener('click', logoutFunc);
+
+        document.getElementById('login-link')?.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (!isLoggedIn) {
+                loginModalEl.style.display = 'flex';
+                if (registerWarning) registerWarning.style.display = 'none';
+                if (loginWarning) loginWarning.innerHTML = '';
+                registerModalEl.style.display = 'none';
+            } else {
+                alert("Already logged in");
+            }
+        });
+
+        document.getElementById('registration-link')?.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (!isLoggedIn) {
+                registerModalEl.style.display = 'flex';
+                if (registerWarning) {
+                    registerWarning.innerHTML = "⚠️ REGISTRATION BLOCKED!<br>Only ONE authorized account exists.<br>Use Login with: " + ALLOWED_EMAIL;
+                    registerWarning.style.display = 'block';
+                }
+                loginModalEl.style.display = 'none';
+            } else {
+                alert("Already logged in");
+            }
+        });
+
+        document.querySelectorAll('.close-login, .close-register, .close-modal-btn').forEach(btn => btn.addEventListener('click', () => {
+            loginModalEl.style.display = 'none';
+            registerModalEl.style.display = 'none';
+        }));
+
+        window.onclick = (e) => {
+            if (e.target === loginModalEl) loginModalEl.style.display = 'none';
+            if (e.target === registerModalEl) registerModalEl.style.display = 'none';
+        };
+
+        document.getElementById('home-link')?.addEventListener('click', (e) => { e.preventDefault();
+            window.scrollTo({ top: 0, behavior: 'smooth' }); });
+        document.getElementById('contact-link')?.addEventListener('click', (e) => { e.preventDefault();
+            document.querySelector('.contact-info')?.scrollIntoView({ behavior: 'smooth' }); });
+        ['about-link', 'projects-link', 'tech-link', 'research-link', 'robotics-link', 'ml-link', 'automation-link', 'ai-link']
+        .forEach(id => {
+            document.getElementById(id)?.addEventListener('click', (e) => { e.preventDefault();
+                addNotif(`📡 ${id} module coming soon`);
+                alert(`📡 Coming soon`); });
+        });
+
+        // ========== INTERAÇÃO COM IA MELHORADA ==========
+        const aiInput = document.getElementById('aiMessageInput');
+        const sendBtn = document.getElementById('sendAiMessageBtn');
+        const aiResponseBox = document.getElementById('aiResponseBox');
+        const typingIndicator = document.getElementById('typingIndicator');
+        const conversationHistoryDiv = document.getElementById('conversationHistory');
+        const messageCountSpan = document.getElementById('messageCount');
+
+        const knowledgeBaseData = {
+            neural: "🧠 Neural Networks are computing systems inspired by biological neural networks. They are used for pattern recognition and machine learning.",
+            quantum: "⚛️ Quantum Computing uses quantum-mechanical phenomena like superposition and entanglement to perform computation.",
+            nlp: "💬 Natural Language Processing (NLP) enables computers to understand, interpret, and respond to human language.",
+            vision: "👁️ Computer Vision enables machines to interpret and understand visual information from the world.",
+            robotics: "🤖 Robotics combines engineering, computer science, and AI to create intelligent machines."
+        };
+
+        const responses = [
+            "🤖 Holoxorn AI: I've analyzed your input. My neural networks are processing the information. How can I assist you further?",
+            "✨ AI Core: Quantum response ready. I've optimized my learning algorithms based on your query.",
+            "🧠 Holoxorn: Thank you for your message. I'm enhancing my understanding through deep learning.",
+            "⚡ AI Interface active: Your message has been logged and analyzed by the neural network.",
+            "🌌 Neural insight: Holoxorn is continuously improving its knowledge base.",
+            "🔮 Holoxorn AI: I've detected patterns in your request. My predictive analytics are activated.",
+            "💡 Holoxorn: Great question! I'm processing it through my NLP optimizer.",
+            "🚀 Holoxorn: Your input is being analyzed by the quantum boost engine.",
+            "🎯 Holoxorn: I've identified key entities in your message. My visual recognition is also scanning.",
+            "🌟 Holoxorn: The neural cache has been updated with your interaction."
+        ];
+
+        function addToHistory(role, text) {
+            const time = new Date().toLocaleTimeString();
+            const entry = { role, text, time };
+            conversationHistory.push(entry);
+            if (conversationHistory.length > 50) conversationHistory.shift();
+
+            const historyItem = document.createElement('div');
+            historyItem.className = 'history-item';
+            const icon = role === 'user' ? '<i class="fas fa-user"></i>' : '<i class="fas fa-robot"></i>';
+            historyItem.innerHTML = `${icon} [${time}] ${text.substring(0, 80)}${text.length > 80 ? '...' : ''}`;
+            conversationHistoryDiv.appendChild(historyItem);
+            conversationHistoryDiv.scrollTop = conversationHistoryDiv.scrollHeight;
+
+            systemMessages++;
+            messageCountSpan.textContent = systemMessages;
+
+            // Atualizar entidades detectadas
+            extractEntities(text);
+        }
+
+        function extractEntities(text) {
+            const entityList = document.getElementById('entityList');
+            const entities = text.match(/\b[A-Z][a-z]+\b/g) || [];
+            const techTerms = ['AI', 'NLP', 'ML', 'Quantum', 'Neural', 'Robotics', 'Vision', 'Deep Learning', 'Machine Learning',
+                'Algorithm'
             ];
-            let randomResp = responses[Math.floor(Math.random() * responses.length)];
-            aiResponseBox.innerHTML = `<i class="fas fa-robot"></i> ${randomResp}`;
-            addNotif(`💬 AI responded to your message`);
+
+            let foundEntities = [];
+            entities.forEach(e => {
+                if (e.length > 2 && !foundEntities.includes(e)) {
+                    foundEntities.push(e);
+                }
+            });
+            techTerms.forEach(term => {
+                if (text.toLowerCase().includes(term.toLowerCase()) && !foundEntities.includes(term)) {
+                    foundEntities.push(term);
+                }
+            });
+
+            if (foundEntities.length > 0) {
+                const existingTags = entityList.querySelectorAll('.entity-tag');
+                const existingTexts = Array.from(existingTags).map(tag => tag.textContent);
+                foundEntities.forEach(entity => {
+                    if (!existingTexts.includes(entity) && entityList.children.length < 15) {
+                        const tag = document.createElement('span');
+                        tag.className = 'entity-tag';
+                        tag.textContent = entity;
+                        entityList.appendChild(tag);
+                    }
+                });
+            }
+        }
+
+        function sendToAI() {
+            let msg = aiInput.value.trim();
+            if (!msg) { alert("Please type or speak a message"); return; }
+
+            addToHistory('user', msg);
+
+            typingIndicator.classList.add('active');
+            aiResponseBox.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Holoxorn AI is processing...`;
+
+            setTimeout(() => {
+                typingIndicator.classList.remove('active');
+
+                // Análise de sentimento simulada
+                updateSentiment(msg);
+
+                // Resposta baseada no conteúdo
+                let response = responses[Math.floor(Math.random() * responses.length)];
+
+                // Verificar se a mensagem contém palavras-chave para respostas específicas
+                const lowerMsg = msg.toLowerCase();
+                if (lowerMsg.includes('hello') || lowerMsg.includes('hi') || lowerMsg.includes('hey')) {
+                    response = "👋 Hello! Welcome to Holoxorn AI. I'm here to assist you with any questions or tasks.";
+                } else if (lowerMsg.includes('help') || lowerMsg.includes('support')) {
+                    response =
+                    "🆘 I'm here to help! I can assist with data analysis, natural language processing, visual recognition, and more. What specific assistance do you need?";
+                } else if (lowerMsg.includes('who are you') || lowerMsg.includes('what are you')) {
+                    response =
+                    "🤖 I am Holoxorn AI, a multi-functional artificial intelligence designed to help with complex tasks, data analysis, and intelligent automation.";
+                } else if (lowerMsg.includes('capabilities') || lowerMsg.includes('features')) {
+                    response =
+                    "✨ My capabilities include: Natural Language Processing, Computer Vision, Predictive Analytics, Quantum Computing simulations, Neural Networks, and Intelligent Automation.";
+                } else if (lowerMsg.includes('thank')) {
+                    response = "🙌 You're welcome! I'm always here to assist. Feel free to ask me anything.";
+                } else if (lowerMsg.includes('bye') || lowerMsg.includes('goodbye')) {
+                    response = "👋 Goodbye! It was a pleasure assisting you. Come back anytime!";
+                }
+
+                aiResponseBox.innerHTML = `<i class="fas fa-robot"></i> ${response}`;
+                addToHistory('assistant', response);
+
+                // Atualizar estatísticas do sistema
+                updateSystemStats();
+
+                aiInput.value = '';
+                addNotif(`💬 AI responded to your message`);
+
+                // Verificar se a resposta contém entidades
+                extractEntities(response);
+
+            }, 1000 + Math.random() * 800);
+        }
+
+        function updateSentiment(text) {
+            // Simulação simples de análise de sentimento
+            const positiveWords = ['good', 'great', 'excellent', 'amazing', 'wonderful', 'fantastic', 'love', 'happy', 'excited',
+                'awesome', 'best'
+            ];
+            const negativeWords = ['bad', 'terrible', 'awful', 'horrible', 'hate', 'sad', 'angry', 'frustrated', 'worst',
+                'disappointing'
+            ];
+
+            let posScore = 0,
+                negScore = 0;
+            const words = text.toLowerCase().split(' ');
+
+            words.forEach(word => {
+                if (positiveWords.includes(word)) posScore++;
+                if (negativeWords.includes(word)) negScore++;
+            });
+
+            // Atualizar barras de sentimento com pequena variação
+            const basePos = parseInt(document.getElementById('sentimentPositive').style.width) || 65;
+            const baseNeut = parseInt(document.getElementById('sentimentNeutral').style.width) || 25;
+            const baseNeg = parseInt(document.getElementById('sentimentNegative').style.width) || 10;
+
+            let newPos = Math.max(5, Math.min(95, basePos + (posScore - negScore) * 3));
+            let newNeg = Math.max(5, Math.min(50, baseNeg + (negScore - posScore) * 3));
+            let newNeut = Math.max(5, Math.min(70, 100 - newPos - newNeg));
+
+            // Normalizar para 100%
+            const total = newPos + newNeut + newNeg;
+            newPos = (newPos / total) * 100;
+            newNeut = (newNeut / total) * 100;
+            newNeg = (newNeg / total) * 100;
+
+            document.getElementById('sentimentPositive').style.width = newPos + '%';
+            document.getElementById('sentimentNeutral').style.width = newNeut + '%';
+            document.getElementById('sentimentNegative').style.width = newNeg + '%';
+            document.getElementById('sentimentPositiveText').textContent = Math.round(newPos) + '%';
+            document.getElementById('sentimentNeutralText').textContent = Math.round(newNeut) + '%';
+            document.getElementById('sentimentNegativeText').textContent = Math.round(newNeg) + '%';
+        }
+
+        function updateSystemStats() {
+            // Simular carga variável
+            const load = 20 + Math.random() * 50;
+            document.getElementById('systemLoadBar').style.width = load + '%';
+            document.getElementById('systemLoadText').textContent = Math.round(load) + '%';
+
+            const temp = 38 + Math.random() * 12;
+            document.getElementById('aiTemp').textContent = Math.round(temp) + '°C';
+
+            const neuralLoad = 15 + Math.random() * 45;
+            document.getElementById('neuralLoad').textContent = Math.round(neuralLoad) + '%';
+
+            // Status da IA
+            const statusTexts = ['Online', 'Optimizing', 'Learning', 'Processing', 'Idle'];
+            const status = statusTexts[Math.floor(Math.random() * statusTexts.length)];
+            document.getElementById('aiStatusText').textContent = status;
+        }
+
+        sendBtn.addEventListener('click', sendToAI);
+        aiInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendToAI(); });
+
+        // ========== BOTÃO LIMPAR CHAT ==========
+        document.getElementById('clearChatBtn')?.addEventListener('click', () => {
             aiInput.value = '';
-        }, 1000);
-    }
-    sendBtn.addEventListener('click', sendToAI);
-    aiInput.addEventListener('keypress', (e) => { if(e.key === 'Enter') sendToAI(); });
+            aiResponseBox.innerHTML = '<i class="fas fa-robot"></i> Chat cleared. Holoxorn AI is ready.';
+            document.getElementById('conversationHistory').innerHTML =
+                '<div class="history-item" style="opacity:0.6;"><i class="fas fa-robot"></i> Welcome to Holoxorn AI</div>';
+            conversationHistory = [];
+            addNotif('🗑️ Chat cleared');
+        });
 
-    // ========== MICROFONE ==========
-    const micBtn = document.getElementById('micButton');
-    const micActionBtn = document.getElementById('micActionBtn');
-    const micStatus = document.getElementById('micStatus');
-    const transcriptDiv = document.getElementById('transcriptText');
-    let isRecordingMic = false;
-    let recognition = null;
-    
-    function initSpeechRecognition() {
-        if('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            recognition = new SpeechRecognition();
-            recognition.continuous = false;
-            recognition.interimResults = true;
-            recognition.lang = 'en-US';
-            recognition.onstart = () => { micStatus.innerHTML = '🔴 Recording... Speak now'; micBtn.classList.add('recording'); if(micActionBtn) micActionBtn.classList.add('recording'); isRecordingMic = true; };
-            recognition.onresult = (event) => {
-                let transcript = Array.from(event.results).map(r => r[0].transcript).join('');
-                transcriptDiv.innerHTML = `🎤 You said: "${transcript}"`;
-                micStatus.innerHTML = '✅ Processed';
-                aiInput.value = transcript;
+        document.getElementById('clearHistoryBtn')?.addEventListener('click', () => {
+            document.getElementById('conversationHistory').innerHTML =
+                '<div class="history-item" style="opacity:0.6;"><i class="fas fa-robot"></i> Welcome to Holoxorn AI</div>';
+            conversationHistory = [];
+            addNotif('🗑️ History cleared');
+        });
+
+        // ========== MICROFONE ==========
+        const micBtn = document.getElementById('micButton');
+        const micActionBtn = document.getElementById('micActionBtn');
+        const micStatus = document.getElementById('micStatus');
+        const transcriptDiv = document.getElementById('transcriptText');
+        let isRecordingMic = false;
+        let recognition = null;
+
+        function initSpeechRecognition() {
+            if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                recognition = new SpeechRecognition();
+                recognition.continuous = false;
+                recognition.interimResults = true;
+                recognition.lang = 'en-US';
+                recognition.onstart = () => { micStatus.innerHTML = '🔴 Recording... Speak now';
+                    micBtn.classList.add('recording'); if (micActionBtn) micActionBtn.classList.add('recording');
+                    isRecordingMic = true; };
+                recognition.onresult = (event) => {
+                    let transcript = Array.from(event.results).map(r => r[0].transcript).join('');
+                    transcriptDiv.innerHTML = `🎤 You said: "${transcript}"`;
+                    micStatus.innerHTML = '✅ Processed';
+                    aiInput.value = transcript;
+                    sendToAI();
+                    addNotif(`🎤 Voice input: ${transcript.substring(0,40)}`);
+                    stopRecording();
+                };
+                recognition.onerror = (e) => { micStatus.innerHTML = '⚠️ Error, try again';
+                    stopRecording(); };
+                recognition.onend = () => { stopRecording(); };
+            } else {
+                micStatus.innerHTML = '❌ Not supported';
+                if (micBtn) micBtn.disabled = true;
+                if (micActionBtn) micActionBtn.disabled = true;
+            }
+        }
+
+        function stopRecording() {
+            if (recognition) try { recognition.stop(); } catch (e) {}
+            micBtn.classList.remove('recording');
+            if (micActionBtn) micActionBtn.classList.remove('recording');
+            if (micStatus.innerHTML.includes('Recording')) micStatus.innerHTML = '⚪ Ready';
+            isRecordingMic = false;
+        }
+
+        function startRecording() {
+            if (recognition) { try { recognition.start(); } catch (e) { micStatus.innerHTML = '⚠️ Already recording'; } } else { alert(
+                    "Speech recognition not supported"); }
+        }
+
+        function toggleMic() { if (isRecordingMic) stopRecording();
+            else startRecording(); }
+        initSpeechRecognition();
+        if (micBtn) micBtn.addEventListener('click', toggleMic);
+        if (micActionBtn) micActionBtn.addEventListener('click', toggleMic);
+
+        // ========== UPLOAD ==========
+        let uploadedFiles = [];
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInputEl = document.getElementById('fileInput');
+        const fileListDiv = document.getElementById('fileList');
+        const mediaPreviewDiv = document.getElementById('mediaPreview');
+        const uploadActionBtn = document.getElementById('uploadActionBtn');
+
+        function triggerUpload() { fileInputEl.click(); }
+        uploadArea?.addEventListener('click', triggerUpload);
+        uploadActionBtn?.addEventListener('click', triggerUpload);
+        uploadArea?.addEventListener('dragover', e => e.preventDefault());
+        uploadArea?.addEventListener('drop', e => { e.preventDefault();
+            handleFiles(e.dataTransfer.files); });
+        fileInputEl?.addEventListener('change', e => handleFiles(e.target.files));
+
+        function handleFiles(files) {
+            Array.from(files).forEach(file => {
+                const reader = new FileReader();
+                reader.onload = (ev) => {
+                    uploadedFiles.push({ name: file.name, type: file.type, data: ev.target.result });
+                    updateFileListUI();
+                    updateStorageMetric();
+                    addPreview(file.type, ev.target.result);
+                    addNotif(`📎 Uploaded: ${file.name}`);
+                    // Analisar arquivo com IA (simulação)
+                    aiResponseBox.innerHTML =
+                        `<i class="fas fa-robot"></i> 📄 I've received your file: "${file.name}". Analyzing content...`;
+                    setTimeout(() => {
+                        aiResponseBox.innerHTML =
+                            `<i class="fas fa-robot"></i> ✅ File "${file.name}" has been processed. I can help you analyze its contents.`;
+                    }, 1500);
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function updateFileListUI() {
+            fileListDiv.innerHTML = uploadedFiles.map((f, idx) =>
+                    `<div class="file-item"><div><i class="fas fa-${f.type.includes('image')?'image':f.type.includes('video')?'video':'file'}"></i> ${f.name.substring(0,25)}</div><i class="fas fa-trash delete-file" data-idx="${idx}"></i></div>`
+                    ).join('');
+            document.querySelectorAll('.delete-file').forEach(el => { el.addEventListener('click', (e) => { let idx = parseInt(el
+                        .getAttribute('data-idx'));
+                    uploadedFiles.splice(idx, 1);
+                    updateFileListUI();
+                    updateStorageMetric();
+                    addNotif(`🗑️ File removed`); }); });
+        }
+
+        function addPreview(type, data) {
+            let html = '';
+            if (type.includes('image')) html = `<img src="${data}" alt="preview">`;
+            else if (type.includes('video')) html = `<video controls><source src="${data}"></video>`;
+            else html = `<div style="background:#2d2d5e; padding:5px; border-radius:8px;"><i class="fas fa-file-alt"></i> Document</div>`;
+            if (html) mediaPreviewDiv.innerHTML = html + mediaPreviewDiv.innerHTML;
+            if (mediaPreviewDiv.children.length > 4) mediaPreviewDiv.removeChild(mediaPreviewDiv.lastChild);
+        }
+
+        function updateStorageMetric() {
+            let total = uploadedFiles.reduce((s, f) => s + (f.data?.length || 0), 0);
+            let mb = (total / (1024 * 1024)).toFixed(2);
+            document.getElementById('storageInfoDash').innerText = `${mb} MB (${uploadedFiles.length} files)`;
+        }
+
+        // ========== TOGGLES ==========
+        const toggles = ['deepToggle', 'visionToggle', 'nlpTogglex', 'autoToggle', 'predictToggle', 'cacheToggle',
+            'anomalyToggle', 'cloudToggle', 'quantumBoostToggle', 'hudAnim', 'encryptToggle'
+        ];
+        toggles.forEach(id => { let el = document.getElementById(id); if (el) el.addEventListener('click', function() { this
+                    .classList.toggle('active');
+                addNotif(`⚙️ ${id.replace('Toggle','')} ${this.classList.contains('active')?'ON':'OFF'}`); }); });
+        document.getElementById('glowSelect')?.addEventListener('change', (e) => addNotif(`✨ Neon intensity: ${e.target.value}`));
+        document.getElementById('clearNotifBtn')?.addEventListener('click', () => { document.getElementById('notificationList')
+                .innerHTML = '✨ Notifications cleared.';
+            addNotif("Notifications cleared"); });
+
+        function addNotif(msg) {
+            let notifDiv = document.getElementById('notificationList');
+            let newMsg = `<div>🔔 ${new Date().toLocaleTimeString()} - ${msg}</div>`;
+            notifDiv.innerHTML = newMsg + notifDiv.innerHTML;
+            if (notifDiv.children.length > 6) notifDiv.removeChild(notifDiv.lastChild);
+        }
+
+        // ========== MÉTRICAS ==========
+        let startTime = Date.now();
+        setInterval(() => {
+            let seconds = Math.floor((Date.now() - startTime) / 1000);
+            let hrs = Math.floor(seconds / 3600),
+                mins = Math.floor((seconds % 3600) / 60),
+                secs = seconds % 60;
+            document.getElementById('uptime').innerText =
+                `${hrs.toString().padStart(2,'0')}:${mins.toString().padStart(2,'0')}:${secs.toString().padStart(2,'0')}`;
+            updateSystemStats();
+        }, 4000);
+
+        // ========== TRADUTOR ==========
+        const trans = {
+            en: { menu: { home: "Home", login: "Login", registration: "Register", contact: "Contact", about: "About",
+                    projects: "Projects", technology: "Tech", research: "Research", robotics: "Robotics",
+                    "machine-learning": "ML", automation: "Auto", innovations: "AI" }, title: "Holoxorn",
+                contact: { info: "Contact: <a href='mailto:contact@holoxorn.com' style='color:#00ff99;'>contact@holoxorn.com</a>" } },
+            pt: { menu: { home: "Início", login: "Login", registration: "Cadastro", contact: "Contato", about: "Sobre",
+                    projects: "Projetos", technology: "Tecnologia", research: "Pesquisa", robotics: "Robótica",
+                    "machine-learning": "ML", automation: "Automação", innovations: "Inovações" }, title: "Holoxorn",
+                contact: { info: "Contato: <a href='mailto:contact@holoxorn.com' style='color:#00ff99;'>contact@holoxorn.com</a>" } },
+            es: { menu: { home: "Inicio", login: "Iniciar", registration: "Registro", contact: "Contacto", about: "Acerca",
+                    projects: "Proyectos", technology: "Tecnología", research: "Investigación", robotics: "Robótica",
+                    "machine-learning": "ML", automation: "Automación", innovations: "Innovaciones" }, title: "Holoxorn",
+                contact: { info: "Contacto: <a href='mailto:contact@holoxorn.com' style='color:#00ff99;'>contact@holoxorn.com</a>" } },
+            ar: { menu: { home: "الرئيسية", login: "دخول", registration: "تسجيل", contact: "اتصل", about: "عن",
+                    projects: "مشاريع", technology: "تقنية", research: "بحث", robotics: "روبوتات",
+                    "machine-learning": "تعلم آلة", automation: "أتمتة", innovations: "ابتكارات" }, title: "هولوكسورن",
+                contact: { info: "اتصال: <a href='mailto:contact@holoxorn.com' style='color:#00ff99;'>contact@holoxorn.com</a>" } }
+        };
+        let curLang = 'en';
+
+        function updateTexts() {
+            let t = trans[curLang];
+            if (!t) return;
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                let key = el.getAttribute('data-i18n');
+                let val = key.split('.').reduce((o, i) => o?.[i], t);
+                if (val) { if (el.innerHTML.includes('href')) el.innerHTML = val;
+                    else el.innerText = val; }
+            });
+            document.getElementById('language-button').innerHTML = `🌐 ${curLang.toUpperCase()}`;
+        }
+        document.querySelectorAll('.lang-dropdown button').forEach(btn => { btn.addEventListener('click', (e) => { curLang = btn
+                    .getAttribute('data-lang');
+                updateTexts();
+                document.getElementById('langSelector').classList.remove('active'); }); });
+        document.getElementById('language-button')?.addEventListener('click', (e) => { e.stopPropagation();
+            document.getElementById('langSelector').classList.toggle('active'); });
+        document.addEventListener('click', () => document.getElementById('langSelector')?.classList.remove('active'));
+        updateTexts();
+
+        // ========== QUICK ACTIONS ==========
+        document.querySelectorAll('.quick-action-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const action = this.dataset.action;
+                const input = aiInput;
+
+                const actionMessages = {
+                    analyze: "Analyze the data and provide insights.",
+                    summarize: "Summarize the key points.",
+                    translate: "Translate this to English.",
+                    sentiment: "Analyze the sentiment of this text.",
+                    entities: "Extract all named entities from this text.",
+                    generate: "Generate creative content based on this."
+                };
+
+                if (input.value.trim()) {
+                    input.value = actionMessages[action] + " " + input.value;
+                } else {
+                    input.value = actionMessages[action];
+                }
                 sendToAI();
-                addNotif(`🎤 Voice input: ${transcript.substring(0,40)}`);
-                stopRecording();
-            };
-            recognition.onerror = (e) => { micStatus.innerHTML = '⚠️ Error, try again'; stopRecording(); };
-            recognition.onend = () => { stopRecording(); };
-        } else {
-            micStatus.innerHTML = '❌ Not supported';
-            if(micBtn) micBtn.disabled = true;
-            if(micActionBtn) micActionBtn.disabled = true;
-        }
-    }
-    function stopRecording() {
-        if(recognition) try { recognition.stop(); } catch(e) {}
-        micBtn.classList.remove('recording');
-        if(micActionBtn) micActionBtn.classList.remove('recording');
-        if(micStatus.innerHTML.includes('Recording')) micStatus.innerHTML = '⚪ Ready';
-        isRecordingMic = false;
-    }
-    function startRecording() {
-        if(recognition) { try { recognition.start(); } catch(e) { micStatus.innerHTML = '⚠️ Already recording'; } }
-        else { alert("Speech recognition not supported"); }
-    }
-    function toggleMic() { if(isRecordingMic) stopRecording(); else startRecording(); }
-    initSpeechRecognition();
-    if(micBtn) micBtn.addEventListener('click', toggleMic);
-    if(micActionBtn) micActionBtn.addEventListener('click', toggleMic);
-
-    // ========== UPLOAD ==========
-    let uploadedFiles = [];
-    const uploadArea = document.getElementById('uploadArea');
-    const fileInputEl = document.getElementById('fileInput');
-    const fileListDiv = document.getElementById('fileList');
-    const mediaPreviewDiv = document.getElementById('mediaPreview');
-    const uploadActionBtn = document.getElementById('uploadActionBtn');
-    
-    function triggerUpload() { fileInputEl.click(); }
-    uploadArea?.addEventListener('click', triggerUpload);
-    uploadActionBtn?.addEventListener('click', triggerUpload);
-    uploadArea?.addEventListener('dragover', e => e.preventDefault());
-    uploadArea?.addEventListener('drop', e => { e.preventDefault(); handleFiles(e.dataTransfer.files); });
-    fileInputEl?.addEventListener('change', e => handleFiles(e.target.files));
-    
-    function handleFiles(files) {
-        Array.from(files).forEach(file => {
-            const reader = new FileReader();
-            reader.onload = (ev) => {
-                uploadedFiles.push({ name: file.name, type: file.type, data: ev.target.result });
-                updateFileListUI();
-                updateStorageMetric();
-                addPreview(file.type, ev.target.result);
-                addNotif(`📎 Uploaded: ${file.name}`);
-            };
-            reader.readAsDataURL(file);
+                addNotif(`⚡ Quick action: ${action}`);
+            });
         });
-    }
-    function updateFileListUI() {
-        fileListDiv.innerHTML = uploadedFiles.map((f, idx) => `<div class="file-item"><div><i class="fas fa-${f.type.includes('image')?'image':f.type.includes('video')?'video':'file'}"></i> ${f.name.substring(0,25)}</div><i class="fas fa-trash delete-file" data-idx="${idx}"></i></div>`).join('');
-        document.querySelectorAll('.delete-file').forEach(el => { el.addEventListener('click', (e) => { let idx = parseInt(el.getAttribute('data-idx')); uploadedFiles.splice(idx, 1); updateFileListUI(); updateStorageMetric(); addNotif(`🗑️ File removed`); }); });
-    }
-    function addPreview(type, data) {
-        let html = '';
-        if(type.includes('image')) html = `<img src="${data}" alt="preview">`;
-        else if(type.includes('video')) html = `<video controls><source src="${data}"></video>`;
-        else html = `<div style="background:#2d2d5e; padding:5px; border-radius:8px;"><i class="fas fa-file-alt"></i> Document</div>`;
-        if(html) mediaPreviewDiv.innerHTML = html + mediaPreviewDiv.innerHTML;
-        if(mediaPreviewDiv.children.length > 4) mediaPreviewDiv.removeChild(mediaPreviewDiv.lastChild);
-    }
-    function updateStorageMetric() {
-        let total = uploadedFiles.reduce((s,f) => s + (f.data?.length || 0), 0);
-        let mb = (total / (1024*1024)).toFixed(2);
-        document.getElementById('storageInfoDash').innerText = `${mb} MB (${uploadedFiles.length} files)`;
-    }
 
-    // ========== TOGGLES ==========
-    const toggles = ['deepToggle','visionToggle','nlpTogglex','autoToggle','predictToggle','cacheToggle','anomalyToggle','cloudToggle','quantumBoostToggle','hudAnim','encryptToggle'];
-    toggles.forEach(id => { let el = document.getElementById(id); if(el) el.addEventListener('click', function() { this.classList.toggle('active'); addNotif(`⚙️ ${id.replace('Toggle','')} ${this.classList.contains('active')?'ON':'OFF'}`); }); });
-    document.getElementById('glowSelect')?.addEventListener('change', (e) => addNotif(`✨ Neon intensity: ${e.target.value}`));
-    document.getElementById('clearNotifBtn')?.addEventListener('click', () => { document.getElementById('notificationList').innerHTML = '✨ Notifications cleared.'; addNotif("Notifications cleared"); });
-    
-    function addNotif(msg) {
-        let notifDiv = document.getElementById('notificationList');
-        let newMsg = `<div>🔔 ${new Date().toLocaleTimeString()} - ${msg}</div>`;
-        notifDiv.innerHTML = newMsg + notifDiv.innerHTML;
-        if(notifDiv.children.length > 6) notifDiv.removeChild(notifDiv.lastChild);
-    }
-
-    // ========== MÉTRICAS ==========
-    let startTime = Date.now();
-    setInterval(() => {
-        let seconds = Math.floor((Date.now() - startTime)/1000);
-        let hrs = Math.floor(seconds/3600), mins = Math.floor((seconds%3600)/60), secs = seconds%60;
-        document.getElementById('uptime').innerText = `${hrs.toString().padStart(2,'0')}:${mins.toString().padStart(2,'0')}:${secs.toString().padStart(2,'0')}`;
-        let temp = 38 + Math.floor(Math.random() * 10);
-        let load = 20 + Math.floor(Math.random() * 45);
-        document.getElementById('aiTemp').innerText = `${temp}°C`;
-        document.getElementById('neuralLoad').innerText = `${load}%`;
-    }, 4000);
-
-    // ========== TRADUTOR ==========
-    const trans = {
-        en: { menu: { home:"Home", login:"Login", registration:"Register", contact:"Contact", about:"About", projects:"Projects", technology:"Tech", research:"Research", robotics:"Robotics", "machine-learning":"ML", automation:"Auto", innovations:"AI" }, title:"Holoxorn", contact: { info:"Contact: <a href='mailto:contact@holoxorn.com' style='color:#00ff99;'>contact@holoxorn.com</a>" } },
-        pt: { menu: { home:"Início", login:"Login", registration:"Cadastro", contact:"Contato", about:"Sobre", projects:"Projetos", technology:"Tecnologia", research:"Pesquisa", robotics:"Robótica", "machine-learning":"ML", automation:"Automação", innovations:"Inovações" }, title:"Holoxorn", contact: { info:"Contato: <a href='mailto:contact@holoxorn.com' style='color:#00ff99;'>contact@holoxorn.com</a>" } },
-        es: { menu: { home:"Inicio", login:"Iniciar", registration:"Registro", contact:"Contacto", about:"Acerca", projects:"Proyectos", technology:"Tecnología", research:"Investigación", robotics:"Robótica", "machine-learning":"ML", automation:"Automación", innovations:"Innovaciones" }, title:"Holoxorn", contact: { info:"Contacto: <a href='mailto:contact@holoxorn.com' style='color:#00ff99;'>contact@holoxorn.com</a>" } },
-        ar: { menu: { home:"الرئيسية", login:"دخول", registration:"تسجيل", contact:"اتصل", about:"عن", projects:"مشاريع", technology:"تقنية", research:"بحث", robotics:"روبوتات", "machine-learning":"تعلم آلة", automation:"أتمتة", innovations:"ابتكارات" }, title:"هولوكسورن", contact: { info:"اتصال: <a href='mailto:contact@holoxorn.com' style='color:#00ff99;'>contact@holoxorn.com</a>" } }
-    };
-    let curLang = 'en';
-    function updateTexts() {
-        let t = trans[curLang];
-        if(!t) return;
-        document.querySelectorAll('[data-i18n]').forEach(el => {
-            let key = el.getAttribute('data-i18n');
-            let val = key.split('.').reduce((o,i) => o?.[i], t);
-            if(val) { if(el.innerHTML.includes('href')) el.innerHTML = val; else el.innerText = val; }
+        // ========== KNOWLEDGE BASE ==========
+        document.querySelectorAll('.knowledge-base-item').forEach(item => {
+            item.addEventListener('click', function() {
+                const topic = this.dataset.topic;
+                const info = knowledgeBaseData[topic] || "Information about this topic is being processed.";
+                aiInput.value = `Tell me more about ${topic}`;
+                sendToAI();
+                addNotif(`📚 Knowledge: ${topic}`);
+            });
         });
-        document.getElementById('language-button').innerHTML = `🌐 ${curLang.toUpperCase()}`;
-    }
-    document.querySelectorAll('.lang-dropdown button').forEach(btn => { btn.addEventListener('click', (e) => { curLang = btn.getAttribute('data-lang'); updateTexts(); document.getElementById('langSelector').classList.remove('active'); }); });
-    document.getElementById('language-button')?.addEventListener('click', (e) => { e.stopPropagation(); document.getElementById('langSelector').classList.toggle('active'); });
-    document.addEventListener('click', () => document.getElementById('langSelector')?.classList.remove('active'));
-    updateTexts();
 
-    // ========== ANIMAÇÃO 3D CUBOS ==========
-    let scene, camera, renderer, cubes = [], mouseX = 0, mouseY = 0;
-    function init3D() {
-        scene = new THREE.Scene();
-        camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        camera.position.z = 5;
-        renderer = new THREE.WebGLRenderer({ alpha: false });
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.setClearColor(0x000000, 0);
-        document.body.appendChild(renderer.domElement);
-        const cubeMaterial = new THREE.MeshStandardMaterial({ color: 0x7f00ff, emissive: 0x3f51b5, emissiveIntensity: 0.6, roughness: 0.5, metalness: 0.8 });
-        for (let i = 0; i < 1500; i++) {
-            const geometry = new THREE.BoxGeometry(0.5, 0.5, 0.5);
-            const cube = new THREE.Mesh(geometry, cubeMaterial);
-            cube.position.x = (Math.random() - 0.5) * 80;
-            cube.position.y = (Math.random() - 0.5) * 80;
-            cube.position.z = (Math.random() - 0.5) * 80;
-            cube.rotation.x = Math.random() * Math.PI;
-            cube.rotation.y = Math.random() * Math.PI;
-            scene.add(cube);
-            cubes.push(cube);
-        }
-        const light = new THREE.PointLight(0xffffff, 1, 100);
-        light.position.set(10, 10, 10);
-        scene.add(light);
-        const ambientLight = new THREE.AmbientLight(0x404040);
-        scene.add(ambientLight);
-        const backLight = new THREE.PointLight(0x7f00ff, 0.5);
-        backLight.position.set(-5, -5, -5);
-        scene.add(backLight);
-        window.addEventListener('mousemove', onMouseMove, false);
-        animate();
-    }
-    function onMouseMove(event) {
-        mouseX = (event.clientX / window.innerWidth) * 2 - 1;
-        mouseY = -(event.clientY / window.innerHeight) * 2 + 1;
-    }
-    function animate() {
-        requestAnimationFrame(animate);
-        cubes.forEach(cube => {
-            cube.rotation.x += 0.01;
-            cube.rotation.y += 0.01;
-            cube.rotation.z += 0.005;
-        });
-        camera.position.x += (mouseX * 2 - camera.position.x) * 0.03;
-        camera.position.y += (-mouseY * 2 - camera.position.y) * 0.03;
-        camera.lookAt(scene.position);
-        renderer.render(scene, camera);
-    }
-    window.addEventListener('resize', () => {
-        if(renderer) {
+        // ========== ANIMAÇÃO 3D CUBOS (ORIGINAL) ==========
+        let scene, camera, renderer, cubes = [],
+            mouseX = 0,
+            mouseY = 0;
+
+        function init3D() {
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.z = 5;
+            renderer = new THREE.WebGLRenderer({ alpha: false });
             renderer.setSize(window.innerWidth, window.innerHeight);
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
+            renderer.setClearColor(0x000000, 0);
+            document.body.appendChild(renderer.domElement);
+            const cubeMaterial = new THREE.MeshStandardMaterial({ color: 0x7f00ff, emissive: 0x3f51b5, emissiveIntensity: 0.6,
+                roughness: 0.5, metalness: 0.8 });
+            for (let i = 0; i < 1500; i++) {
+                const geometry = new THREE.BoxGeometry(0.5, 0.5, 0.5);
+                const cube = new THREE.Mesh(geometry, cubeMaterial);
+                cube.position.x = (Math.random() - 0.5) * 80;
+                cube.position.y = (Math.random() - 0.5) * 80;
+                cube.position.z = (Math.random() - 0.5) * 80;
+                cube.rotation.x = Math.random() * Math.PI;
+                cube.rotation.y = Math.random() * Math.PI;
+                scene.add(cube);
+                cubes.push(cube);
+            }
+            const light = new THREE.PointLight(0xffffff, 1, 100);
+            light.position.set(10, 10, 10);
+            scene.add(light);
+            const ambientLight = new THREE.AmbientLight(0x404040);
+            scene.add(ambientLight);
+            const backLight = new THREE.PointLight(0x7f00ff, 0.5);
+            backLight.position.set(-5, -5, -5);
+            scene.add(backLight);
+            window.addEventListener('mousemove', onMouseMove, false);
+            animate();
         }
-    });
-    init3D();
-    updateUI();
-    updateStorageMetric();
-</script>
+
+        function onMouseMove(event) {
+            mouseX = (event.clientX / window.innerWidth) * 2 - 1;
+            mouseY = -(event.clientY / window.innerHeight) * 2 + 1;
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            cubes.forEach(cube => {
+                cube.rotation.x += 0.01;
+                cube.rotation.y += 0.01;
+                cube.rotation.z += 0.005;
+            });
+            camera.position.x += (mouseX * 2 - camera.position.x) * 0.03;
+            camera.position.y += (-mouseY * 2 - camera.position.y) * 0.03;
+            camera.lookAt(scene.position);
+            renderer.render(scene, camera);
+        }
+        window.addEventListener('resize', () => {
+            if (renderer) {
+                renderer.setSize(window.innerWidth, window.innerHeight);
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+            }
+        });
+        init3D();
+        updateUI();
+        updateStorageMetric();
+    </script>
 </body>
 </html>
